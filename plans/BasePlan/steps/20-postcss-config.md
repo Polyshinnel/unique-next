@@ -1,13 +1,13 @@
 # Шаг 4.2 — Настроить PostCSS
 
 **Этап:** 4. Интеграция Mantine UI  
-**Статус:** [ ] Не выполнен
+**Статус:** [x] Выполнен
 
 ## Описание
 
 Создать конфигурацию PostCSS для корректной работы Mantine UI. Mantine использует CSS variables и требует специальных PostCSS-плагинов.
 
-## Содержимое `frontend/postcss.config.mjs`
+## Содержимое `resources/js/postcss.config.mjs`
 
 ```javascript
 export default {
@@ -55,4 +55,10 @@ export default {
 
 ## Критерий завершения
 
-Файл `frontend/postcss.config.mjs` создан. Mantine-стили корректно обрабатываются при сборке.
+Файл `resources/js/postcss.config.mjs` создан. Mantine-стили корректно обрабатываются при сборке.
+
+## Проверка выполнения
+
+- Создан файл [resources/js/postcss.config.mjs](/home/andrey/projects/uniqset2.com/resources/js/postcss.config.mjs:1) с `postcss-preset-mantine` и `postcss-simple-vars`
+- В конфиг добавлены breakpoint-переменные Mantine: `xs`, `sm`, `md`, `lg`, `xl`
+- `npm run build` завершился успешно, что подтвердило корректную обработку PostCSS-конфигурации в Next.js

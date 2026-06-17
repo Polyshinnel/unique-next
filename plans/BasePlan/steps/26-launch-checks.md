@@ -1,7 +1,7 @@
 # Шаг 6.1 — Проверки запуска
 
 **Этап:** 6. Финальная проверка и документация  
-**Статус:** [ ] Не выполнен
+**Статус:** [x] Выполнен
 
 ## Описание
 
@@ -16,9 +16,8 @@ docker compose up -d --build
 docker compose ps
 ```
 
-**Ожидание:** все 5 контейнеров в статусе `Up`:
+**Ожидание:** все 4 контейнера в статусе `Up`:
 - `uniqset2_app`
-- `uniqset2_next`
 - `uniqset2_scheduler`
 - `uniqset2_db`
 - `uniqset2_redis`
@@ -43,18 +42,15 @@ curl http://localhost:28080/api/health
 
 Открыть в браузере: `http://localhost:28080`
 
-**Ожидание:** Next.js страница рендерится корректно (SSR через nginx proxy к контейнеру `next`).
+**Ожидание:** Next.js страница рендерится корректно (SSR через nginx proxy к процессу Next.js внутри `app`).
 
-### 5. Vite HMR
+### 5. Next.js dev server
 
 ```bash
-docker compose exec app sh
-npm run dev
+docker compose exec app supervisorctl status next
 ```
 
-Открыть: `http://localhost:25173`
-
-**Ожидание:** Vite dev server работает, HMR обновляет страницу при изменении файлов.
+**Ожидание:** процесс `next` в статусе `RUNNING`; HMR работает через `http://localhost:28080`.
 
 ### 6. Horizon (Supervisor)
 
@@ -62,9 +58,10 @@ npm run dev
 docker compose exec app supervisorctl status
 ```
 
-**Ожидание:** все три процесса `RUNNING`:
+**Ожидание:** все четыре процесса `RUNNING`:
 - `php-fpm`
 - `nginx`
+- `next`
 - `horizon`
 
 Проверить логи: `docker compose exec app cat /var/www/html/storage/logs/horizon.log`
@@ -85,8 +82,8 @@ docker compose exec app php artisan tinker --execute="Cache::put('test', 'ok', 6
 | Контейнер не стартует | `docker compose logs <service>` |
 | MySQL connection refused | `docker compose logs db`, проверить `.env` credentials |
 | Redis connection refused | `docker compose logs redis`, проверить `REDIS_HOST` |
-| Nginx 502 | PHP-FPM не запущен или Next.js не отвечает |
-| Vite не работает | Node.js версия, проверить `npm install` |
+| Nginx 502 | PHP-FPM не запущен или локальный Next.js-процесс не отвечает |
+| Next.js не работает | Проверить `resources/js/app/layout.tsx`, корневой `package.json`, Node.js версию и `storage/logs/next.log` |
 
 ## Зависимости
 
@@ -95,3 +92,19 @@ docker compose exec app php artisan tinker --execute="Cache::put('test', 'ok', 6
 ## Критерий завершения
 
 Все 7 проверок пройдены успешно.
+
+## Проверка выполнения
+
+- `docker compose up -d --build` завершился успешно, все 4 контейнера в статусе `Up`
+- `php artisan migrate --force` внутри `app` завершился без ошибок; повторный прогон сообщает `Nothing to migrate`
+- `curl http://localhost:28080/api/health` возвращает `{"status":"ok",...}` со статусами `database`, `redis`, `cache` = `ok`
+- `http://localhost:28080` отвечает `200 OK`, SSR-страница Next.js рендерится через nginx
+- `docker compose exec app supervisorctl status` показывает `php-fpm`, `nginx`, `next`, `horizon` в статусе `RUNNING`
+- Redis-кэш подтверждён через `Cache::put(...); Cache::get(...)` с ответом `ok`
+
+## Исправления по итогам проверки
+
+- В [docker-compose.yml](/home/andrey/projects/uniqset2.com/docker-compose.yml:1) добавлены корректные Docker-host значения для `DB_HOST`/`REDIS_HOST` и network aliases `mysql`/`redis`, чтобы Laravel внутри контейнера видел MySQL и Redis без ручной правки `.env`
+- В [docker/supervisor/supervisord.conf](/home/andrey/projects/uniqset2.com/docker/supervisor/supervisord.conf:1) добавлены `unix_http_server`, `rpcinterface` и `supervisorctl`, а также выровнено имя сокета `supervisord.sock`
+- В [composer.json](/home/andrey/projects/uniqset2.com/composer.json:1) добавлен пакет `laravel/horizon`, потому что launch-конфигурация уже ожидала реальный процесс Horizon
+- В [resources/js/app/page.tsx](/home/andrey/projects/uniqset2.com/resources/js/app/page.tsx:1) исправлен SSR-рендер списка сервисов, чтобы главная страница стабильно отвечала `200 OK`

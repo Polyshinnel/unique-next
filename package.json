@@ -3,14 +3,32 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "build": "vite build",
-        "dev": "vite"
+        "build": "next build resources/js",
+        "dev": "next dev resources/js",
+        "lint": "eslint resources/js",
+        "start": "next start resources/js"
     },
     "devDependencies": {
-        "@tailwindcss/vite": "^4.0.0",
+        "@types/node": "^25.9.3",
+        "@types/react": "^19.2.17",
+        "@types/react-dom": "^19.2.3",
         "concurrently": "^9.0.1",
-        "laravel-vite-plugin": "^3.1",
-        "tailwindcss": "^4.0.0",
-        "vite": "^8.0.0"
+        "eslint": "^9.39.4",
+        "eslint-config-next": "^16.2.9",
+        "next": "^16.2.9",
+        "react": "^19.2.7",
+        "react-dom": "^19.2.7",
+        "typescript": "^6.0.3"
+    },
+    "dependencies": {
+        "@mantine/core": "^9.3.2",
+        "@mantine/form": "^9.3.2",
+        "@mantine/hooks": "^9.3.2",
+        "@mantine/modals": "^9.3.2",
+        "@mantine/notifications": "^9.3.2",
+        "@tabler/icons-react": "^3.44.0",
+        "postcss": "^8.5.15",
+        "postcss-preset-mantine": "^1.18.0",
+        "postcss-simple-vars": "^7.0.1"
     }
 }

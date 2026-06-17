@@ -11,28 +11,26 @@
 
 ```gitignore
 # Next.js
-frontend/.next/
-frontend/node_modules/
-frontend/.env.local
+resources/js/.next/
+resources/js/.env.local
 ```
 
 ## Пояснение
 
 | Паттерн | Зачем |
 |---|---|
-| `frontend/.next/` | Build-кеш и output Next.js (пересоздаётся при сборке) |
-| `frontend/node_modules/` | npm-зависимости (устанавливаются через `npm install`) |
-| `frontend/.env.local` | Локальные переменные окружения (могут содержать секреты) |
+| `resources/js/.next/` | Build-кеш и output Next.js (пересоздаётся при сборке) |
+| `resources/js/.env.local` | Локальные переменные окружения (могут содержать секреты) |
 
 ## Важно
 
 - Корневые `node_modules/` и `vendor/` уже в `.gitignore` (стандарт Laravel)
-- Не добавлять `frontend/package-lock.json` — он **должен** быть в git (воспроизводимость сборки)
+- Не добавлять отдельный `resources/js/package.json` — npm-зависимости живут в корневом `package.json`
 
 ## Зависимости
 
-- Шаг 3.1 (директория `frontend/` существует)
+- Шаг 3.1 (Next.js структура в `resources/js` существует)
 
 ## Критерий завершения
 
-`.gitignore` содержит записи для Next.js. `git status` не показывает `frontend/.next/` и `frontend/node_modules/`.
+`.gitignore` содержит записи для Next.js. `git status` не показывает `resources/js/.next/`.

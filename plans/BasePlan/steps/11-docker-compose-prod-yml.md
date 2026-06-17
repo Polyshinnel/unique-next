@@ -1,7 +1,7 @@
 # Шаг 1.11 — `docker-compose.prod.yml`
 
 **Этап:** 1. Docker-инфраструктура  
-**Статус:** [ ] Не выполнен
+**Статус:** [x] Выполнен
 
 ## Описание
 
@@ -9,7 +9,7 @@ Production-версия Docker Compose. Отличия от dev-версии:
 
 - **Нет bind-mount** всего проекта — код запекается в образ
 - **Именованный volume** `storage_public_data` для `storage/app/public`
-- **Нет контейнера `next`** в dev-режиме — Next.js собирается и встраивается (или отдельно)
+- **Нет контейнера `next`** — Next.js является частью монолитного контейнера `app`
 - **Нет проброса портов** для MySQL и Redis наружу (безопасность)
 - **`RUN_STORAGE_LINK=true`** в env — создаёт symlink при старте
 
@@ -31,6 +31,8 @@ services:
       - "${APP_HTTP_PORT:-28080}:80"
     environment:
       RUN_STORAGE_LINK: "true"
+      BACKEND_URL: http://127.0.0.1
+      NEXT_PUBLIC_API_URL: /api
       REDIS_HOST: uniqset2-redis
       REDIS_PORT: "6379"
       REDIS_PASSWORD: ""

@@ -1,7 +1,7 @@
 # Шаг 5.3 — Паттерн SSR ↔ API
 
 **Этап:** 5. Связка Laravel API ↔ Next.js  
-**Статус:** [ ] Не выполнен
+**Статус:** [x] Выполнен
 
 ## Описание
 
@@ -9,18 +9,17 @@
 
 ## Два режима запросов
 
-### 1. Серверные компоненты (RSC) — запросы через внутреннюю Docker-сеть
+### 1. Серверные компоненты (RSC) — запросы внутри контейнера `app`
 
 ```
-[Next.js SSR] --HTTP--> [app container nginx :80] --fastcgi--> [PHP-FPM]
-     │                           ▲
-     │     Docker internal       │
-     └───── http://app:80/api/ ──┘
+[Next.js SSR] --HTTP--> [nginx 127.0.0.1:80] --fastcgi--> [PHP-FPM]
+     │                            ▲
+     └──── http://127.0.0.1/api ──┘
 ```
 
-- URL: `http://uniqset2_app:80/api/...` (env `BACKEND_URL`)
+- URL: `http://127.0.0.1/api/...` (env `BACKEND_URL`)
 - Без cookies — серверный контекст, нет браузера
-- Быстро — нет выхода за пределы Docker-сети
+- Быстро — нет выхода за пределы контейнера
 - Используется `api.server.get()` из `@/lib/api`
 
 ### 2. Клиентские компоненты — запросы через браузер
@@ -29,7 +28,7 @@
 [Browser] --HTTP--> [nginx :28080] --proxy/fastcgi--> [PHP-FPM / Next.js]
 ```
 
-- URL: `http://localhost:28080/api/...` (env `NEXT_PUBLIC_API_URL`)
+- URL: `/api/...` (same-origin через nginx)
 - С cookies — Sanctum CSRF + session
 - Для мутирующих запросов (POST, PUT, DELETE) — сначала `getCsrfToken()`
 - Используется `api.get()`, `api.post()` из `@/lib/api`
@@ -94,3 +93,9 @@ export function ItemsList({ initialItems }: { initialItems: Item[] }) {
 ## Критерий завершения
 
 Паттерн задокументирован. Тестовая страница работает с SSR-запросом к `/api/health` и отображает результат.
+
+## Проверка выполнения
+
+- Главная страница [resources/js/app/page.tsx](/home/andrey/projects/uniqset2.com/resources/js/app/page.tsx:1) переведена на SSR-запрос через `api.server.get<HealthResponse>('/health')`
+- Ответ `/api/health` типизирован и отображается в UI, включая общий статус, timestamp и статусы сервисов
+- Для неуспешного ответа добавлен fallback с сообщением об ошибке, чтобы поведение SSR оставалось прозрачным при проблемах бэкенда

@@ -6,7 +6,7 @@
 |-----------------|------------------------------------|
 | PHP             | ^8.4 (в Docker), ^8.3 (composer)   |
 | Laravel         | ^13.8                              |
-| Node.js (Vite)  | Vite 8, TailwindCSS 4             |
+| Node.js         | Node.js 22, Next.js 15, Mantine UI |
 | БД              | SQLite (переводим на MySQL)        |
 | Очередь         | database (переводим на Redis)      |
 | Кэш             | database (переводим на Redis)      |
@@ -34,8 +34,6 @@
 | 28080 | nginx (HTTP)     |
 | 23306 | mysql            |
 | 26379 | redis            |
-| 25173 | Vite dev (app)   |
-| 23000 | Next.js dev/prod |
 
 > Все порты конфигурируются через `.env` и могут быть переопределены.
 
@@ -45,30 +43,27 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                docker-compose  (uniqset2_local)                  │
+│ docker-compose (uniqset2_local)                                  │
 │                                                                  │
-│  ┌─────────────────────────────────────┐  ┌───────────────────┐ │
-│  │  app  (монолит)                     │  │  next             │ │
-│  │  ┌──────────┐ ┌────────┐ ┌────────┐ │  │  Node.js 22       │ │
-│  │  │ nginx    │ │PHP-FPM │ │horizon │ │  │  Next.js SSR      │ │
-│  │  │ :80→:28080│ │ :9000  │ │(queue) │ │  │  :3000 → :23000  │ │
-│  │  └──────────┘ └────────┘ └────────┘ │  └───────────────────┘ │
-│  │       supervisor управляет всеми     │          │             │
-│  │       + Node.js 22 (npm run dev)     │          │             │
-│  │       Vite :25173                    │          │             │
-│  └──────────────────┬──────────────────┘          │             │
-│                     │                              │             │
-│              ┌──────┴──────┐     ┌────────────────┘             │
-│              │             │     │                               │
-│         ┌────┴─────┐  ┌───┴─────┐                               │
-│         │  mysql   │  │  redis  │                               │
-│         │  :23306  │  │  :26379 │                               │
-│         └──────────┘  └─────────┘                               │
+│ ┌───────────────────────────────────────────────────────────────┐│
+│ │ app (модульный монолит)                                      ││
+│ │ nginx :80 -> host :28080                                     ││
+│ │ php-fpm :9000                                                ││
+│ │ next :3000 (только внутри контейнера)                         ││
+│ │ horizon                                                      ││
+│ │ supervisor управляет всеми процессами                         ││
+│ └───────────────────────────┬───────────────────────────────────┘│
+│                             │                                    │
+│              ┌──────────────┴──────────────┐                     │
+│              │                             │                     │
+│        ┌─────┴─────┐                 ┌─────┴─────┐               │
+│        │ mysql     │                 │ redis     │               │
+│        │ :23306    │                 │ :26379    │               │
+│        └───────────┘                 └───────────┘               │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-- **app** — монолитный контейнер (как в supply): PHP 8.4 FPM + Nginx + Node.js 22 + Supervisor. Supervisor запускает `php-fpm`, `nginx`, `horizon`. Порт **28080** → HTTP (nginx), порт **25173** → Vite HMR. Можно `docker compose exec app bash` и запускать `npm run dev`, `composer install` и т.д.
-- **next** — отдельный контейнер Next.js 15 SSR с Mantine UI (порт **23000**). Nginx из `app` проксирует фронтенд-запросы сюда.
+- **app** — монолитный контейнер (как в supply): PHP 8.4 FPM + Nginx + Node.js 22 + Supervisor. Supervisor запускает `php-fpm`, `nginx`, `next`, `horizon`. Порт **28080** → HTTP (nginx). Next.js слушает `127.0.0.1:3000` только внутри контейнера.
 - **scheduler** — тот же образ, команда `php artisan schedule:work` (по аналогии с supply prod)
 - **mysql** — MySQL 8.4 (порт **23306**)
 - **redis** — Redis 7.x (порт **26379**) — кэш, очереди, сессии
@@ -87,12 +82,12 @@ Dockerfile                        # Монолитный: PHP 8.4 FPM + Nginx + 
 docker/
 ├── entrypoint.sh                 # Права, storage dirs, опциональные runtime-задачи
 ├── nginx/
-│   └── default.conf              # Nginx конфиг (fastcgi → 127.0.0.1:9000, proxy → next:3000)
+│   └── default.conf              # Nginx конфиг (fastcgi → 127.0.0.1:9000, proxy → 127.0.0.1:3000)
 ├── php/
 │   ├── php.ini                   # memory_limit, upload, opcache
 │   └── www.conf                  # PHP-FPM pool config
 ├── supervisor/
-│   └── supervisord.conf          # php-fpm + nginx + horizon
+│   └── supervisord.conf          # php-fpm + nginx + next + horizon
 └── mysql/
     └── my.cnf                    # utf8mb4, strict mode
 ```
@@ -102,13 +97,14 @@ docker/
 Базовый образ: `php:8.4-fpm-alpine` (как supply, но обновлённая версия)
 
 ```dockerfile
-# Этап 1: Сборка фронтенда (Vite assets для Laravel)
+# Этап 1: Сборка фронтенд-ассетов
 FROM node:22-alpine AS frontend-builder
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci
+RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 COPY . .
-RUN npm run build
+RUN npm run build \
+    && mkdir -p /app/resources/js/.next
 
 # Этап 2: PHP приложение
 FROM php:8.4-fpm-alpine AS php-base
@@ -143,8 +139,9 @@ COPY . .
 RUN composer dump-autoload --optimize \
     && php artisan package:discover --ansi
 
-# Копируем собранные ассеты
-COPY --from=frontend-builder /app/public/build ./public/build
+# Копируем Next.js runtime-зависимости и build output
+COPY --from=frontend-builder /app/node_modules ./node_modules
+COPY --from=frontend-builder /app/resources/js/.next ./resources/js/.next
 
 # Права
 RUN chown -R www-data:www-data /var/www/html \
@@ -181,7 +178,7 @@ sync_www_data_ids() {
 
 ensure_laravel_permissions() {
     mkdir -p /var/www/html/storage/logs /var/www/html/bootstrap/cache
-    touch /var/www/html/storage/logs/laravel.log /var/www/html/storage/logs/horizon.log
+    touch /var/www/html/storage/logs/laravel.log /var/www/html/storage/logs/horizon.log /var/www/html/storage/logs/next.log
     if [ "$(id -u)" = "0" ]; then
         chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
     fi
@@ -222,6 +219,16 @@ autostart=true
 autorestart=true
 stderr_logfile=/var/log/nginx.err.log
 stdout_logfile=/var/log/nginx.out.log
+
+[program:next]
+command=/bin/sh -c 'while [ ! -f /var/www/html/resources/js/app/layout.tsx ]; do echo "Waiting for Next.js app in resources/js..."; sleep 10; done; npm install && npm run dev -- --hostname 0.0.0.0 --port 3000'
+autostart=true
+autorestart=true
+stopasgroup=true
+killasgroup=true
+user=www-data
+redirect_stderr=true
+stdout_logfile=/var/www/html/storage/logs/next.log
 
 [program:horizon]
 process_name=%(program_name)s
@@ -266,9 +273,20 @@ server {
         fastcgi_hide_header X-Powered-By;
     }
 
-    # Next.js SSR — всё остальное проксируем в контейнер next
+    location ^~ /_next/ {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # Next.js SSR — всё остальное проксируем в локальный процесс внутри app
     location / {
-        proxy_pass http://next:3000;
+        proxy_pass http://127.0.0.1:3000;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
@@ -282,11 +300,6 @@ server {
         deny all;
     }
 
-    # Кеширование статики
-    location ~* \.(jpg|jpeg|png|gif|ico|css|js|svg|woff|woff2|ttf|eot)$ {
-        expires 1y;
-        add_header Cache-Control "public, immutable";
-    }
 }
 ```
 
@@ -355,10 +368,11 @@ services:
       - ./docker/nginx/default.conf:/etc/nginx/http.d/default.conf
     ports:
       - "${APP_HTTP_PORT:-28080}:80"
-      - "${VITE_PORT:-25173}:${VITE_PORT:-25173}"
     environment:
       - APP_ENV=local
       - APP_DEBUG=true
+      - BACKEND_URL=http://127.0.0.1
+      - NEXT_PUBLIC_API_URL=/api
       - REDIS_HOST=uniqset2-redis
       - WWWUSER=${UID:-1000}
       - WWWGROUP=${GID:-1000}
@@ -367,22 +381,6 @@ services:
     depends_on:
       - db
       - redis
-      - next
-
-  next:
-    image: node:22-alpine
-    container_name: uniqset2_next
-    restart: unless-stopped
-    working_dir: /app
-    command: sh -c "npm install && npm run dev"
-    volumes:
-      - ./frontend:/app
-      - next_node_modules:/app/node_modules
-    environment:
-      - BACKEND_URL=http://uniqset2_app:80
-      - NEXT_PUBLIC_API_URL=http://localhost:${APP_HTTP_PORT:-28080}/api
-    networks:
-      - uniqset2_network
 
   scheduler:
     build:
@@ -438,7 +436,6 @@ services:
 volumes:
   db_data:
   redis_data:
-  next_node_modules:
 
 networks:
   uniqset2_network:
@@ -467,8 +464,8 @@ docker-compose.prod.yml
 README.md
 tests
 phpunit.xml
-frontend/node_modules
-frontend/.next
+resources/js/.next
+resources/js/.env.local
 ```
 
 #### 1.11 `docker-compose.prod.yml`
@@ -561,14 +558,13 @@ networks:
 ```env
 # Docker ports (host)
 APP_HTTP_PORT=28080
-VITE_PORT=25173
 MYSQL_HOST_PORT=23306
 REDIS_HOST_PORT=26379
 ```
 
-### Работа с `npm run dev` из контейнера
+### Работа с Next.js из контейнера
 
-Контейнер `app` содержит Node.js 22 + npm (установлены через apk). Можно запускать любые npm-команды:
+Контейнер `app` содержит Node.js 22 + npm (установлены через apk). Next.js-приложение лежит в `resources/js`, а npm-команды запускаются из корня проекта:
 
 ```bash
 # Подключиться к контейнеру
@@ -576,13 +572,11 @@ docker compose exec app sh
 
 # Внутри контейнера:
 npm install
-npm run dev -- --host=0.0.0.0 --port=25173   # Vite dev server с HMR
-npm run build                                  # Production build
+npm run dev -- --hostname 0.0.0.0 --port 3000
+npm run build
 ```
 
-Порт **25173** пробрасывается на хост → `http://localhost:25173`.
-
-Next.js dev сервер запускается автоматически в контейнере **next** (`npm run dev`) → `http://localhost:23000` (через nginx на `http://localhost:28080`).
+Наружу публикуется только nginx: `http://localhost:28080`. Nginx проксирует frontend-запросы в локальный Next.js-процесс `127.0.0.1:3000`.
 
 ---
 
@@ -612,40 +606,45 @@ composer require predis/predis
 
 #### 2.4 Добавить health-check эндпоинт
 
-Создать `GET /api/health` — возвращает JSON со статусом подключений (DB, Redis, Queue).
+Создать `GET /api/health` — возвращает JSON со статусом подключений (`database`, `redis`, `cache`) и `503`, если хотя бы один сервис недоступен.
 
 ---
 
 ### Этап 3. Инициализация Next.js приложения
 
-#### 3.1 Создать директорию `frontend/`
+#### 3.1 Инициализировать Next.js в `resources/js`
 
 ```bash
-npx create-next-app@latest frontend \
-  --typescript \
-  --eslint \
-  --app \
-  --src-dir \
-  --import-alias "@/*"
+npm install next react react-dom
+npm install -D typescript @types/react @types/react-dom @types/node eslint eslint-config-next
+```
+
+Корневой `package.json`:
+
+```json
+{
+  "scripts": {
+    "dev": "next dev resources/js",
+    "build": "next build resources/js",
+    "start": "next start resources/js"
+  }
+}
 ```
 
 Структура:
 ```
-frontend/
-├── src/
-│   ├── app/
-│   │   ├── layout.tsx
-│   │   ├── page.tsx
-│   │   └── providers.tsx      # MantineProvider, тема
-│   ├── components/
-│   ├── lib/
-│   │   └── api.ts             # HTTP-клиент для Laravel API
-│   └── styles/
+resources/js/
+├── app/
+│   ├── layout.tsx
+│   ├── page.tsx
+│   └── providers.tsx      # MantineProvider, тема
+├── components/
+├── lib/
+│   └── api.ts             # HTTP-клиент для Laravel API
+├── styles/
 ├── public/
 ├── next.config.ts
-├── package.json
-├── tsconfig.json
-└── .env.local
+└── tsconfig.json
 ```
 
 #### 3.2 Настроить `next.config.ts`
@@ -658,7 +657,7 @@ const nextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: `${process.env.BACKEND_URL || 'http://app:9000'}/api/:path*`,
+        destination: `${process.env.BACKEND_URL || 'http://127.0.0.1'}/api/:path*`,
       },
     ];
   },
@@ -668,7 +667,7 @@ export default nextConfig;
 ```
 
 - `output: 'standalone'` — обязательно для Docker (минимальный self-contained build)
-- `rewrites` — проксирование `/api/*` запросов к Laravel (для SSR, серверные компоненты)
+- `rewrites` — проксирование `/api/*` запросов к Laravel внутри того же контейнера (для SSR, серверные компоненты)
 
 ---
 
@@ -677,14 +676,13 @@ export default nextConfig;
 #### 4.1 Установить пакеты Mantine
 
 ```bash
-cd frontend
 npm install @mantine/core @mantine/hooks @mantine/form @mantine/notifications @mantine/modals
 npm install postcss postcss-preset-mantine postcss-simple-vars
 ```
 
 #### 4.2 Настроить PostCSS
 
-`frontend/postcss.config.mjs`:
+`resources/js/postcss.config.mjs`:
 ```javascript
 export default {
   plugins: {
@@ -763,18 +761,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 - Создать `routes/api.php` (если отсутствует, установить `php artisan install:api`)
 - Настроить Laravel Sanctum для SPA-аутентификации
-- Добавить CORS-конфигурацию для `http://localhost:3000` (dev) и production-домен
+- Добавить CORS-конфигурацию для `http://localhost:28080` и production-домен
 
 #### 5.2 Next.js: создать HTTP-клиент
 
-`frontend/src/lib/api.ts` — обёртка над `fetch` / `axios`:
-- Базовый URL из env-переменной `NEXT_PUBLIC_API_URL`
+`resources/js/lib/api.ts` — обёртка над `fetch` / `axios`:
+- Базовый URL по умолчанию `/api` (same-origin через nginx)
 - Автоматическое добавление CSRF-токена (Sanctum)
 - Обработка ошибок и типизация ответов
 
 #### 5.3 Паттерн SSR ↔ API
 
-- **Серверные компоненты** (RSC): запросы к Laravel напрямую через внутреннюю сеть Docker (`http://app:9000/api/...`)
+- **Серверные компоненты** (RSC): запросы к Laravel через локальный nginx внутри контейнера (`http://127.0.0.1/api/...`)
 - **Клиентские компоненты**: запросы через браузер к `/api/...` (прокси через nginx)
 
 ---
@@ -787,7 +785,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 2. `docker compose exec app php artisan migrate` — миграции проходят на MySQL
 3. `http://localhost:28080/api/health` — JSON-ответ от Laravel
 4. `http://localhost:28080` — Next.js SSR-страница через nginx-прокси
-5. `docker compose exec app sh` → `npm run dev` — Vite HMR на `http://localhost:25173`
+5. `docker compose exec app supervisorctl status next` — Next.js процесс запущен внутри `app`, HMR работает через `http://localhost:28080`
 6. Horizon работает (supervisor), логи в `storage/logs/horizon.log`
 7. Кэш/сессии через Redis: `php artisan cache:clear`
 
@@ -803,9 +801,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 Добавить:
 ```
 # Next.js
-frontend/.next/
-frontend/node_modules/
-frontend/.env.local
+resources/js/.next/
+resources/js/.env.local
 ```
 
 ---
@@ -813,8 +810,8 @@ frontend/.env.local
 ## Порядок выполнения (чеклист)
 
 - [ ] **1.1–1.12** — Docker-инфраструктура (Dockerfile, docker-compose.yml/prod.yml, конфиги supervisor/nginx/php/mysql, entrypoint, .dockerignore)
-- [ ] **2.1–2.4** — Настройка Laravel (MySQL, Redis, health-check)
-- [ ] **3.1–3.2** — Инициализация Next.js в `frontend/`
+- [x] **2.1–2.4** — Настройка Laravel (MySQL, Redis, health-check)
+- [ ] **3.1–3.2** — Инициализация Next.js в `resources/js`
 - [ ] **4.1–4.4** — Подключение Mantine UI
 - [ ] **5.1–5.3** — Связка Laravel API ↔ Next.js (маршруты, HTTP-клиент, CORS)
 - [ ] **6.1–6.3** — Проверка, README, .gitignore

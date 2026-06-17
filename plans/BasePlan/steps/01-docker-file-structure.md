@@ -15,12 +15,12 @@ Dockerfile                        # Монолитный: PHP 8.4 FPM + Nginx + 
 docker/
 ├── entrypoint.sh                 # Права, storage dirs, опциональные runtime-задачи
 ├── nginx/
-│   └── default.conf              # Nginx конфиг (fastcgi → 127.0.0.1:9000, proxy → next:3000)
+│   └── default.conf              # Nginx конфиг (fastcgi → 127.0.0.1:9000, proxy → 127.0.0.1:3000)
 ├── php/
 │   ├── php.ini                   # memory_limit, upload, opcache
 │   └── www.conf                  # PHP-FPM pool config
 ├── supervisor/
-│   └── supervisord.conf          # php-fpm + nginx + horizon
+│   └── supervisord.conf          # php-fpm + nginx + next + horizon
 └── mysql/
     └── my.cnf                    # utf8mb4, strict mode
 ```

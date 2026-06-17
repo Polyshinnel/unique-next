@@ -1,14 +1,14 @@
 # Шаг 1.5 — `docker/nginx/default.conf`
 
 **Этап:** 1. Docker-инфраструктура  
-**Статус:** [ ] Не выполнен
+**Статус:** [x] Выполнен
 
 ## Описание
 
 Nginx конфигурация внутри контейнера `app`. Nginx выполняет две роли:
 
 1. **FastCGI proxy** для PHP-FPM (Laravel API, Horizon UI, и т.д.)
-2. **Reverse proxy** для контейнера `next` (Next.js SSR фронтенд)
+2. **Reverse proxy** для локального Next.js SSR-процесса внутри того же контейнера `app`
 
 ## Содержимое файла
 
@@ -39,9 +39,20 @@ server {
         fastcgi_hide_header X-Powered-By;
     }
 
-    # Next.js SSR — всё остальное проксируем в контейнер next
+    location ^~ /_next/ {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # Next.js SSR — всё остальное проксируем в локальный процесс внутри app
     location / {
-        proxy_pass http://next:3000;
+        proxy_pass http://127.0.0.1:3000;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
@@ -55,11 +66,6 @@ server {
         deny all;
     }
 
-    # Кеширование статики
-    location ~* \.(jpg|jpeg|png|gif|ico|css|js|svg|woff|woff2|ttf|eot)$ {
-        expires 1y;
-        add_header Cache-Control "public, immutable";
-    }
 }
 ```
 
@@ -73,12 +79,15 @@ server {
 | `/telescope/*` | PHP-FPM (Laravel) | Telescope debug |
 | `/_ignition/*` | PHP-FPM (Laravel) | Ignition error page |
 | `/*.php` | PHP-FPM (Laravel) | Любые PHP-файлы |
-| `/*` (остальное) | Next.js `:3000` | SSR фронтенд |
+| `/_next/*` | Next.js `127.0.0.1:3000` | Next.js assets, HMR |
+| `/*` (остальное) | Next.js `127.0.0.1:3000` | SSR фронтенд |
 
 ## Ключевые моменты
 
 - **`client_max_body_size 64M`** — согласовано с `upload_max_filesize` в php.ini
 - **WebSocket-заголовки** в proxy_pass к Next.js — нужны для HMR в dev-режиме
+- **`location ^~ /_next/`** — явно проксирует Next.js assets и HMR
+- **Нет отдельного regex-блока статики** — иначе Nginx может перехватить Next public assets (`/logo.png`, `/icon.svg`) и искать их в Laravel `public`
 - **`fastcgi_hide_header X-Powered-By`** — скрываем версию PHP из заголовков ответа
 - **Скрытие dotfiles** — `location ~ /\.(?!well-known).*` запрещает доступ к `.env`, `.git` и т.д.
 
@@ -88,4 +97,4 @@ server {
 
 ## Критерий завершения
 
-Файл `docker/nginx/default.conf` создан, маршрутизация Laravel/Next.js работает корректно.
+Файл `docker/nginx/default.conf` создан, маршрутизация Laravel/Next.js внутри одного контейнера работает корректно.

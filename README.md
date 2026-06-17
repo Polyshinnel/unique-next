@@ -1,58 +1,142 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# uniqset2.com
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Laravel 13 + Next.js 16 приложение в Docker-окружении с монолитным контейнером `app`, внутри которого вместе работают PHP-FPM, nginx, Next.js dev server и Horizon под управлением Supervisor.
 
-## About Laravel
+## Архитектура
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
-
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
-
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
-
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
-
-```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+```text
+┌─────────────────────────────────────────────────────────────────┐
+│ docker compose (uniqset2_local)                                │
+│                                                                 │
+│ ┌─────────────────────────────────────────────────────────────┐ │
+│ │ app                                                        │ │
+│ │ nginx :80 -> host :28080                                   │ │
+│ │ php-fpm :9000                                              │ │
+│ │ next :3000 (только внутри контейнера)                      │ │
+│ │ horizon                                                    │ │
+│ │ supervisor управляет всеми процессами                      │ │
+│ └──────────────────────────┬──────────────────────────────────┘ │
+│                            │                                    │
+│             ┌──────────────┴──────────────┐                     │
+│             │                             │                     │
+│       ┌─────┴─────┐                 ┌─────┴─────┐               │
+│       │ db        │                 │ redis     │               │
+│       │ :23306    │                 │ :26379    │               │
+│       └───────────┘                 └───────────┘               │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### Контейнеры
 
-## Contributing
+- `app` — основной контейнер: PHP 8.4 FPM, nginx, Node.js 22, Next.js, Horizon и Supervisor; наружу публикуется HTTP-порт `28080`
+- `scheduler` — отдельный контейнер на том же образе с командой `php artisan schedule:work`
+- `db` — MySQL 8.4 с хранением данных в volume `db_data`
+- `redis` — Redis 7 с AOF persistence в volume `redis_data`
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Технологический стек
 
-## Code of Conduct
+- Laravel 13
+- Next.js 16
+- React 19
+- Mantine UI 9
+- MySQL 8.4
+- Redis 7
+- Docker Compose
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### SSR и API
 
-## Security Vulnerabilities
+- SSR-запросы из Next.js идут внутри контейнера `app` на `http://127.0.0.1/api` через `BACKEND_URL`
+- Браузерные запросы идут на `/api/...` через same-origin nginx
+- Health-check доступен по `GET /api/health`
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Быстрый старт
 
-## License
+```bash
+git clone <repo-url>
+cd uniqset2.com
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+cp .env.example .env
+
+docker compose up -d --build
+
+docker compose exec app php artisan migrate --force
+
+# Открыть в браузере
+# http://localhost:28080
+```
+
+После старта можно проверить API:
+
+```bash
+curl http://localhost:28080/api/health
+```
+
+## Полезные команды
+
+```bash
+# Контейнеры и логи
+docker compose ps
+docker compose logs -f app
+docker compose logs -f scheduler
+
+# Подключиться к app
+docker compose exec app sh
+
+# Artisan
+docker compose exec app php artisan migrate
+docker compose exec app php artisan tinker
+docker compose exec app php artisan cache:clear
+docker compose exec app php artisan queue:restart
+
+# Supervisor
+docker compose exec app supervisorctl status
+docker compose exec app supervisorctl status next
+
+# Frontend
+docker compose exec app npm run dev -- --hostname 0.0.0.0 --port 3000
+docker compose exec app npm run build
+
+# Проверки
+curl http://localhost:28080/api/health
+docker compose exec app php artisan tinker --execute="Cache::put('test', 'ok', 60); echo Cache::get('test');"
+```
+
+## Переменные окружения и порты
+
+Основные значения для локального запуска уже описаны в `.env.example`.
+
+| Переменная | Значение по умолчанию | Назначение |
+|---|---:|---|
+| `APP_HTTP_PORT` | `28080` | HTTP nginx на хосте |
+| `MYSQL_HOST_PORT` | `23306` | MySQL на хосте |
+| `REDIS_HOST_PORT` | `26379` | Redis на хосте |
+| `DB_HOST` | `mysql` | имя MySQL-сервиса внутри Docker-сети |
+| `REDIS_HOST` | `redis` | имя Redis-сервиса внутри Docker-сети |
+| `FRONTEND_URL` | `http://localhost:28080` | frontend origin для Sanctum/CORS |
+
+| Порт | Сервис |
+|---|---|
+| `28080` | nginx (HTTP) |
+| `23306` | MySQL |
+| `26379` | Redis |
+
+## Production деплой
+
+Production-конфигурация описана в [`docker-compose.prod.yml`](./docker-compose.prod.yml). Базовый запуск:
+
+```bash
+docker compose -f docker-compose.prod.yml up -d --build
+```
+
+Особенности production-сборки:
+
+- `app` и `scheduler` используют тот же `Dockerfile`
+- статические и runtime-файлы для `storage/app/public` вынесены в volume `storage_public_data`
+- наружу публикуется только HTTP-порт приложения
+
+## Что проверить после запуска
+
+- `docker compose ps` показывает `app`, `scheduler`, `db`, `redis` в статусе `Up`
+- `docker compose exec app supervisorctl status` показывает `php-fpm`, `nginx`, `next`, `horizon` в статусе `RUNNING`
+- `http://localhost:28080` открывает SSR-страницу Next.js
+- `http://localhost:28080/api/health` возвращает статус `ok` или диагностический `degraded`

@@ -1,7 +1,7 @@
 # Шаг 4.1 — Установить пакеты Mantine
 
 **Этап:** 4. Интеграция Mantine UI  
-**Статус:** [ ] Не выполнен
+**Статус:** [x] Выполнен
 
 ## Описание
 
@@ -10,8 +10,6 @@
 ## Команды
 
 ```bash
-cd frontend
-
 # Основные пакеты Mantine
 npm install @mantine/core @mantine/hooks @mantine/form @mantine/notifications @mantine/modals
 
@@ -34,8 +32,14 @@ npm install postcss postcss-preset-mantine postcss-simple-vars
 
 ## Зависимости
 
-- Шаг 3.1 (Next.js приложение создано, `package.json` существует)
+- Шаг 3.1 (Next.js приложение создано в `resources/js`, корневой `package.json` существует)
 
 ## Критерий завершения
 
 Все пакеты установлены, `package.json` содержит зависимости Mantine. `npm install` проходит без ошибок.
+
+## Проверка выполнения
+
+- В корневые [package.json](/home/andrey/projects/uniqset2.com/package.json:1) и [package-lock.json](/home/andrey/projects/uniqset2.com/package-lock.json:1) добавлены зависимости `@mantine/core`, `@mantine/hooks`, `@mantine/form`, `@mantine/notifications`, `@mantine/modals`, `postcss`, `postcss-preset-mantine`, `postcss-simple-vars`
+- `npm install` завершился успешно
+- `npm ls @mantine/core @mantine/hooks @mantine/form @mantine/notifications @mantine/modals postcss postcss-preset-mantine postcss-simple-vars --depth=0` подтвердил установленные версии пакетов

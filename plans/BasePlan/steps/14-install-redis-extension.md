@@ -1,7 +1,7 @@
 # Шаг 2.2 — Установить PHP-расширение Redis для Laravel
 
 **Этап:** 2. Настройка Laravel под MySQL + Redis  
-**Статус:** [ ] Не выполнен
+**Статус:** [x] Выполнен
 
 ## Описание
 
@@ -43,6 +43,12 @@ REDIS_CLIENT=predis
 ## Рекомендация
 
 Использовать **phpredis** — быстрее, уже установлен в Docker-образе. `REDIS_CLIENT=phpredis` уже есть в стандартном `.env.example` Laravel.
+
+## Проверка выполнения
+
+- В [Dockerfile](/home/andrey/projects/uniqset2.com/Dockerfile:23) есть установка расширения Redis через `pecl install redis`
+- В [.env.example](/home/andrey/projects/uniqset2.com/.env.example:45) указан `REDIS_CLIENT=phpredis`
+- Дополнительный Composer-пакет `predis/predis` не требуется
 
 ## Зависимости
 

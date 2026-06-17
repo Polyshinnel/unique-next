@@ -6,7 +6,8 @@ COPY package*.json ./
 RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 
 COPY . .
-RUN npm run build
+RUN npm run build \
+    && mkdir -p /app/resources/js/.next
 
 FROM php:8.4-fpm-alpine AS php-base
 
@@ -39,7 +40,8 @@ COPY . .
 RUN composer dump-autoload --optimize \
     && php artisan package:discover --ansi
 
-COPY --from=frontend-builder /app/public/build ./public/build
+COPY --from=frontend-builder /app/node_modules ./node_modules
+COPY --from=frontend-builder /app/resources/js/.next ./resources/js/.next
 
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage \

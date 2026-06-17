@@ -1,7 +1,7 @@
 # Шаг 1.12 — Обновить `.env.example` (Docker-порты)
 
 **Этап:** 1. Docker-инфраструктура  
-**Статус:** [ ] Не выполнен
+**Статус:** [x] Выполнен
 
 ## Описание
 
@@ -14,7 +14,6 @@
 ```env
 # Docker ports (host)
 APP_HTTP_PORT=28080
-VITE_PORT=25173
 MYSQL_HOST_PORT=23306
 REDIS_HOST_PORT=26379
 ```
@@ -24,7 +23,6 @@ REDIS_HOST_PORT=26379
 | Переменная | Значение | Сервис | Внутренний порт |
 |---|---|---|---|
 | `APP_HTTP_PORT` | 28080 | nginx (HTTP) | 80 |
-| `VITE_PORT` | 25173 | Vite dev (HMR) | 25173 |
 | `MYSQL_HOST_PORT` | 23306 | MySQL | 3306 |
 | `REDIS_HOST_PORT` | 26379 | Redis | 6379 |
 
@@ -39,4 +37,4 @@ REDIS_HOST_PORT=26379
 
 ## Критерий завершения
 
-Переменные `APP_HTTP_PORT`, `VITE_PORT`, `MYSQL_HOST_PORT`, `REDIS_HOST_PORT` присутствуют в `.env.example`.
+Переменные `APP_HTTP_PORT`, `MYSQL_HOST_PORT`, `REDIS_HOST_PORT` присутствуют в `.env.example`.

@@ -22,16 +22,16 @@
 | # | Файл | Описание | Статус |
 |---|---|---|---|
 | 2.1 | [13-env-mysql-redis.md](13-env-mysql-redis.md) | Обновить `.env.example` (MySQL + Redis) | [ ] |
-| 2.2 | [14-install-redis-extension.md](14-install-redis-extension.md) | PHP-расширение Redis | [ ] |
-| 2.3 | [15-check-laravel-configs.md](15-check-laravel-configs.md) | Проверить конфигурацию Laravel | [ ] |
-| 2.4 | [16-health-check-endpoint.md](16-health-check-endpoint.md) | Health-check эндпоинт `/api/health` | [ ] |
+| 2.2 | [14-install-redis-extension.md](14-install-redis-extension.md) | PHP-расширение Redis | [x] |
+| 2.3 | [15-check-laravel-configs.md](15-check-laravel-configs.md) | Проверить конфигурацию Laravel | [x] |
+| 2.4 | [16-health-check-endpoint.md](16-health-check-endpoint.md) | Health-check эндпоинт `/api/health` | [x] |
 
 ## Этап 3. Инициализация Next.js
 
 | # | Файл | Описание | Статус |
 |---|---|---|---|
-| 3.1 | [17-create-nextjs-app.md](17-create-nextjs-app.md) | Создать `frontend/` (Next.js) | [ ] |
-| 3.2 | [18-next-config.md](18-next-config.md) | Настроить `next.config.ts` | [ ] |
+| 3.1 | [17-create-nextjs-app.md](17-create-nextjs-app.md) | Инициализировать Next.js в `resources/js` | [x] |
+| 3.2 | [18-next-config.md](18-next-config.md) | Настроить `next.config.ts` | [x] |
 
 ## Этап 4. Интеграция Mantine UI
 

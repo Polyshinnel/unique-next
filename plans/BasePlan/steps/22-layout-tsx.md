@@ -7,7 +7,7 @@
 
 Обновить корневой layout Next.js для интеграции с Mantine UI. Добавить `ColorSchemeScript` в `<head>` и обернуть `{children}` в `Providers`.
 
-## Содержимое `frontend/src/app/layout.tsx`
+## Содержимое `resources/js/app/layout.tsx`
 
 ```tsx
 import { ColorSchemeScript } from '@mantine/core';
@@ -51,4 +51,4 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 ## Критерий завершения
 
-`frontend/src/app/layout.tsx` содержит `ColorSchemeScript` и `Providers`. Страница рендерится без ошибок гидратации.
+`resources/js/app/layout.tsx` содержит `ColorSchemeScript` и `Providers`. Страница рендерится без ошибок гидратации.

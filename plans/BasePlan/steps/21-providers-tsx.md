@@ -1,13 +1,13 @@
 # Шаг 4.3 — Создать `providers.tsx` с MantineProvider
 
 **Этап:** 4. Интеграция Mantine UI  
-**Статус:** [ ] Не выполнен
+**Статус:** [x] Выполнен
 
 ## Описание
 
 Создать компонент-обёртку `Providers`, который инициализирует Mantine UI, систему уведомлений и менеджер модальных окон.
 
-## Содержимое `frontend/src/app/providers.tsx`
+## Содержимое `resources/js/app/providers.tsx`
 
 ```tsx
 'use client';
@@ -60,4 +60,10 @@ MantineProvider
 
 ## Критерий завершения
 
-Файл `frontend/src/app/providers.tsx` создан. Компонент экспортирует `Providers`.
+Файл `resources/js/app/providers.tsx` создан. Компонент экспортирует `Providers`.
+
+## Проверка выполнения
+
+- Создан файл [resources/js/app/providers.tsx](/home/andrey/projects/uniqset2.com/resources/js/app/providers.tsx:1) с клиентским компонентом `Providers`
+- Внутри подключены `MantineProvider`, `ModalsProvider` и `Notifications` в ожидаемом порядке
+- CSS Mantine импортируется из `providers.tsx`, как и требуется для клиентского компонента

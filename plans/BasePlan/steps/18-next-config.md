@@ -1,13 +1,13 @@
 # Шаг 3.2 — Настроить `next.config.ts`
 
 **Этап:** 3. Инициализация Next.js приложения  
-**Статус:** [ ] Не выполнен
+**Статус:** [x] Выполнен
 
 ## Описание
 
 Настроить конфигурацию Next.js для работы в Docker и интеграции с Laravel API.
 
-## Содержимое `frontend/next.config.ts`
+## Содержимое `resources/js/next.config.ts`
 
 ```typescript
 const nextConfig = {
@@ -17,7 +17,7 @@ const nextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: `${process.env.BACKEND_URL || 'http://app:9000'}/api/:path*`,
+        destination: `${process.env.BACKEND_URL || 'http://127.0.0.1'}/api/:path*`,
       },
     ];
   },
@@ -37,9 +37,9 @@ export default nextConfig;
 ### `rewrites`
 
 - Проксирует `/api/*` запросы из Next.js к Laravel
-- Используется для **серверных компонентов** (SSR) — запросы идут по внутренней Docker-сети
-- `BACKEND_URL` задаётся через env в `docker-compose.yml` (`http://uniqset2_app:80`)
-- Fallback `http://app:9000` — для обратной совместимости
+- Используется для **серверных компонентов** (SSR) — запросы идут через nginx внутри контейнера `app`
+- `BACKEND_URL` задаётся через env в `docker-compose.yml` (`http://127.0.0.1`)
+- Fallback `http://127.0.0.1` — Next.js и nginx живут в одном контейнере
 
 ### `reactStrictMode: true`
 
@@ -51,4 +51,9 @@ export default nextConfig;
 
 ## Критерий завершения
 
-Файл `frontend/next.config.ts` содержит `output: 'standalone'` и rewrites для `/api/*`.
+Файл `resources/js/next.config.ts` содержит `output: 'standalone'` и rewrites для `/api/*`.
+
+## Проверка выполнения
+
+- В [resources/js/next.config.ts](/home/andrey/projects/uniqset2.com/resources/js/next.config.ts:1) настроены `output: 'standalone'`, `reactStrictMode: true` и rewrite `/api/:path*` на `${process.env.BACKEND_URL || 'http://127.0.0.1'}/api/:path*`
+- `npm run lint` завершился успешно

@@ -8,19 +8,20 @@
 Написать многоэтапный (multi-stage) Dockerfile для монолитного контейнера `app`.
 
 - **Базовый образ:** `php:8.4-fpm-alpine`
-- **Этап 1 (frontend-builder):** сборка Vite-ассетов для Laravel через `node:22-alpine`
+- **Этап 1 (frontend-builder):** сборка фронтенд-ассетов через `node:22-alpine`
 - **Этап 2 (php-base):** PHP 8.4 FPM + системные пакеты + PHP-расширения + Nginx + Supervisor + Node.js 22
 
 ## Содержимое файла
 
 ```dockerfile
-# Этап 1: Сборка фронтенда (Vite assets для Laravel)
+# Этап 1: Сборка фронтенд-ассетов
 FROM node:22-alpine AS frontend-builder
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci
+RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 COPY . .
-RUN npm run build
+RUN npm run build \
+    && mkdir -p /app/resources/js/.next
 
 # Этап 2: PHP приложение
 FROM php:8.4-fpm-alpine AS php-base
@@ -55,8 +56,9 @@ COPY . .
 RUN composer dump-autoload --optimize \
     && php artisan package:discover --ansi
 
-# Копируем собранные ассеты
-COPY --from=frontend-builder /app/public/build ./public/build
+# Копируем Next.js runtime-зависимости и build output
+COPY --from=frontend-builder /app/node_modules ./node_modules
+COPY --from=frontend-builder /app/resources/js/.next ./resources/js/.next
 
 # Права
 RUN chown -R www-data:www-data /var/www/html \
@@ -78,7 +80,8 @@ CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
 
 ## Ключевые моменты
 
-- **multi-stage build:** первый этап собирает Vite-ассеты, второй — финальный образ с PHP
+- **multi-stage build:** первый этап собирает Next.js-приложение из `resources/js`, второй — финальный образ с PHP
+- **npm install fallback:** пока `package-lock.json` отсутствует, сборка использует `npm install`; после появления lock-файла автоматически переключится на `npm ci`
 - **phpredis** устанавливается через `pecl install redis` (не predis)
 - **Composer** копируется из официального образа `composer:2`
 - **Порядок COPY:** сначала `composer.json` + `composer.lock` (кеширование слоёв), потом весь код

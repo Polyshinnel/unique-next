@@ -1,7 +1,7 @@
 # Шаг 1.10 — `.dockerignore`
 
 **Этап:** 1. Docker-инфраструктура  
-**Статус:** [ ] Не выполнен
+**Статус:** [x] Выполнен
 
 ## Описание
 
@@ -29,8 +29,8 @@ docker-compose.prod.yml
 README.md
 tests
 phpunit.xml
-frontend/node_modules
-frontend/.next
+resources/js/.next
+resources/js/.env.local
 ```
 
 ## Что исключается и почему
@@ -43,7 +43,7 @@ frontend/.next
 | `storage/logs/*`, `storage/framework/*` | Runtime-данные, не часть кода |
 | `docker-compose*.yml` | Файлы оркестрации, не нужны внутри |
 | `tests`, `phpunit.xml` | Тесты не нужны в production-образе |
-| `frontend/node_modules`, `frontend/.next` | Runtime-данные Next.js |
+| `resources/js/.next`, `resources/js/.env.local` | Runtime/build-данные и локальное окружение Next.js |
 
 ## Зависимости
 

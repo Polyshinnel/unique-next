@@ -1,7 +1,7 @@
 # Шаг 6.2 — Обновить README.md
 
 **Этап:** 6. Финальная проверка и документация  
-**Статус:** [ ] Не выполнен
+**Статус:** [x] Выполнен
 
 ## Описание
 
@@ -12,8 +12,8 @@
 ### 1. Описание архитектуры
 
 - Схема из BasePlan (ASCII-диаграмма docker-compose)
-- Описание контейнеров: app, next, scheduler, db, redis
-- Технологический стек: Laravel 13, Next.js 15, Mantine UI, MySQL 8.4, Redis 7
+- Описание контейнеров: app, scheduler, db, redis
+- Технологический стек: Laravel 13, Next.js 16, Mantine UI, MySQL 8.4, Redis 7
 
 ### 2. Быстрый старт
 
@@ -46,13 +46,12 @@ docker compose exec app php artisan migrate
 docker compose exec app php artisan tinker
 docker compose exec app php artisan cache:clear
 
-# Npm в контейнере
-docker compose exec app npm run dev
+# Npm/Next.js в контейнере
+docker compose exec app npm run dev -- --hostname 0.0.0.0 --port 3000
 docker compose exec app npm run build
 
 # Логи
 docker compose logs -f app
-docker compose logs -f next
 
 # Supervisor статус
 docker compose exec app supervisorctl status
@@ -67,8 +66,6 @@ docker compose exec app supervisorctl status
 | 28080 | nginx (HTTP) |
 | 23306 | MySQL |
 | 26379 | Redis |
-| 25173 | Vite dev |
-| 23000 | Next.js dev |
 
 ### 5. Production деплой
 
@@ -83,3 +80,10 @@ docker compose -f docker-compose.prod.yml up -d --build
 ## Критерий завершения
 
 `README.md` содержит актуальное описание архитектуры, инструкции быстрого старта, список команд и таблицу портов.
+
+## Проверка выполнения
+
+- Корневой [README.md](/home/andrey/projects/uniqset2.com/README.md:1) полностью обновлён под текущую архитектуру проекта вместо стандартного шаблона Laravel
+- Добавлены ASCII-схема docker-compose, описание контейнеров `app` / `scheduler` / `db` / `redis`, быстрый старт, полезные команды и таблицы переменных/портов
+- Production-запуск через `docker compose -f docker-compose.prod.yml up -d --build` задокументирован отдельной секцией
+- Технологический стек в README приведён к фактическому состоянию репозитория: Laravel 13, Next.js 16, Mantine UI, MySQL 8.4, Redis 7

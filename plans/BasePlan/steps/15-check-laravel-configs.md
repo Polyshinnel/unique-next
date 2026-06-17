@@ -1,7 +1,7 @@
 # Шаг 2.3 — Проверить конфигурацию Laravel
 
 **Этап:** 2. Настройка Laravel под MySQL + Redis  
-**Статус:** [ ] Не выполнен
+**Статус:** [x] Выполнен
 
 ## Описание
 
@@ -44,6 +44,14 @@
 ## Зависимости
 
 - Шаг 2.1 (`.env.example` обновлён)
+
+## Проверка выполнения
+
+- В [config/database.php](/home/andrey/projects/uniqset2.com/config/database.php:47) присутствует connection `mysql` с `host`, `port`, `database`, `username`, `password`, `charset` и `collation`, читаемыми из `env(...)`
+- В [config/database.php](/home/andrey/projects/uniqset2.com/config/database.php:146) присутствуют Redis connections `default` и `cache`
+- В [config/cache.php](/home/andrey/projects/uniqset2.com/config/cache.php:81) настроен store `redis` с Redis driver и connection `cache`
+- В [config/queue.php](/home/andrey/projects/uniqset2.com/config/queue.php:67) настроен queue connection `redis` с connection `default` и queue `default`
+- В [config/session.php](/home/andrey/projects/uniqset2.com/config/session.php:21) драйвер сессий читается из `SESSION_DRIVER`, что позволяет использовать `redis`
 
 ## Критерий завершения
 

@@ -1,17 +1,18 @@
 # Шаг 1.9 — `docker-compose.yml` (local dev)
 
 **Этап:** 1. Docker-инфраструктура  
-**Статус:** [ ] Не выполнен
+**Статус:** [x] Выполнен
 
 ## Описание
 
-Основной файл Docker Compose для локальной разработки. Определяет 5 сервисов:
+Основной файл Docker Compose для локальной разработки. Определяет 4 сервиса:
 
 1. **app** — монолитный контейнер (PHP-FPM + Nginx + Supervisor + Node.js)
-2. **next** — контейнер Next.js SSR (Mantine UI)
-3. **scheduler** — Laravel scheduler (`php artisan schedule:work`)
-4. **db** — MySQL 8.4
-5. **redis** — Redis 7.x
+2. **scheduler** — Laravel scheduler (`php artisan schedule:work`)
+3. **db** — MySQL 8.4
+4. **redis** — Redis 7.x
+
+Next.js живёт внутри того же репозитория и контейнера `app` как часть модульного монолита. Nginx проксирует фронтенд-запросы на локальный Next.js-процесс `127.0.0.1:3000`, а не в отдельный Docker-сервис.
 
 ## Содержимое файла
 
@@ -31,10 +32,11 @@ services:
       - ./docker/nginx/default.conf:/etc/nginx/http.d/default.conf
     ports:
       - "${APP_HTTP_PORT:-28080}:80"
-      - "${VITE_PORT:-25173}:${VITE_PORT:-25173}"
     environment:
       - APP_ENV=local
       - APP_DEBUG=true
+      - BACKEND_URL=http://127.0.0.1
+      - NEXT_PUBLIC_API_URL=/api
       - REDIS_HOST=uniqset2-redis
       - WWWUSER=${UID:-1000}
       - WWWGROUP=${GID:-1000}
@@ -43,22 +45,6 @@ services:
     depends_on:
       - db
       - redis
-      - next
-
-  next:
-    image: node:22-alpine
-    container_name: uniqset2_next
-    restart: unless-stopped
-    working_dir: /app
-    command: sh -c "npm install && npm run dev"
-    volumes:
-      - ./frontend:/app
-      - next_node_modules:/app/node_modules
-    environment:
-      - BACKEND_URL=http://uniqset2_app:80
-      - NEXT_PUBLIC_API_URL=http://localhost:${APP_HTTP_PORT:-28080}/api
-    networks:
-      - uniqset2_network
 
   scheduler:
     build:
@@ -114,7 +100,6 @@ services:
 volumes:
   db_data:
   redis_data:
-  next_node_modules:
 
 networks:
   uniqset2_network:
@@ -123,10 +108,11 @@ networks:
 
 ## Ключевые моменты
 
-- **Порты конфигурируются через `.env`** — значения по умолчанию: 28080, 25173, 23306, 26379
+- **Порты конфигурируются через `.env`** — значения по умолчанию: 28080, 23306, 26379
 - **`network: host`** в `build` — для доступа к npm registry через хостовую сеть при сборке
 - **Volumes для app** — весь проект монтируется для hot-reload в dev-режиме
-- **`next_node_modules`** — именованный volume, чтобы node_modules не перезаписывался хостовым маунтом
+- **Next.js внутри app** — отдельного сервиса `next` нет; процесс запускается Supervisor-ом внутри монолитного контейнера
+- **Same-origin API** — клиентский Next.js код использует относительный `/api`, SSR-запросы используют `BACKEND_URL=http://127.0.0.1`
 - **Redis alias `uniqset2-redis`** — используется как `REDIS_HOST` в приложении
 - **`depends_on`** — задаёт порядок запуска (db, redis → app)
 

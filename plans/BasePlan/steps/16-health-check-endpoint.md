@@ -1,7 +1,7 @@
 # Шаг 2.4 — Добавить health-check эндпоинт
 
 **Этап:** 2. Настройка Laravel под MySQL + Redis  
-**Статус:** [ ] Не выполнен
+**Статус:** [x] Выполнен
 
 ## Описание
 
@@ -100,6 +100,13 @@ Route::get('/health', HealthController::class);
 - Шаг 2.1–2.3 (MySQL и Redis настроены)
 - `routes/api.php` должен существовать (см. шаг 5.1 — `php artisan install:api`)
 
+## Проверка выполнения
+
+- Добавлен invokable-контроллер [app/Http/Controllers/Api/HealthController.php](/home/andrey/projects/uniqset2.com/app/Http/Controllers/Api/HealthController.php:1), который проверяет `database`, `redis` и `cache`
+- Подключён API routing в [bootstrap/app.php](/home/andrey/projects/uniqset2.com/bootstrap/app.php:8), чтобы `routes/api.php` обрабатывался с префиксом `/api`
+- Добавлен маршрут [routes/api.php](/home/andrey/projects/uniqset2.com/routes/api.php:1) с `GET /health`
+- Добавлены feature-тесты [tests/Feature/HealthControllerTest.php](/home/andrey/projects/uniqset2.com/tests/Feature/HealthControllerTest.php:1) на `200 OK` и `503 Service Unavailable`
+
 ## Критерий завершения
 
-`GET /api/health` возвращает JSON с состоянием всех сервисов.
+`GET /api/health` возвращает JSON с состоянием всех сервисов и отдаёт `503`, если хотя бы одна проверка падает.

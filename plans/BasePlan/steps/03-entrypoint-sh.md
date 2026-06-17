@@ -1,7 +1,7 @@
 # Шаг 1.3 — `docker/entrypoint.sh`
 
 **Этап:** 1. Docker-инфраструктура  
-**Статус:** [ ] Не выполнен
+**Статус:** [x] Выполнен
 
 ## Описание
 
@@ -34,7 +34,7 @@ sync_www_data_ids() {
 
 ensure_laravel_permissions() {
     mkdir -p /var/www/html/storage/logs /var/www/html/bootstrap/cache
-    touch /var/www/html/storage/logs/laravel.log /var/www/html/storage/logs/horizon.log
+    touch /var/www/html/storage/logs/laravel.log /var/www/html/storage/logs/horizon.log /var/www/html/storage/logs/next.log
     if [ "$(id -u)" = "0" ]; then
         chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
     fi

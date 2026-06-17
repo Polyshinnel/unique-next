@@ -1,19 +1,19 @@
 # Шаг 5.2 — Next.js: создать HTTP-клиент
 
 **Этап:** 5. Связка Laravel API ↔ Next.js  
-**Статус:** [ ] Не выполнен
+**Статус:** [x] Выполнен
 
 ## Описание
 
 Создать обёртку над `fetch` для взаимодействия с Laravel API из Next.js. Клиент должен поддерживать CSRF-токены Sanctum и типизацию ответов.
 
-## Файл: `frontend/src/lib/api.ts`
+## Файл: `resources/js/lib/api.ts`
 
 ```typescript
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:28080/api';
-const BACKEND_URL = process.env.BACKEND_URL || 'http://uniqset2_app:80';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
+const BACKEND_URL = process.env.BACKEND_URL || 'http://127.0.0.1';
 
-// Для серверных компонентов (SSR) — запросы по внутренней Docker-сети
+// Для серверных компонентов (SSR) — запросы через nginx внутри app-контейнера
 export function getServerApiUrl(): string {
   return `${BACKEND_URL}/api`;
 }
@@ -27,9 +27,21 @@ interface ApiOptions extends RequestInit {
   params?: Record<string, string>;
 }
 
+function buildApiUrl(baseUrl: string, endpoint: string): URL {
+  const url = `${baseUrl}${endpoint}`;
+
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return new URL(url);
+  }
+
+  const origin = typeof window === 'undefined' ? 'http://localhost:28080' : window.location.origin;
+
+  return new URL(url, origin);
+}
+
 // Получить CSRF-cookie от Sanctum (для мутирующих запросов)
 export async function getCsrfToken(): Promise<void> {
-  await fetch(`${getClientApiUrl().replace('/api', '')}/sanctum/csrf-cookie`, {
+  await fetch('/sanctum/csrf-cookie', {
     credentials: 'include',
   });
 }
@@ -41,8 +53,8 @@ export async function apiRequest<T>(
   isServer = false,
 ): Promise<T> {
   const baseUrl = isServer ? getServerApiUrl() : getClientApiUrl();
-  
-  const url = new URL(`${baseUrl}${endpoint}`);
+  const url = buildApiUrl(baseUrl, endpoint);
+
   if (options.params) {
     Object.entries(options.params).forEach(([key, value]) => {
       url.searchParams.append(key, value);
@@ -118,8 +130,8 @@ async function handleSubmit(data: FormData) {
 
 | Переменная | Где используется | Значение |
 |---|---|---|
-| `NEXT_PUBLIC_API_URL` | Клиент (браузер) | `http://localhost:28080/api` |
-| `BACKEND_URL` | Сервер (SSR, Docker) | `http://uniqset2_app:80` |
+| `NEXT_PUBLIC_API_URL` | Клиент (браузер) | `/api` |
+| `BACKEND_URL` | Сервер (SSR, Docker) | `http://127.0.0.1` |
 
 ## Зависимости
 
@@ -128,4 +140,4 @@ async function handleSubmit(data: FormData) {
 
 ## Критерий завершения
 
-Файл `frontend/src/lib/api.ts` создан. Запросы к Laravel API проходят из серверных и клиентских компонентов.
+Файл `resources/js/lib/api.ts` создан. Запросы к Laravel API проходят из серверных и клиентских компонентов.
