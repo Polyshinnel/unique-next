@@ -885,6 +885,14 @@ img {
     color: #ffffff;
 }
 
+.footer-legal {
+    max-width: 780px;
+}
+
+.footer-legal__text {
+    line-height: 1.55;
+}
+
 .catalog-hero {
     position: relative;
     overflow: hidden;

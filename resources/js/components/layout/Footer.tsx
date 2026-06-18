@@ -106,7 +106,14 @@ export function Footer() {
                 <Divider color="rgba(255,255,255,.14)" my="xl" />
 
                 <Group justify="space-between" gap="md" className="footer-bottom">
-                    <Text c="gray.5" size="sm">© “ЮНИК С” 2019-{year}</Text>
+                    <Stack gap={4} className="footer-legal">
+                        <Text c="gray.5" size="sm">© “ЮНИК С” 2019-{year}</Text>
+                        <Text c="gray.5" size="sm" className="footer-legal__text">
+                            Вся представленная на сайте информация носит информационный характер и не является публичной
+                            офертой, определяемой положениями ст. 437 (2) ГК РФ. Опубликованная на данном сайте
+                            информация может быть изменена в любое время без предварительного уведомления.
+                        </Text>
+                    </Stack>
                     <Stack gap={8} align="flex-end">
                         <Group gap="xs" className="footer-request">
                             <TextInput placeholder="Ваш телефон" aria-label="Телефон для обратного звонка" />
