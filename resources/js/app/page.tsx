@@ -1,300 +1,56 @@
 'use client';
 
 import Link from 'next/link';
+import { catalogProducts } from '@/lib/catalog-products';
+import { demoServices } from '@/lib/site-content';
+import { Footer } from '@/components/layout/Footer';
+import { Header } from '@/components/layout/Header';
+import { ProductCard } from '@/components/catalog/ProductCard';
+import { ServiceCard } from '@/components/services/ServiceCard';
 import {
-    Anchor,
-    Badge,
-    Box,
-    Burger,
     Button,
     Container,
-    Divider,
-    Drawer,
     Group,
     Image,
     SimpleGrid,
     Stack,
     Text,
-    TextInput,
     Title,
     UnstyledButton,
 } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
-import {
-    IconArrowRight,
-    IconBrandTelegram,
-    IconBrandVk,
-    IconChevronLeft,
-    IconChevronRight,
-    IconMail,
-    IconMapPin,
-    IconMessageCircle,
-    IconPackage,
-    IconPhone,
-    IconSearch,
-    IconShieldCheck,
-    IconTool,
-    IconTruckDelivery,
-} from '@tabler/icons-react';
+import { IconArrowRight, IconChevronLeft, IconChevronRight, IconSearch } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
-
-const navItems = [
-    { label: 'Главная', href: '/' },
-    { label: 'Услуги', href: '/services' },
-    { label: 'Каталог оборудования', href: '/catalog' },
-    { label: 'Отгрузки', href: '/otgruzki' },
-    { label: 'Компания', href: '/about' },
-    { label: 'Контакты', href: '/contacts' },
-];
-
-const contacts = {
-    phone: '8 (4842) 59-65-75',
-    email: 'info@uniqset.com',
-    address: 'г. Калуга',
-    socialLinks: {
-        max: '#',
-        vk: '#',
-        telegram: '#',
-    },
-};
 
 const heroSlides = [
     {
-        title: 'Промышленное оборудование с понятной историей',
-        text: 'Подбираем станки, прессовое и складское оборудование под производственные задачи, сроки и бюджет.',
-        label: 'Каталог ЮНИК С',
-        action: 'Смотреть каталог',
+        title: 'Продажа б/у оборудования',
+        text: 'Продажа бывшего в употреблении промышленного оборудования: металлорежущих и деревообрабатывающих станков, прессового и кузнечного оборудования, спецтехники и оборудования для погрузочно-разгрузочных работ.',
+        action: 'В каталог',
         href: '/catalog',
-        image: '/assets/img/catalog.jpeg',
+        image: '/assets/img/slide-1.jpeg',
     },
     {
-        title: 'Быстрые поступления для производства',
-        text: 'Показываем доступность, состояние и ключевые параметры, чтобы заявку можно было собрать без лишних уточнений.',
-        label: 'Последние поступления',
-        action: 'Перейти к товарам',
-        href: '/catalog',
-        image: '/assets/img/stanok.webp',
-    },
-    {
-        title: 'Выкуп, продажа и сопровождение сделок',
-        text: 'Помогаем с оценкой, демонтажем, погрузкой и логистикой оборудования по России.',
-        label: 'Сервис под ключ',
-        action: 'Услуги компании',
+        title: 'Выкуп б/у оборудования',
+        text: 'Осуществляем выкуп или берем на реализацию любое промышленное оборудование, производственные линии, станки с заводов, цехов, предприятий. Отталкиваемся от Ваших ценовых ожиданий. Производим оперативную оценку стоимости.',
+        action: 'Подробнее',
         href: '/services',
-        image: '/assets/img/catalog.jpeg',
-    },
-];
-
-const demoProducts = [
-    {
-        id: 'demo-1',
-        title: 'Токарный станок 16К20',
-        sku: 'UNQ-2048',
-        category: { name: 'Металлорежущие станки' },
-        price: { amount: 1250000, isPublished: true },
-        availability: 'in_stock',
-        condition: 'used',
-        imageUrl: '/assets/img/stanok.webp',
-        url: '/catalog',
+        image: '/assets/img/slide-2.jpg',
     },
     {
-        id: 'demo-2',
-        title: 'Листогибочный пресс 100 т',
-        sku: 'UNQ-2051',
-        category: { name: 'Прессовое оборудование' },
-        price: { amount: null, isPublished: false },
-        availability: 'on_request',
-        condition: 'used',
-        imageUrl: '/assets/img/catalog.jpeg',
-        url: '/catalog',
+        title: 'Поставка импортного оборудования',
+        text: 'Ввоз и растаможка оборудования из стран ЕС и Азии, подготовка и оформление всех необходимых документов, организация транспорта. Мы - ваш российский поставщик оборудования.',
+        action: 'Подробнее',
+        href: '/services',
+        image: '/assets/img/slide-3.jpg',
     },
     {
-        id: 'demo-3',
-        title: 'Фрезерный обрабатывающий центр',
-        sku: 'UNQ-2074',
-        category: { name: 'Станки с ЧПУ' },
-        price: { amount: 3900000, isPublished: true },
-        availability: 'in_stock',
-        condition: 'after_service',
-        imageUrl: '/assets/img/stanok.webp',
-        url: '/catalog',
-    },
-    {
-        id: 'demo-4',
-        title: 'Погрузчик вилочный 3 т',
-        sku: 'UNQ-2080',
-        category: { name: 'Складская техника' },
-        price: { amount: 980000, isPublished: true },
-        availability: 'in_stock',
-        condition: 'used',
-        imageUrl: '/assets/img/catalog.jpeg',
-        url: '/catalog',
-    },
-    {
-        id: 'demo-5',
-        title: 'Сверлильный станок 2Н125',
-        sku: 'UNQ-2086',
-        category: { name: 'Сверлильные станки' },
-        price: { amount: 640000, isPublished: true },
-        availability: 'in_stock',
-        condition: 'used',
-        imageUrl: '/assets/img/stanok.webp',
-        url: '/catalog',
-    },
-    {
-        id: 'demo-6',
-        title: 'Гидравлический пресс 160 т',
-        sku: 'UNQ-2091',
-        category: { name: 'Гидравлические прессы' },
-        price: { amount: 2150000, isPublished: true },
-        availability: 'on_request',
-        condition: 'after_service',
-        imageUrl: '/assets/img/catalog.jpeg',
-        url: '/catalog',
-    },
-    {
-        id: 'demo-7',
-        title: 'Ленточнопильный станок',
-        sku: 'UNQ-2097',
-        category: { name: 'Пильное оборудование' },
-        price: { amount: 870000, isPublished: true },
-        availability: 'in_stock',
-        condition: 'used',
-        imageUrl: '/assets/img/stanok.webp',
-        url: '/catalog',
-    },
-    {
-        id: 'demo-8',
-        title: 'Компрессор винтовой 11 кВт',
-        sku: 'UNQ-2102',
-        category: { name: 'Компрессорное оборудование' },
-        price: { amount: null, isPublished: false },
-        availability: 'on_request',
-        condition: 'used',
-        imageUrl: '/assets/img/catalog.jpeg',
-        url: '/catalog',
-    },
-];
-
-const demoServices = [
-    {
-        id: 'service-1',
-        title: 'Продажа оборудования',
-        slug: 'prodazha-oborudovaniya',
-        excerpt: 'Подбор, проверка состояния, резервирование и сопровождение покупки.',
-    },
-    {
-        id: 'service-2',
-        title: 'Выкуп оборудования',
-        slug: 'vykup',
-        excerpt: 'Оценка станков и производственных линий с быстрым согласованием сделки.',
-    },
-    {
-        id: 'service-3',
         title: 'Продажа инструмента',
-        slug: 'prodazha-instrumenta',
-        excerpt: 'Поможем заказать инструмент и расходники со склада в нужном объеме и с удобной доставкой.',
-    },
-    {
-        id: 'service-4',
-        title: 'Импорт оборудования',
-        slug: 'import-oborudovaniya',
-        excerpt: 'Сопровождаем ВЭД, таможенное оформление и расчет поставки, чтобы точно прогнозировать стоимость.',
+        text: 'Оптовые поставки промышленного инструмента: металлорежущего, алмазного, абразивного, слесарного и прочего со склада. Профессиональная консультация. Отправка по всей территории РФ.',
+        action: 'Подробнее',
+        href: '/services',
+        image: '/assets/img/slide-4.jpg',
     },
 ];
-
-type Contact = typeof contacts;
-type Product = (typeof demoProducts)[number];
-type SocialIcon = typeof IconBrandVk;
-
-function phoneHref(phone: string) {
-    const normalized = phone.replace(/[^\d+]/g, '');
-
-    return normalized ? `tel:${normalized}` : '#';
-}
-
-function emailHref(email: string) {
-    return email ? `mailto:${email}` : '#';
-}
-
-function formatPrice(price: Product['price']) {
-    if (!price || !price.isPublished || !price.amount) {
-        return 'По запросу';
-    }
-
-    return `${String(price.amount).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')} ₽`;
-}
-
-function readableStatus(value: string) {
-    const statuses: Record<string, string> = {
-        in_stock: 'В наличии',
-        on_request: 'По запросу',
-        reserved: 'Резерв',
-        sold: 'Продано',
-        new: 'Новое',
-        used: 'Б/у',
-        after_service: 'После сервиса',
-    };
-
-    return statuses[value] || value || 'Уточняется';
-}
-
-function Header({ contacts: siteContacts }: { contacts: Contact }) {
-    const [opened, { toggle, close }] = useDisclosure(false);
-
-    const menu = (
-        <nav className="site-nav">
-            {navItems.map((item) => (
-                <Link key={item.href} href={item.href} className="site-nav__link" onClick={close}>
-                    {item.label}
-                </Link>
-            ))}
-        </nav>
-    );
-
-    return (
-        <header className="site-header">
-            <Container size="xl" className="site-header__inner">
-                <Link href="/" className="site-logo" aria-label="ЮНИК С">
-                    <Image src="/assets/img/unique-logo.png" alt="ЮНИК С" />
-                </Link>
-
-                <Box className="site-header__nav">{menu}</Box>
-
-                <div className="site-header__contacts">
-                    <Anchor href={phoneHref(siteContacts.phone)} className="contact-link">
-                        <IconPhone size={18} className="contact-link__icon" />
-                        <span className="contact-link__text">{siteContacts.phone}</span>
-                    </Anchor>
-                    <Anchor href={emailHref(siteContacts.email)} className="contact-link">
-                        <IconMail size={18} className="contact-link__icon" />
-                        <span className="contact-link__text">{siteContacts.email}</span>
-                    </Anchor>
-                </div>
-
-                <Burger opened={opened} onClick={toggle} hiddenFrom="md" aria-label="Меню" />
-            </Container>
-
-            <Drawer opened={opened} onClose={close} position="right" title="ЮНИК С" size="sm">
-                <Stack gap="lg">
-                    {menu}
-                    <Divider />
-                    <Anchor href={phoneHref(siteContacts.phone)} className="contact-link">
-                        <IconPhone size={18} />
-                        <span>{siteContacts.phone}</span>
-                    </Anchor>
-                    <Anchor href={emailHref(siteContacts.email)} className="contact-link">
-                        <IconMail size={18} />
-                        <span>{siteContacts.email}</span>
-                    </Anchor>
-                    <Button component={Link} href="/contacts" onClick={close}>
-                        Связаться
-                    </Button>
-                </Stack>
-            </Drawer>
-        </header>
-    );
-}
 
 function HeroSlider() {
     const [active, setActive] = useState(0);
@@ -316,10 +72,9 @@ function HeroSlider() {
             <div className="hero-slider__media" style={{ backgroundImage: `url(${slide.image})` }} />
             <Container size="xl" className="hero-slider__content">
                 <Stack gap="lg" maw={760}>
-                    <Badge className="hero-slider__badge">{slide.label}</Badge>
                     <Title order={1}>{slide.title}</Title>
                     <Text>{slide.text}</Text>
-                    <Group gap="sm">
+                    <Group gap="sm" className="hero-slider__actions">
                         <Button component={Link} href={slide.href} size="lg" rightSection={<IconArrowRight size={19} />}>
                             {slide.action}
                         </Button>
@@ -358,14 +113,28 @@ function CompanySection() {
             <Container size="xl">
                 <div className="company-block">
                     <Stack gap="md">
-                        <Badge variant="light" color="orange">О компании</Badge>
-                        <Title order={2}>ЮНИК С помогает производствам находить оборудование без лишнего риска</Title>
-                        <Text c="dimmed" size="lg">
-                            Мы работаем с промышленным оборудованием, которое уже прошло реальную эксплуатацию:
-                            подбираем позиции под задачу, фиксируем состояние, помогаем с осмотром, оформлением
-                            сделки и дальнейшей отгрузкой.
-                        </Text>
-                        <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md">
+                        <Title order={2}>Компания &quot;ЮНИК С&quot; - промышленные станки и оборудование</Title>
+                        <Stack gap={12}>
+                            <Text c="dimmed" size="lg">
+                                Наша компания «Юник С» работает в сфере купли-продажи бывшего в употреблении
+                                промышленного оборудования с 2019 года.
+                            </Text>
+                            <Text c="dimmed" size="lg">
+                                У нас вы найдете станки и оборудование под любые технологические задачи.
+                            </Text>
+                            <Text c="dimmed" size="lg">
+                                В случае необходимости поможем реализовать ваше оборудование.
+                            </Text>
+                            <Text c="dimmed" size="lg">
+                                Также при необходимости проработаем варианты поставки импортного оборудования из
+                                стран Азии и ЕС.
+                            </Text>
+                            <Text c="dimmed" size="lg">
+                                На нашем сайте найдете информацию, где просто купить весь необходимый инструмент и
+                                прочие расходники.
+                            </Text>
+                        </Stack>
+                        <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md" mt="md">
                             <div className="fact-tile">
                                 <b>2019</b>
                                 <span>год основания</span>
@@ -381,7 +150,7 @@ function CompanySection() {
                         </SimpleGrid>
                     </Stack>
                     <div className="company-image">
-                        <Image src="/assets/img/catalog.jpeg" alt="Промышленное оборудование ЮНИК С" />
+                        <Image src="/assets/img/main.jpeg" alt="Промышленное оборудование ЮНИК С" />
                     </div>
                 </div>
             </Container>
@@ -389,40 +158,12 @@ function CompanySection() {
     );
 }
 
-function ProductCard({ product }: { product: Product }) {
-    return (
-        <article className="product-card">
-            <Link href={product.url} className="product-card__image">
-                <Image src={product.imageUrl} alt={product.title} />
-            </Link>
-            <div className="product-card__body">
-                <Group justify="space-between" gap="xs">
-                    <Badge variant="light" color="blue">{product.sku}</Badge>
-                    <span className="product-card__price">{formatPrice(product.price)}</span>
-                </Group>
-                <Title order={3}>
-                    <Link href={product.url}>{product.title}</Link>
-                </Title>
-                <Text c="dimmed" size="sm">{product.category.name}</Text>
-                <Group gap="xs" mt="sm">
-                    <span className="product-tag">{readableStatus(product.condition)}</span>
-                    <span className="product-tag">{readableStatus(product.availability)}</span>
-                </Group>
-                <Button component={Link} href={product.url} variant="default" rightSection={<IconArrowRight size={17} />}>
-                    Подробнее
-                </Button>
-            </div>
-        </article>
-    );
-}
-
 function LatestProducts() {
     return (
-        <section className="content-section content-section--tight-top">
+        <section className="content-section content-section--tight-top latest-products-section">
             <Container size="xl">
                 <Group justify="space-between" align="end" mb="xl" gap="lg">
                     <Stack gap={6}>
-                        <Badge variant="light" color="orange">Каталог</Badge>
                         <Title order={2}>Последние поступления</Title>
                         <Text c="dimmed">Примеры карточек товаров для будущего наполнения каталога.</Text>
                     </Stack>
@@ -431,7 +172,7 @@ function LatestProducts() {
                     </Button>
                 </Group>
                 <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="lg">
-                    {demoProducts.map((product) => (
+                    {catalogProducts.map((product) => (
                         <ProductCard key={product.id} product={product} />
                     ))}
                 </SimpleGrid>
@@ -441,14 +182,11 @@ function LatestProducts() {
 }
 
 function ServicesSection() {
-    const icons = [IconPackage, IconTool, IconTruckDelivery, IconShieldCheck];
-
     return (
-        <section className="content-section content-section--white content-section--tight-top">
+        <section className="content-section content-section--white content-section--tight-top services-section">
             <Container size="xl">
                 <Group justify="space-between" align="end" mb="xl" gap="lg">
                     <Stack gap={6}>
-                        <Badge variant="light" color="orange">Сервис</Badge>
                         <Title order={2}>Услуги</Title>
                         <Text c="dimmed">Основные направления работы с оборудованием и сделками.</Text>
                     </Stack>
@@ -457,23 +195,9 @@ function ServicesSection() {
                     </Button>
                 </Group>
                 <SimpleGrid cols={{ base: 1, sm: 2, xl: 4 }} spacing="lg">
-                    {demoServices.map((service, index) => {
-                        const Icon = icons[index] || IconTool;
-
-                        return (
-                            <Link key={service.id} href={`/services/${service.slug}`} className="service-card">
-                                <span className="service-card__icon">
-                                    <Icon size={26} />
-                                </span>
-                                <Title order={3}>{service.title}</Title>
-                                <Text c="dimmed">{service.excerpt}</Text>
-                                <span className="service-card__more">
-                                    Подробнее
-                                    <IconArrowRight size={17} />
-                                </span>
-                            </Link>
-                        );
-                    })}
+                    {demoServices.map((service) => (
+                        <ServiceCard key={service.id} service={service} />
+                    ))}
                 </SimpleGrid>
             </Container>
         </section>
@@ -535,114 +259,10 @@ function BusinessEquipmentSection() {
     );
 }
 
-function SocialButton({ href, icon: Icon, label }: { href: string; icon: SocialIcon; label: string }) {
-    return (
-        <Anchor href={href} className={`social-button ${href === '#' ? 'social-button--disabled' : ''}`}>
-            <span className="social-button__icon">
-                <Icon size={18} />
-            </span>
-            <span className="social-button__label">{label}</span>
-        </Anchor>
-    );
-}
-
-function Footer({ contacts: siteContacts }: { contacts: Contact }) {
-    const year = new Date().getFullYear();
-
-    return (
-        <footer className="site-footer">
-            <Container size="xl">
-                <SimpleGrid cols={{ base: 1, sm: 2, lg: 5 }} spacing="xl">
-                    <Stack gap="md">
-                        <Image src="/assets/img/unique-logo.png" alt="ЮНИК С" className="footer-logo" />
-                        <Text c="white" fw={700}>ООО “Юник С”</Text>
-                        <Text c="gray.4" size="sm">ИНН: 4027139409</Text>
-                        <Text c="gray.4" size="sm">ОГРН: 1194027002861</Text>
-                    </Stack>
-
-                    <Stack gap="sm">
-                        <Text c="white" fw={700}>Разделы</Text>
-                        {navItems.slice(1).map((item) => (
-                            <Anchor key={item.href} component={Link} href={item.href} className="footer-link">
-                                {item.label}
-                            </Anchor>
-                        ))}
-                    </Stack>
-
-                    <Stack gap="sm">
-                        <Text c="white" fw={700}>Документы</Text>
-                        <Anchor href="#" className="footer-link">Охрана труда</Anchor>
-                        <Anchor href="#" className="footer-link">Политика конфиденциальности</Anchor>
-                    </Stack>
-
-                    <Stack gap="sm">
-                        <Text c="white" fw={700}>Услуги</Text>
-                        {demoServices.map((service) => (
-                            <Anchor
-                                key={service.id}
-                                component={Link}
-                                href={`/services/${service.slug}`}
-                                className="footer-link"
-                            >
-                                {service.title}
-                            </Anchor>
-                        ))}
-                    </Stack>
-
-                    <Stack gap="md">
-                        <Text c="white" fw={700}>Контакты</Text>
-                        <Anchor href={phoneHref(siteContacts.phone)} className="footer-contact">
-                            <span className="footer-contact__row">
-                                <IconPhone size={18} className="footer-contact__icon" />
-                                <span className="footer-contact__text">{siteContacts.phone}</span>
-                            </span>
-                        </Anchor>
-                        <Anchor href={emailHref(siteContacts.email)} className="footer-contact">
-                            <span className="footer-contact__row">
-                                <IconMail size={18} className="footer-contact__icon" />
-                                <span className="footer-contact__text">{siteContacts.email}</span>
-                            </span>
-                        </Anchor>
-                        <span className="footer-contact">
-                            <span className="footer-contact__row">
-                                <IconMapPin size={18} className="footer-contact__icon" />
-                                <span className="footer-contact__text">{siteContacts.address}</span>
-                            </span>
-                        </span>
-                        <Group gap="xs">
-                            <SocialButton href={siteContacts.socialLinks.max} icon={IconMessageCircle} label="Max" />
-                            <SocialButton href={siteContacts.socialLinks.vk} icon={IconBrandVk} label="VK" />
-                            <SocialButton href={siteContacts.socialLinks.telegram} icon={IconBrandTelegram} label="Telegram" />
-                        </Group>
-                    </Stack>
-                </SimpleGrid>
-
-                <Divider color="rgba(255,255,255,.14)" my="xl" />
-
-                <Group justify="space-between" gap="md" className="footer-bottom">
-                    <Text c="gray.5" size="sm">© “ЮНИК С” 2019-{year}</Text>
-                    <Stack gap={8} align="flex-end">
-                        <Group gap="xs" className="footer-request">
-                            <TextInput placeholder="Ваш телефон" aria-label="Телефон для обратного звонка" />
-                            <Button>Позвоните мне</Button>
-                        </Group>
-                        <Text size="sm" c="gray.5" className="footer-consent">
-                            Нажимая кнопку соглашаюсь с{' '}
-                            <Anchor href="#" className="footer-consent__link">
-                                Политикой конфиденциальности
-                            </Anchor>
-                        </Text>
-                    </Stack>
-                </Group>
-            </Container>
-        </footer>
-    );
-}
-
 export default function HomePage() {
     return (
         <>
-            <Header contacts={contacts} />
+            <Header />
             <main>
                 <HeroSlider />
                 <CompanySection />
@@ -663,7 +283,7 @@ export default function HomePage() {
                     </Container>
                 </section>
             </main>
-            <Footer contacts={contacts} />
+            <Footer />
         </>
     );
 }

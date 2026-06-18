@@ -9,7 +9,8 @@ import { ModalsProvider } from '@mantine/modals';
 import { Notifications } from '@mantine/notifications';
 
 const theme = createTheme({
-    primaryColor: 'blue',
+    primaryColor: 'teal',
+    primaryShade: 6,
     fontFamily: 'Inter, sans-serif',
 });
 

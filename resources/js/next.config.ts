@@ -3,6 +3,9 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
     output: 'standalone',
     reactStrictMode: true,
+    env: {
+        NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN: process.env.MAP_BOX_ACCESS_TOKEN,
+    },
     async rewrites() {
         return [
             {
