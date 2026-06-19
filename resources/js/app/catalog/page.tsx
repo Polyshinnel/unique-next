@@ -40,7 +40,7 @@ function CatalogFilters() {
         <aside className="catalog-sidebar">
             <FilterCard title="Поиск">
                 <TextInput placeholder="Введите запрос..." leftSection={<IconSearch size={17} />} />
-                <Button>Найти</Button>
+                <Button className="product-card__more">Найти</Button>
             </FilterCard>
             <FilterCard title="По цене">
                 <Group grow>
@@ -60,7 +60,7 @@ function CatalogFilters() {
             <FilterCard title="По состоянию">
                 {conditions.map((item) => <Checkbox key={item} label={item} />)}
             </FilterCard>
-            <Button fullWidth>Применить фильтры</Button>
+            <Button fullWidth className="product-card__more">Применить фильтры</Button>
             <Button fullWidth variant="default">Сбросить фильтры</Button>
         </aside>
     );

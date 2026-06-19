@@ -1,3 +1,23 @@
+const defaultManager = {
+    name: 'Нестеров Андрей',
+    phone: '8(903)026-44-56',
+    email: 'polyshinnel@gmail.com',
+    socialLinks: {
+        whatsapp: 'https://wa.me/79030264456',
+        telegram: '#',
+        max: '#',
+    },
+};
+
+function createManager() {
+    return {
+        ...defaultManager,
+        socialLinks: {
+            ...defaultManager.socialLinks,
+        },
+    };
+}
+
 export const catalogProducts = [
     {
         id: 'demo-1',
@@ -8,11 +28,22 @@ export const catalogProducts = [
         price: { amount: 1250000, isPublished: true },
         availability: 'В наличии',
         condition: 'Б/у',
-        imageUrl: '/assets/img/stanok.webp',
+        imageUrl: '/assets/img/products/demo-1/1.jpg',
         url: '/catalog/demo-1',
-        manager: { name: 'Отдел продаж ЮНИК С', phone: '8 (4842) 59-65-75' },
+        manager: createManager(),
         summary: 'Универсальный токарно-винторезный станок для обработки деталей из стали, чугуна и цветных металлов.',
-        galleryImages: ['/assets/img/stanok.webp', '/assets/img/catalog.jpeg'],
+        galleryImages: [
+            '/assets/img/products/demo-1/1.jpg',
+            '/assets/img/products/demo-1/2.jpg',
+            '/assets/img/products/demo-1/3.jpg',
+            '/assets/img/products/demo-1/4.jpg',
+            '/assets/img/products/demo-1/5.jpg',
+            '/assets/img/products/demo-1/6.jpg',
+            '/assets/img/products/demo-1/7.jpg',
+            '/assets/img/products/demo-1/8.jpg',
+            '/assets/img/products/demo-1/9.jpg',
+            '/assets/img/products/demo-1/10.jpg',
+        ],
         details: [
             { label: 'Год выпуска', value: 'уточняется' },
             { label: 'Тип оборудования', value: 'токарный станок' },
@@ -45,7 +76,7 @@ export const catalogProducts = [
         condition: 'Б/у',
         imageUrl: '/assets/img/catalog.jpeg',
         url: '/catalog/demo-2',
-        manager: { name: 'Отдел продаж ЮНИК С', phone: '8 (4842) 59-65-75' },
+        manager: createManager(),
         summary: 'Гидравлический листогибочный пресс для гибки листового металла на производственных участках.',
         galleryImages: ['/assets/img/catalog.jpeg', '/assets/img/stanok.webp'],
         details: [
@@ -80,7 +111,7 @@ export const catalogProducts = [
         condition: 'После сервиса',
         imageUrl: '/assets/img/stanok.webp',
         url: '/catalog/demo-3',
-        manager: { name: 'Отдел продаж ЮНИК С', phone: '8 (4842) 59-65-75' },
+        manager: createManager(),
         summary: 'Вертикальный обрабатывающий центр с ЧПУ для фрезерования корпусных деталей и оснастки.',
         galleryImages: ['/assets/img/stanok.webp', '/assets/img/catalog.jpeg'],
         details: [
@@ -115,7 +146,7 @@ export const catalogProducts = [
         condition: 'Б/у',
         imageUrl: '/assets/img/catalog.jpeg',
         url: '/catalog/demo-4',
-        manager: { name: 'Отдел продаж ЮНИК С', phone: '8 (4842) 59-65-75' },
+        manager: createManager(),
         summary: 'Вилочный погрузчик грузоподъемностью 3 тонны для склада, производства и погрузочных работ.',
         galleryImages: ['/assets/img/catalog.jpeg', '/assets/img/stanok.webp'],
         details: [
@@ -150,7 +181,7 @@ export const catalogProducts = [
         condition: 'Б/у',
         imageUrl: '/assets/img/stanok.webp',
         url: '/catalog/demo-5',
-        manager: { name: 'Отдел продаж ЮНИК С', phone: '8 (4842) 59-65-75' },
+        manager: createManager(),
         summary: 'Вертикально-сверлильный станок для сверления, рассверливания, зенкерования и нарезания резьбы.',
         galleryImages: ['/assets/img/stanok.webp', '/assets/img/catalog.jpeg'],
         details: [
@@ -185,7 +216,7 @@ export const catalogProducts = [
         condition: 'После сервиса',
         imageUrl: '/assets/img/catalog.jpeg',
         url: '/catalog/demo-6',
-        manager: { name: 'Отдел продаж ЮНИК С', phone: '8 (4842) 59-65-75' },
+        manager: createManager(),
         summary: 'Гидравлический пресс усилием 160 тонн для производственных, ремонтных и сборочных операций.',
         galleryImages: ['/assets/img/catalog.jpeg', '/assets/img/stanok.webp'],
         details: [
@@ -220,7 +251,7 @@ export const catalogProducts = [
         condition: 'Б/у',
         imageUrl: '/assets/img/stanok.webp',
         url: '/catalog/demo-7',
-        manager: { name: 'Отдел продаж ЮНИК С', phone: '8 (4842) 59-65-75' },
+        manager: createManager(),
         summary: 'Ленточнопильный станок для резки сортового и профильного металлопроката.',
         galleryImages: ['/assets/img/stanok.webp', '/assets/img/catalog.jpeg'],
         details: [
@@ -255,7 +286,7 @@ export const catalogProducts = [
         condition: 'Б/у',
         imageUrl: '/assets/img/catalog.jpeg',
         url: '/catalog/demo-8',
-        manager: { name: 'Отдел продаж ЮНИК С', phone: '8 (4842) 59-65-75' },
+        manager: createManager(),
         summary: 'Винтовой компрессор мощностью 11 кВт для стабильного снабжения производственной линии сжатым воздухом.',
         galleryImages: ['/assets/img/catalog.jpeg', '/assets/img/stanok.webp'],
         details: [
