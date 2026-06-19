@@ -1,7 +1,7 @@
-'use client';
-
+import type { Metadata } from 'next';
 import ImageView from 'next/image';
 import Link from 'next/link';
+import { Pagination } from '@/components/common/Pagination';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
 import {
@@ -16,47 +16,22 @@ import {
 } from '@mantine/core';
 import {
     IconArrowRight,
+    IconChevronLeft,
+    IconChevronRight,
+    IconChevronsLeft,
+    IconChevronsRight,
     IconExternalLink,
     IconMessageCircle,
     IconShieldCheck,
     IconTruckDelivery,
     IconVideo,
 } from '@tabler/icons-react';
+import { shipments } from '@/lib/shipments';
 
-const shipments = [
-    {
-        id: 'shipment-1',
-        title: 'Отгрузка машины для шовной сварки SBKJ SBFN-55',
-        date: '29.01.2024',
-        destination: 'Республика Беларусь, г. Смолевичи',
-        image: '/assets/img/otgruzki-1.jpeg',
-        summary: 'Экспортная отгрузка машины шовной сварки в Беларусь: онлайн-показ, проверка комплектности и полный пакет документов.',
-    },
-    {
-        id: 'shipment-2',
-        title: 'Отгрузка станка плазменной резки с ЧПУ Hypertherm PowerMax 105',
-        date: '26.09.2023',
-        destination: 'г. Обнинск, Калужская область',
-        image: '/assets/img/otgruzki-2.jpg',
-        summary: 'Плазменный станок Hypertherm PowerMax 105 отгружен в Обнинск после согласования условий, договора и логистики.',
-    },
-    {
-        id: 'shipment-3',
-        title: 'Отгрузка 1531М — токарно-карусельного одностоечного станка',
-        date: '31.08.2023',
-        destination: 'г. Пенза',
-        image: '/assets/img/otgruzki-3.jpeg',
-        summary: 'Токарно-карусельный 1531М отправлен в Пензу под восстановление с удаленным согласованием и контролем отгрузки.',
-    },
-    {
-        id: 'shipment-4',
-        title: 'Удаленная отгрузка с полным контролем процесса',
-        date: 'Кейс удаленной покупки',
-        destination: 'Отгрузка без присутствия клиента',
-        image: '/assets/img/otgruzki-1.jpeg',
-        summary: 'Если клиент не приезжает, организуем удаленную отгрузку: фото и видео узлов, онлайн-показ и фиксация погрузки.',
-    },
-];
+export const metadata: Metadata = {
+    title: 'Отгрузки оборудования | ЮНИК С',
+    description: 'Кейсы и отгрузки промышленного оборудования ЮНИК С с описанием этапов сделки и логистики.',
+};
 
 const remoteSupportSteps = [
     'Дополнительные фото и видео конкретных узлов по запросу.',
@@ -73,7 +48,34 @@ function shortText(text: string, maxLength = 150) {
     return `${text.slice(0, maxLength - 1).trimEnd()}…`;
 }
 
-function ShipmentsSection() {
+const SHIPMENTS_PER_PAGE = 8;
+
+type OtgruzkiPageProps = {
+    searchParams?: Promise<{
+        page?: string | string[];
+    }>;
+};
+
+function getCurrentPage(pageParam: string | string[] | undefined, totalPages: number) {
+    const pageValue = Array.isArray(pageParam) ? pageParam[0] : pageParam;
+    const parsedPage = Number(pageValue ?? 1);
+
+    if (!Number.isFinite(parsedPage) || parsedPage < 1) {
+        return 1;
+    }
+
+    return Math.min(Math.floor(parsedPage), totalPages);
+}
+
+function getShipmentsPageHref(page: number) {
+    return page === 1 ? '/otgruzki' : `/otgruzki?page=${page}`;
+}
+
+function ShipmentsSection({ page }: { page: number }) {
+    const totalPages = Math.ceil(shipments.length / SHIPMENTS_PER_PAGE);
+    const startIndex = (page - 1) * SHIPMENTS_PER_PAGE;
+    const visibleShipments = shipments.slice(startIndex, startIndex + SHIPMENTS_PER_PAGE);
+
     return (
         <section className="content-section content-section--white">
             <Container size="xl">
@@ -82,26 +84,58 @@ function ShipmentsSection() {
                         <Title order={2}>Наши отгрузки</Title>
                         <Text c="dimmed">Публикуем процесс сделки и логистики, чтобы вы видели, как проходят реальные поставки.</Text>
                     </Stack>
-                    <Button component={Link} href="/catalog" variant="outline" rightSection={<IconArrowRight size={18} />}>
+                    <Button component="a" href="/catalog" variant="outline" rightSection={<IconArrowRight size={18} />}>
                         Перейти в каталог
                     </Button>
                 </Group>
 
-                <SimpleGrid cols={{ base: 1, sm: 2, xl: 4 }} spacing="lg">
-                    {shipments.map((shipment) => (
+                <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="lg">
+                    {visibleShipments.map((shipment) => (
                         <article key={shipment.id} className="shipment-card">
-                            <div className="shipment-card__image">
+                            <Link href={`/otgruzki/${shipment.id}`} className="shipment-card__image">
                                 <ImageView src={shipment.image} alt={shipment.title} width={768} height={576} />
+                            </Link>
+                            <div className="shipment-card__body">
+                                <Text size="sm" c="dimmed">{shipment.date}</Text>
+
+                                <Text size="sm" c="dimmed">{shipment.location}</Text>
+
+                                <Title order={3}>
+                                    <Link href={`/otgruzki/${shipment.id}`}>{shipment.title}</Link>
+                                </Title>
+
+                                <Text>{shortText(shipment.summary)}</Text>
+
+                                <Group gap="xs">
+                                    {shipment.tags.map((tag) => (
+                                        <span key={tag} className="product-tag">{tag}</span>
+                                    ))}
+                                </Group>
+
+                                <Button
+                                    component="a"
+                                    href={`/otgruzki/${shipment.id}`}
+                                    className="product-card__more shipment-card__more"
+                                    rightSection={<IconArrowRight size={17} />}
+                                >
+                                    Подробнее
+                                </Button>
                             </div>
-                            <Group justify="space-between" gap="xs">
-                                <Badge variant="light" color="blue">{shipment.date}</Badge>
-                                <Text size="sm" c="dimmed">{shipment.destination}</Text>
-                            </Group>
-                            <Title order={3}>{shipment.title}</Title>
-                            <Text>{shortText(shipment.summary)}</Text>
                         </article>
                     ))}
                 </SimpleGrid>
+
+                <Pagination
+                    currentPage={page}
+                    totalPages={totalPages}
+                    getPageHref={getShipmentsPageHref}
+                    ariaLabel="Пагинация отгрузок"
+                    className="shipments-pagination"
+                    firstControl={<IconChevronsLeft size={18} />}
+                    previousControl={<IconChevronLeft size={18} />}
+                    nextControl={<IconChevronRight size={18} />}
+                    lastControl={<IconChevronsRight size={18} />}
+                />
             </Container>
         </section>
     );
@@ -192,7 +226,7 @@ function RemoteShipmentSection() {
                             Если вы выбираете удаленный формат и не присутствуете на отгрузке, мы контролируем процесс
                             погрузки и отправляем фото того, как оборудование размещено и закреплено в транспорте.
                         </Text>
-                        <Button component={Link} href="/about" variant="outline" rightSection={<IconArrowRight size={17} />}>
+                        <Button component="a" href="/about" variant="outline" rightSection={<IconArrowRight size={17} />}>
                             О компании
                         </Button>
                     </Group>
@@ -202,7 +236,11 @@ function RemoteShipmentSection() {
     );
 }
 
-export default function OtgruzkiPage() {
+export default async function OtgruzkiPage({ searchParams }: OtgruzkiPageProps) {
+    const params = await searchParams;
+    const totalPages = Math.max(1, Math.ceil(shipments.length / SHIPMENTS_PER_PAGE));
+    const page = getCurrentPage(params?.page, totalPages);
+
     return (
         <>
             <Header />
@@ -222,7 +260,7 @@ export default function OtgruzkiPage() {
                     </Container>
                 </section>
 
-                <ShipmentsSection />
+                <ShipmentsSection page={page} />
                 <FollowSection />
                 <RemoteShipmentSection />
             </main>

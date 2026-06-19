@@ -1,8 +1,8 @@
-'use client';
-
+import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { catalogProducts } from '@/lib/catalog-products';
+import { Pagination } from '@/components/common/Pagination';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
 import { ProductCard } from '@/components/catalog/ProductCard';
@@ -19,12 +19,45 @@ import {
     TextInput,
     Title,
 } from '@mantine/core';
-import { IconSearch } from '@tabler/icons-react';
+import {
+    IconChevronLeft,
+    IconChevronRight,
+    IconChevronsLeft,
+    IconChevronsRight,
+    IconSearch,
+} from '@tabler/icons-react';
+
+export const metadata: Metadata = {
+    title: 'Каталог оборудования | ЮНИК С',
+    description: 'Каталог промышленного оборудования, станков, спецтехники и инструмента с карточками товаров и контактами менеджера.',
+};
 
 const categories = Array.from(new Set(catalogProducts.map((product) => product.category)));
 const regions = Array.from(new Set(catalogProducts.map((product) => product.location)));
 const availability = ['В наличии', 'По запросу', 'Резерв'];
 const conditions = ['Новое', 'Б/у', 'После сервиса'];
+const CATALOG_PRODUCTS_PER_PAGE = 12;
+
+type CatalogPageProps = {
+    searchParams?: Promise<{
+        page?: string | string[];
+    }>;
+};
+
+function getCurrentPage(pageParam: string | string[] | undefined, totalPages: number) {
+    const pageValue = Array.isArray(pageParam) ? pageParam[0] : pageParam;
+    const parsedPage = Number(pageValue ?? 1);
+
+    if (!Number.isFinite(parsedPage) || parsedPage < 1) {
+        return 1;
+    }
+
+    return Math.min(Math.floor(parsedPage), totalPages);
+}
+
+function getCatalogPageHref(page: number) {
+    return page === 1 ? '/catalog' : `/catalog?page=${page}`;
+}
 
 function FilterCard({ title, children }: { title: string; children: ReactNode }) {
     return (
@@ -66,7 +99,13 @@ function CatalogFilters() {
     );
 }
 
-export default function CatalogPage() {
+export default async function CatalogPage({ searchParams }: CatalogPageProps) {
+    const params = await searchParams;
+    const totalPages = Math.max(1, Math.ceil(catalogProducts.length / CATALOG_PRODUCTS_PER_PAGE));
+    const currentPage = getCurrentPage(params?.page, totalPages);
+    const startIndex = (currentPage - 1) * CATALOG_PRODUCTS_PER_PAGE;
+    const visibleProducts = catalogProducts.slice(startIndex, startIndex + CATALOG_PRODUCTS_PER_PAGE);
+
     return (
         <>
             <Header />
@@ -101,11 +140,23 @@ export default function CatalogPage() {
                                         ]}
                                     />
                                 </Group>
+                                <Text size="sm" c="dimmed" mb="lg">Найдено 30 объявлений</Text>
                                 <SimpleGrid cols={{ base: 1, sm: 2, xl: 3 }} spacing="lg">
-                                    {catalogProducts.map((product) => (
+                                    {visibleProducts.map((product) => (
                                         <ProductCard key={product.id} product={product} />
                                     ))}
                                 </SimpleGrid>
+                                <Pagination
+                                    currentPage={currentPage}
+                                    totalPages={totalPages}
+                                    getPageHref={getCatalogPageHref}
+                                    ariaLabel="Пагинация каталога"
+                                    className="catalog-pagination"
+                                    firstControl={<IconChevronsLeft size={18} />}
+                                    previousControl={<IconChevronLeft size={18} />}
+                                    nextControl={<IconChevronRight size={18} />}
+                                    lastControl={<IconChevronsRight size={18} />}
+                                />
                             </div>
                         </div>
                     </Container>
@@ -117,7 +168,7 @@ export default function CatalogPage() {
                                 <Title order={2}>Не нашли нужную позицию?</Title>
                                 <Text>Оставьте запрос, и менеджер подберет оборудование под ваши параметры.</Text>
                             </Stack>
-                            <Button component={Link} href="/contacts" size="lg" leftSection={<IconSearch size={19} />}>
+                            <Button component="a" href="/contacts" size="lg" leftSection={<IconSearch size={19} />}>
                                 Оставить заявку
                             </Button>
                         </Group>

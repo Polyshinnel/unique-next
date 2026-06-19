@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import {
     Anchor,
     Button,
@@ -49,7 +48,7 @@ export function Footer() {
                     <Stack gap="sm">
                         <Text c="white" fw={700}>Разделы</Text>
                         {navItems.slice(1).map((item) => (
-                            <Anchor key={item.href} component={Link} href={item.href} className="footer-link">
+                            <Anchor key={item.href} href={item.href} className="footer-link">
                                 {item.label}
                             </Anchor>
                         ))}
@@ -66,7 +65,6 @@ export function Footer() {
                         {demoServices.map((service) => (
                             <Anchor
                                 key={service.id}
-                                component={Link}
                                 href={`/services/${service.slug}`}
                                 className="footer-link"
                             >

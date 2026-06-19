@@ -64,7 +64,7 @@ export function Header() {
                         <IconMail size={18} />
                         <span>{siteContacts.email}</span>
                     </Anchor>
-                    <Button component={Link} href="/contacts" onClick={close}>
+                    <Button component="a" href="/contacts" onClick={close}>
                         Связаться
                     </Button>
                 </Stack>

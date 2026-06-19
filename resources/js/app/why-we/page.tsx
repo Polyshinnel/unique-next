@@ -1,9 +1,13 @@
-'use client';
-
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
 import { Button, Container, Stack, Text, Title } from '@mantine/core';
+
+export const metadata: Metadata = {
+    title: 'Почему мы | ЮНИК С',
+    description: 'Преимущества работы с ЮНИК С при покупке, продаже и поставке промышленного оборудования.',
+};
 
 export default function WhyWePage() {
     return (
@@ -32,7 +36,7 @@ export default function WhyWePage() {
                             <Text c="dimmed" size="lg">
                                 Здесь удобно разместить аргументы для клиентов: опыт команды, прозрачность сделок, географию поставок, отзывы и примеры реализованных проектов.
                             </Text>
-                            <Button component={Link} href="/contacts">
+                            <Button component="a" href="/contacts">
                                 Связаться с нами
                             </Button>
                         </Stack>

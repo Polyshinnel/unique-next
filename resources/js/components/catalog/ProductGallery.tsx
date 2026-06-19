@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActionIcon, Image, Modal, Text } from '@mantine/core';
 import { IconChevronLeft, IconChevronRight, IconMinus, IconPlus, IconZoomReset } from '@tabler/icons-react';
 
@@ -14,7 +14,7 @@ const MAX_ZOOM = 3;
 const ZOOM_STEP = 0.25;
 
 export function ProductGallery({ title, images }: ProductGalleryProps) {
-    const normalizedImages = Array.from(new Set(images.filter(Boolean)));
+    const normalizedImages = useMemo(() => Array.from(new Set(images.filter(Boolean))), [images]);
     const [activeIndex, setActiveIndex] = useState(0);
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
@@ -29,18 +29,13 @@ export function ProductGallery({ title, images }: ProductGalleryProps) {
     });
     const suppressClickRef = useRef(false);
 
-    useEffect(() => {
-        if (normalizedImages.length === 0) {
-            setActiveIndex(0);
-            return;
-        }
-
-        setActiveIndex((currentIndex) => Math.min(currentIndex, normalizedImages.length - 1));
-    }, [normalizedImages.length]);
-
-    useEffect(() => {
+    const goToImage = useCallback((direction: 1 | -1) => {
         setZoom(MIN_ZOOM);
-    }, [activeIndex, isPreviewOpen]);
+        setActiveIndex((currentIndex) => {
+            const nextIndex = (currentIndex + direction + normalizedImages.length) % normalizedImages.length;
+            return nextIndex;
+        });
+    }, [normalizedImages.length]);
 
     useEffect(() => {
         if (!isPreviewOpen) {
@@ -64,7 +59,7 @@ export function ProductGallery({ title, images }: ProductGalleryProps) {
         return () => {
             window.removeEventListener('keydown', handleKeyDown);
         };
-    }, [isPreviewOpen, normalizedImages.length]);
+    }, [goToImage, isPreviewOpen]);
 
     useEffect(() => {
         const viewport = viewportRef.current;
@@ -82,13 +77,6 @@ export function ProductGallery({ title, images }: ProductGalleryProps) {
     }
 
     const activeImage = normalizedImages[activeIndex] ?? normalizedImages[0];
-
-    const goToImage = (direction: 1 | -1) => {
-        setActiveIndex((currentIndex) => {
-            const nextIndex = (currentIndex + direction + normalizedImages.length) % normalizedImages.length;
-            return nextIndex;
-        });
-    };
 
     const goToThumb = (direction: 1 | -1) => {
         setActiveIndex((currentIndex) => {
@@ -162,7 +150,7 @@ export function ProductGallery({ title, images }: ProductGalleryProps) {
         setIsDragging(false);
     };
 
-    const handlePointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
+    const handlePointerUp = () => {
         const viewport = viewportRef.current;
 
         if (viewport?.hasPointerCapture(dragStateRef.current.pointerId)) {
@@ -181,6 +169,7 @@ export function ProductGallery({ title, images }: ProductGalleryProps) {
             return;
         }
 
+        setZoom(MIN_ZOOM);
         setActiveIndex(index);
     };
 
@@ -197,7 +186,10 @@ export function ProductGallery({ title, images }: ProductGalleryProps) {
                 <button
                     type="button"
                     className="product-show-gallery__main"
-                    onClick={() => setIsPreviewOpen(true)}
+                    onClick={() => {
+                        setZoom(MIN_ZOOM);
+                        setIsPreviewOpen(true);
+                    }}
                     aria-label={`Открыть фото товара ${title}`}
                 >
                     <Image src={activeImage} alt={title} />

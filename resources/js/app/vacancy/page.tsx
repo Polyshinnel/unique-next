@@ -1,9 +1,13 @@
-'use client';
-
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
 import { Button, Container, Stack, Text, Title } from '@mantine/core';
+
+export const metadata: Metadata = {
+    title: 'Вакансии | ЮНИК С',
+    description: 'Карьерная страница ЮНИК С для публикации актуальных вакансий и условий работы.',
+};
 
 export default function VacancyPage() {
     return (
@@ -32,7 +36,7 @@ export default function VacancyPage() {
                             <Text c="dimmed" size="lg">
                                 Здесь можно добавить список вакансий, описание условий работы, стек задач и контакты для отклика.
                             </Text>
-                            <Button component={Link} href="/contacts">
+                            <Button component="a" href="/contacts">
                                 Отправить запрос
                             </Button>
                         </Stack>

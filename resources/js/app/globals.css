@@ -634,19 +634,24 @@ img {
 
 .shipment-card {
     height: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    padding: 24px;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    overflow: hidden;
     border: 1px solid var(--app-border);
     border-radius: 8px;
     background: #ffffff;
     box-shadow: 0 12px 28px rgba(13, 31, 54, 0.08);
+    transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+
+.shipment-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(19, 62, 113, 0.28);
+    box-shadow: var(--app-shadow);
 }
 
 .shipment-card__image {
-    overflow: hidden;
-    border-radius: 8px;
+    display: block;
     aspect-ratio: 4 / 3;
     background: #d9e2ec;
 }
@@ -657,11 +662,29 @@ img {
     object-fit: cover;
 }
 
+.shipment-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 18px;
+}
+
+.shipment-card__meta-label {
+    color: #172033;
+    line-height: 1.3;
+}
+
 .shipment-card h3 {
     color: var(--app-blue-dark);
-    font-size: 22px;
-    line-height: 1.24;
+    font-size: 18px;
+    line-height: 1.3;
     letter-spacing: 0;
+    min-height: 70px;
+}
+
+.shipment-card h3 a {
+    color: inherit;
+    text-decoration: none;
 }
 
 .shipment-card p {
@@ -670,16 +693,78 @@ img {
     line-height: 1.6;
 }
 
-.shipment-card__list {
-    margin: 0;
-    padding-left: 18px;
-    display: grid;
-    gap: 8px;
+.shipment-card__more {
+    margin-top: auto;
 }
 
-.shipment-card__list li {
-    color: #344054;
-    line-height: 1.55;
+.app-pagination,
+.shipments-pagination,
+.catalog-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 32px;
+    flex-wrap: wrap;
+}
+
+.app-pagination__control,
+.app-pagination__page,
+.shipments-pagination__control,
+.shipments-pagination__page,
+.catalog-pagination__control,
+.catalog-pagination__page {
+    min-width: 42px;
+    height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 12px;
+    border: 1px solid var(--app-border);
+    border-radius: 8px;
+    background: #ffffff;
+    color: var(--app-blue-dark);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.app-pagination__control:hover,
+.app-pagination__page:hover,
+.shipments-pagination__control:hover,
+.shipments-pagination__page:hover,
+.catalog-pagination__control:hover,
+.catalog-pagination__page:hover {
+    transform: translateY(-2px);
+    border-color: rgba(19, 62, 113, 0.28);
+}
+
+.app-pagination__page.is-active,
+.shipments-pagination__page.is-active,
+.catalog-pagination__page.is-active {
+    background: #133e71;
+    border-color: #133e71;
+    color: #ffffff;
+}
+
+.shipment-detail {
+    overflow: hidden;
+    border: 1px solid var(--app-border);
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 12px 28px rgba(13, 31, 54, 0.08);
+}
+
+.shipment-detail__image {
+    aspect-ratio: 16 / 9;
+    background: #d9e2ec;
+}
+
+.shipment-detail__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .otgruzki-follow-card {
@@ -1632,6 +1717,14 @@ img {
     .otgruzki-follow-card,
     .about-link-card {
         padding: 18px;
+    }
+
+    .shipment-card {
+        padding: 0;
+    }
+
+    .shipment-card h3 {
+        min-height: auto;
     }
 
     .otgruzki-follow-card h3 {

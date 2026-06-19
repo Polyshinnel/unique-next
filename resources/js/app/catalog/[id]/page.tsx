@@ -1,11 +1,9 @@
-'use client';
-
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
 import { ProductGallery } from '@/components/catalog/ProductGallery';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
-import { formatCatalogPrice, getCatalogProduct } from '@/lib/catalog-products';
+import { catalogProducts, formatCatalogPrice, getCatalogProduct } from '@/lib/catalog-products';
 import { emailHref, phoneHref } from '@/lib/site-content';
 import {
     Anchor,
@@ -20,9 +18,36 @@ import {
 } from '@mantine/core';
 import { IconArrowLeft, IconArrowRight, IconBrandTelegram, IconBrandWhatsapp, IconCheck, IconMessageCircle, IconMail, IconPhone } from '@tabler/icons-react';
 
-export default function ProductShowPage() {
-    const params = useParams<{ id: string }>();
-    const product = getCatalogProduct(params.id);
+type ProductShowPageProps = {
+    params: Promise<{
+        id: string;
+    }>;
+};
+
+export function generateStaticParams() {
+    return catalogProducts.map((product) => ({ id: product.id }));
+}
+
+export async function generateMetadata({ params }: ProductShowPageProps): Promise<Metadata> {
+    const { id } = await params;
+    const product = getCatalogProduct(id);
+
+    if (!product) {
+        return {
+            title: 'Товар не найден | ЮНИК С',
+            description: 'Запрошенная позиция каталога не найдена.',
+        };
+    }
+
+    return {
+        title: `${product.title} | ЮНИК С`,
+        description: product.summary,
+    };
+}
+
+export default async function ProductShowPage({ params }: ProductShowPageProps) {
+    const { id } = await params;
+    const product = getCatalogProduct(id);
 
     if (!product) {
         return (
@@ -35,7 +60,7 @@ export default function ProductShowPage() {
                                 <Badge variant="light" color="orange">Каталог</Badge>
                                 <Title order={1}>Товар не найден</Title>
                                 <Text c="dimmed">Позиция могла быть снята с публикации или перемещена.</Text>
-                                <Button component={Link} href="/catalog" leftSection={<IconArrowLeft size={18} />}>
+                                <Button component="a" href="/catalog" leftSection={<IconArrowLeft size={18} />}>
                                     Вернуться в каталог
                                 </Button>
                             </div>
@@ -169,7 +194,7 @@ export default function ProductShowPage() {
                                             Позвонить
                                         </Button>
                                         <Button
-                                            component={Link}
+                                            component="a"
                                             href="/contacts"
                                             size="lg"
                                             variant="default"

@@ -28,7 +28,7 @@ export function ProductCard({ product }: { product: Product }) {
                 </Group>
                 <span className="product-card__price">{formatCatalogPrice(product.price)}</span>
                 <Button
-                    component={Link}
+                    component="a"
                     href={product.url}
                     className="product-card__more"
                     rightSection={<IconArrowRight size={17} />}

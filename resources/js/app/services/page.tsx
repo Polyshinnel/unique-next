@@ -1,5 +1,4 @@
-'use client';
-
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { demoServices } from '@/lib/site-content';
 import { Footer } from '@/components/layout/Footer';
@@ -7,6 +6,11 @@ import { Header } from '@/components/layout/Header';
 import { ServiceCard } from '@/components/services/ServiceCard';
 import { Button, Container, Group, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 import { IconArrowRight } from '@tabler/icons-react';
+
+export const metadata: Metadata = {
+    title: 'Услуги | ЮНИК С',
+    description: 'Услуги ЮНИК С: продажа, выкуп, поставка, импорт и сопровождение сделок с промышленным оборудованием.',
+};
 
 function ServicesSection() {
     return (
@@ -17,7 +21,7 @@ function ServicesSection() {
                         <Title order={2}>Услуги</Title>
                         <Text c="dimmed">Основные направления работы с оборудованием и сделками.</Text>
                     </Stack>
-                    <Button component={Link} href="/services" variant="outline" rightSection={<IconArrowRight size={18} />}>
+                    <Button component="a" href="/services" variant="outline" rightSection={<IconArrowRight size={18} />}>
                         Все услуги
                     </Button>
                 </Group>

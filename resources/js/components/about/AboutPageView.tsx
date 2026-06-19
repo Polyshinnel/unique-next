@@ -1,9 +1,7 @@
-'use client';
-
-import { useState } from 'react';
 import Link from 'next/link';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
+import { AboutTabs } from '@/components/about/AboutTabs';
 import { Badge, Button, Container, Group, Image, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 import { IconArrowRight } from '@tabler/icons-react';
 
@@ -12,33 +10,6 @@ const coverageRegions = [
     'ПФО: Республики Марий Эл, Башкортостан, Удмуртия, Кировская, Самарская, Нижегородская области.',
     'ЮФО: Волгоградская область.',
     'УрФО: Челябинская область.',
-];
-
-const aboutTabs = [
-    {
-        id: 'expertise',
-        label: 'Мы умеем',
-        title: 'Знаем, как устроен этот рынок',
-        text: 'Мы уже более 5 лет работаем в сфере купли-продажи промышленного оборудования, импорта и поставки оборудования и промышленного инструмента. У нас большая клиентская база по всей территории РФ. А также всегда более 250 единиц оборудования в реализации. Мы обладаем всеми необходимыми компетенциями и инструментами для успешной работы в данной сфере.',
-    },
-    {
-        id: 'values',
-        label: 'Мы ценим',
-        title: 'Ценим наших клиентов и поставщиков',
-        text: 'Среди наших партнеров иностранные и российские компании. Наши основные клиенты - это крупные, средние и малые производственные компании по всей территории РФ. Работаем без НДС и с НДС. Даем гарантии там, где мы можем их дать. Всегда платим НДС, исполняем сроки и обязательства. Наши обязательства - это главный фокус в нашей работе.',
-    },
-    {
-        id: 'honesty',
-        label: 'Мы работаем',
-        title: 'Работаем прозрачно и честно',
-        text: 'Больше всего мы ценим прозрачность и честность в нашей работе. Именно поэтому мы стараемся сделать нашу работу максимально прозрачной: всегда предоставим всю необходимую информацию по компании, бухгалтерскую и финансовую отчетность по запросу. Также вы можете увидеть наши регулярные отгрузки или почитать отзывы о нас в социальных сетях.',
-    },
-    {
-        id: 'support',
-        label: 'Мы организуем',
-        title: 'Организуем сопутствующие вопросы',
-        text: 'У нас большой опыт по организации демонтажных работ, есть проверенные подрядчики, при необходимости привлечем спецтехнику. Через наших партнеров и через АТИ организуем любой транспорт в любую точку РФ и за ее границы. При поставке инструмента сделаем техническую документацию, проработаем вопросы закупки инструмента и привоза из-за границы: налаженные связи с поставщиками в КНР, логистика и таможня.',
-    },
 ];
 
 const bottomLinks = [
@@ -57,9 +28,6 @@ const bottomLinks = [
 ];
 
 export function AboutPageView() {
-    const [activeTab, setActiveTab] = useState(aboutTabs[0].id);
-    const currentTab = aboutTabs.find((tab) => tab.id === activeTab) ?? aboutTabs[0];
-
     return (
         <>
             <Header />
@@ -155,28 +123,7 @@ export function AboutPageView() {
                                 </Text>
                             </Stack>
 
-                            <div className="about-tabs">
-                                <div className="about-tabs__list" role="tablist" aria-label="Блок о компании">
-                                    {aboutTabs.map((tab) => (
-                                        <button
-                                            key={tab.id}
-                                            type="button"
-                                            role="tab"
-                                            aria-selected={tab.id === currentTab.id}
-                                            className={`about-tabs__button ${tab.id === currentTab.id ? 'about-tabs__button--active' : ''}`}
-                                            onClick={() => setActiveTab(tab.id)}
-                                        >
-                                            {tab.label}
-                                        </button>
-                                    ))}
-                                </div>
-
-                                <div className="about-tabs__panel" role="tabpanel">
-                                    <Badge variant="light" color="blue">{currentTab.label}</Badge>
-                                    <Title order={3}>{currentTab.title}</Title>
-                                    <Text c="dimmed" size="lg">{currentTab.text}</Text>
-                                </div>
-                            </div>
+                            <AboutTabs />
                         </Stack>
                     </Container>
                 </section>
@@ -190,7 +137,7 @@ export function AboutPageView() {
                                     <Title order={3}>{item.title}</Title>
                                     <Text c="dimmed">{item.text}</Text>
                                     <Group style={{ marginTop: 'auto' }}>
-                                        <Button component={Link} href={item.href} rightSection={<IconArrowRight size={18} />}>
+                                        <Button component="a" href={item.href} rightSection={<IconArrowRight size={18} />}>
                                             Перейти
                                         </Button>
                                     </Group>

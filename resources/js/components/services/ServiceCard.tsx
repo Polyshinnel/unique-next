@@ -17,7 +17,7 @@ export function ServiceCard({ service }: { service: DemoService }) {
                 </Title>
                 <Text c="dimmed">{service.excerpt}</Text>
                 <Button
-                    component={Link}
+                    component="a"
                     href={href}
                     className="product-card__more service-card__more"
                     rightSection={<IconArrowRight size={17} />}
