@@ -66,11 +66,11 @@ export function ProductGallery({ title, images }: ProductGalleryProps) {
         const activeThumb = viewport?.querySelector<HTMLButtonElement>('[aria-pressed="true"]');
 
         activeThumb?.scrollIntoView({
-            behavior: 'smooth',
+            behavior: isPreviewOpen ? 'auto' : 'smooth',
             block: 'nearest',
             inline: 'center',
         });
-    }, [activeIndex]);
+    }, [activeIndex, isPreviewOpen]);
 
     if (normalizedImages.length === 0) {
         return null;

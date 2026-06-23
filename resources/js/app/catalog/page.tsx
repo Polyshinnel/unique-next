@@ -20,6 +20,7 @@ import {
     Title,
 } from '@mantine/core';
 import {
+    IconBrandTelegram,
     IconChevronLeft,
     IconChevronRight,
     IconChevronsLeft,
@@ -118,9 +119,20 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
                             <span>Каталог оборудования</span>
                         </div>
                         <Title order={1}>Каталог оборудования</Title>
-                        <Text size="lg">
-                            Бывшее в употреблении промышленное оборудование: металлорежущие и деревообрабатывающие станки, прессовое и кузнечное оборудование, спецтехника и позиции для погрузочно-разгрузочных работ.
-                        </Text>
+                        <Stack gap="md" align="flex-start">
+                            <Text size="lg">
+                                Новое оборудование в нашем телеграм канале. Будь в курсе событий.
+                            </Text>
+                            <Button
+                                component="a"
+                                href="https://telegram.me/uniqset_gen"
+                                target="_blank"
+                                rel="noreferrer"
+                                leftSection={<IconBrandTelegram size={18} />}
+                            >
+                                Telegram
+                            </Button>
+                        </Stack>
                     </Container>
                 </section>
                 <section className="content-section catalog-section">

@@ -1,12 +1,37 @@
-export const shipments = [
+export type Shipment = {
+    id: string;
+    title: string;
+    date: string;
+    location: string;
+    image: string;
+    summary: string;
+    tags: string[];
+    galleryImages?: string[];
+    content?: string[];
+};
+
+export const shipments: Shipment[] = [
     {
         id: 'shipment-1',
-        title: 'Отгрузка машины для шовной сварки SBKJ SBFN-55',
+        title: 'Отгрузка машины для шовной сварки SВКJ SВFN-55 в Республику Беларусь',
         date: '29.01.2024',
         location: 'Республика Беларусь, г. Смолевичи',
-        image: '/assets/img/otgruzki-1.jpeg',
-        summary: 'Экспортная отгрузка машины шовной сварки в Беларусь: онлайн-показ, проверка комплектности и полный пакет документов.',
+        image: '/assets/img/shipments/sbkj-sbfn-55/1.jpeg',
+        summary: 'Экспортная отгрузка машины шовной сварки SВКJ SВFN-55 в Республику Беларусь с онлайн-показом, проверкой комплектности и подготовкой пакета документов.',
         tags: ['Экспорт', 'Видеоотчет', 'Документы'],
+        galleryImages: [
+            '/assets/img/shipments/sbkj-sbfn-55/1.jpeg',
+            '/assets/img/shipments/sbkj-sbfn-55/2.jpeg',
+            '/assets/img/shipments/sbkj-sbfn-55/3.jpeg',
+            '/assets/img/shipments/sbkj-sbfn-55/4.jpeg',
+            '/assets/img/shipments/sbkj-sbfn-55/5.jpeg',
+            '/assets/img/shipments/sbkj-sbfn-55/6.jpeg',
+        ],
+        content: [
+            '29.01.2024 г. отгрузили машину шовной сварки Китайского производства SВКJ SВFN-55 от крупного промышленного предприятия по ЭКСПОРТНОМУ ДОГОВОРУ в Республику Беларусь.',
+            'SВКJ SВFN-55 – машина для шовной сварки, производитель – Kитай, без проверки в работе, но до консервации в полностью работоспособном состоянии.',
+            'Показ онлайн – показали покупателю по видео-связи, показали со всех сторон, подтвердили комплектность. Далее составили экспортный договор без НДС, подготовили CMR-ки, отгрузочные и отправили попутной машиной на новое место работы в Минскую область, г. Смолевичи.',
+        ],
     },
     {
         id: 'shipment-2',
@@ -107,6 +132,4 @@ export const shipments = [
         summary: 'Собрали несколько позиций в одну логистическую поставку, синхронизировали документы и проконтролировали отправку.',
         tags: ['Комплексная поставка', 'Несколько позиций', 'Синхронизация'],
     },
-] as const;
-
-export type Shipment = (typeof shipments)[number];
+];

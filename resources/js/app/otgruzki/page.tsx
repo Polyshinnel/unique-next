@@ -40,6 +40,29 @@ const remoteSupportSteps = [
     'Контроль погрузки специалистами с фотофиксацией крепления оборудования в транспорте.',
 ];
 
+const followCards = [
+    {
+        badge: 'ВКонтакте',
+        badgeColor: 'orange',
+        title: 'Наша официальная группа во ВКонтакте',
+        description: 'Публикуем новые поступления, свежие кейсы по отгрузкам и показываем оборудование в работе.',
+        href: 'https://vk.com/uniqset',
+        action: 'Перейти во ВКонтакте',
+        qrSrc: '/assets/img/qr-vk-uniqset.svg',
+        qrAlt: 'QR-код для перехода в группу ЮНИК С во ВКонтакте',
+    },
+    {
+        badge: 'Авито',
+        badgeColor: 'blue',
+        title: 'Профиль компании и отзывы на Авито',
+        description: 'Смотрите актуальные объявления, переходите к отзывам и оценивайте наш профиль перед обращением.',
+        href: 'https://www.avito.ru/brands/i182086396',
+        action: 'Открыть Авито',
+        qrSrc: '/assets/img/qr-avito-uniqset.svg',
+        qrAlt: 'QR-код для перехода в профиль ЮНИК С на Авито',
+    },
+] as const;
+
 function shortText(text: string, maxLength = 150) {
     if (text.length <= maxLength) {
         return text;
@@ -84,9 +107,6 @@ function ShipmentsSection({ page }: { page: number }) {
                         <Title order={2}>Наши отгрузки</Title>
                         <Text c="dimmed">Публикуем процесс сделки и логистики, чтобы вы видели, как проходят реальные поставки.</Text>
                     </Stack>
-                    <Button component="a" href="/catalog" variant="outline" rightSection={<IconArrowRight size={18} />}>
-                        Перейти в каталог
-                    </Button>
                 </Group>
 
                 <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="lg">
@@ -145,52 +165,54 @@ function FollowSection() {
     return (
         <section className="content-section">
             <Container size="xl">
-                <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="lg">
-                    <article className="otgruzki-follow-card">
-                        <Badge variant="light" color="orange">Соцсети</Badge>
-                        <Title order={3}>Наша официальная группа во ВКонтакте</Title>
-                        <Text c="dimmed">
-                            Подписывайтесь, чтобы следить за нашей работой, новыми поставками и живыми кейсами.
+                <Stack gap="xl">
+                    <Stack gap={6}>
+                        <Title order={2}>Где можно посмотреть нас ближе</Title>
+                        <Text c="dimmed" maw={760}>
+                            Переходите в наши публичные каналы, чтобы увидеть новые предложения, отзывы и реальные кейсы.
                         </Text>
-                        <Button
-                            component="a"
-                            href="https://vk.com/uniqset"
-                            target="_blank"
-                            rel="noreferrer"
-                            rightSection={<IconExternalLink size={17} />}
-                        >
-                            Подписаться
-                        </Button>
-                    </article>
+                    </Stack>
 
-                    <article className="otgruzki-follow-card">
-                        <Badge variant="light" color="blue">Отзывы</Badge>
-                        <Title order={3}>97% клиентов довольны нашей работой</Title>
-                        <Text c="dimmed">
-                            Посмотрите отзывы о компании в профиле Авито и переходите к актуальным объявлениям.
+                    <div className="otgruzki-follow-summary">
+                        <Badge variant="filled" color="orange" size="lg">97%</Badge>
+                        <Text size="lg">
+                            <strong>97% клиентов довольны нашей работой</strong> и возвращаются к нам за следующими
+                            сделками или рекомендуют нас коллегам.
                         </Text>
-                        <Group gap="sm">
-                            <Button
-                                component="a"
-                                href="https://www.avito.ru/brands/i182086396"
-                                target="_blank"
-                                rel="noreferrer"
-                                rightSection={<IconExternalLink size={17} />}
-                            >
-                                Смотреть отзывы
-                            </Button>
-                            <Button
-                                component="a"
-                                href="https://www.avito.ru/brands/i182086396"
-                                target="_blank"
-                                rel="noreferrer"
-                                variant="default"
-                            >
-                                Мы на Авито
-                            </Button>
-                        </Group>
-                    </article>
-                </SimpleGrid>
+                    </div>
+
+                    <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="lg">
+                        {followCards.map((card) => (
+                            <article key={card.title} className="otgruzki-follow-card">
+                                <div className="otgruzki-follow-card__content">
+                                    <div className="otgruzki-follow-card__body">
+                                        <Badge variant="light" color={card.badgeColor}>{card.badge}</Badge>
+                                        <Title order={3}>{card.title}</Title>
+                                        <Text c="dimmed">{card.description}</Text>
+                                        <Button
+                                            component="a"
+                                            href={card.href}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            rightSection={<IconExternalLink size={17} />}
+                                        >
+                                            {card.action}
+                                        </Button>
+                                    </div>
+
+                                    <div className="otgruzki-follow-card__qr">
+                                        <div className="otgruzki-follow-card__qr-frame">
+                                            <ImageView src={card.qrSrc} alt={card.qrAlt} width={220} height={220} />
+                                        </div>
+                                        <Text size="sm" c="dimmed" ta="center">
+                                            Сканируйте QR-код, чтобы открыть страницу сразу на телефоне.
+                                        </Text>
+                                    </div>
+                                </div>
+                            </article>
+                        ))}
+                    </SimpleGrid>
+                </Stack>
             </Container>
         </section>
     );
