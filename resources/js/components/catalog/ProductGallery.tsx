@@ -65,10 +65,18 @@ export function ProductGallery({ title, images }: ProductGalleryProps) {
         const viewport = viewportRef.current;
         const activeThumb = viewport?.querySelector<HTMLButtonElement>('[aria-pressed="true"]');
 
-        activeThumb?.scrollIntoView({
+        if (!viewport || !activeThumb) {
+            return;
+        }
+
+        const targetScrollLeft = Math.max(
+            0,
+            activeThumb.offsetLeft - (viewport.clientWidth - activeThumb.clientWidth) / 2,
+        );
+
+        viewport.scrollTo({
+            left: targetScrollLeft,
             behavior: isPreviewOpen ? 'auto' : 'smooth',
-            block: 'nearest',
-            inline: 'center',
         });
     }, [activeIndex, isPreviewOpen]);
 

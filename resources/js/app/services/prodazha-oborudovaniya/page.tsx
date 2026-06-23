@@ -268,9 +268,11 @@ function SummarySection() {
         <section className="content-section">
             <Container size="xl">
                 <div className="sales-summary-card">
-                    <Stack gap="md">
-                        <Title order={2}>Другими словами, мы уже:</Title>
-                        <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
+                    <Stack gap="xl">
+                        <Title order={2} mb="md">
+                            Другими словами, мы уже:
+                        </Title>
+                        <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md" mt="md">
                             {alreadyDoneList.map((item) => (
                                 <div key={item} className="sales-list-item">
                                     <span className="sales-list-item__dot" />
@@ -348,12 +350,12 @@ function RemotePurchaseSection() {
             <Container size="xl">
                 <div className="sales-remote-card">
                     <Stack gap="xl">
-                        <Stack gap="md">
-                            <Title order={2}>
+                        <Stack gap="xl">
+                            <Title order={2} mb="md">
                                 Наши клиенты часто покупают оборудование удалено, после предоставленной нашими
                                 специалистами информации, например:
                             </Title>
-                            <SimpleGrid cols={{ base: 1, md: 3 }} spacing="md">
+                            <SimpleGrid cols={{ base: 1, md: 3 }} spacing="md" mt="md">
                                 {remotePurchaseSupport.map((item, index) => {
                                     const icons = [IconShieldCheck, IconVideo, IconMessageCircle];
                                     const Icon = icons[index] || IconShieldCheck;

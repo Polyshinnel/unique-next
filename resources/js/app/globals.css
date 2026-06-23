@@ -491,6 +491,68 @@ img {
     line-height: 1.18;
 }
 
+.vacancy-intro {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(320px, 520px);
+    gap: clamp(28px, 5vw, 72px);
+    align-items: center;
+}
+
+.vacancy-intro__image {
+    overflow: hidden;
+    max-width: 420px;
+    max-height: 380px;
+    width: 100%;
+    margin-left: auto;
+    border-radius: 8px;
+    box-shadow: var(--app-shadow);
+    background: #d9e2ec;
+}
+
+.vacancy-intro__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.vacancy-card,
+.vacancy-contact-card {
+    padding: clamp(24px, 4vw, 36px);
+    border: 1px solid var(--app-border);
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 12px 28px rgba(13, 31, 54, 0.08);
+}
+
+.vacancy-card__title {
+    color: var(--app-blue-dark);
+    font-size: clamp(24px, 3vw, 34px);
+    line-height: 1.22;
+}
+
+.vacancy-card__subtitle {
+    color: var(--app-blue-dark);
+    font-size: clamp(20px, 2.2vw, 26px);
+    font-weight: 800;
+    line-height: 1.3;
+}
+
+.vacancy-card__note {
+    margin: 0;
+    padding: 20px 22px;
+    border-left: 4px solid var(--app-orange);
+    border-radius: 8px;
+    color: #22324a;
+    line-height: 1.7;
+    background: rgba(240, 163, 47, 0.08);
+}
+
+.vacancy-contact-card {
+    background:
+        linear-gradient(135deg, rgba(19, 62, 113, 0.06), rgba(240, 163, 47, 0.08)),
+        #ffffff;
+}
+
 .product-card,
 .service-card {
     height: 100%;
@@ -1304,20 +1366,7 @@ img {
 
 .instrument-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(320px, 390px);
-    gap: clamp(24px, 4vw, 38px);
-    align-items: start;
-}
-
-.instrument-layout__main {
-    display: grid;
-    gap: 24px;
-    min-width: 0;
-}
-
-.instrument-layout__aside {
-    display: grid;
-    gap: 24px;
+    gap: clamp(24px, 4vw, 32px);
 }
 
 .instrument-card {
@@ -1328,15 +1377,8 @@ img {
     box-shadow: 0 12px 28px rgba(13, 31, 54, 0.08);
 }
 
-.instrument-card--sticky {
-    position: sticky;
-    top: 106px;
-}
-
 .instrument-quote-card {
-    background:
-        linear-gradient(135deg, rgba(19, 62, 113, 0.04), rgba(240, 163, 47, 0.14)),
-        #ffffff;
+    background: #ffffff;
 }
 
 .instrument-side-note {
@@ -1575,6 +1617,128 @@ img {
     margin: 0;
     color: #22324a;
     line-height: 1.75;
+}
+
+.import-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background:
+        linear-gradient(90deg, rgba(8, 27, 51, 0.32), rgba(8, 27, 51, 0.14)),
+        url('/assets/img/services/import-page/import-block.jpeg') center 28% / cover;
+    opacity: 0.22;
+}
+
+.import-intro-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1.12fr) minmax(320px, 500px);
+    gap: clamp(22px, 4vw, 36px);
+    align-items: stretch;
+}
+
+.import-intro-card__content p,
+.import-contact-band p,
+.import-gallery-caption {
+    margin: 0;
+    color: #22324a;
+    line-height: 1.75;
+}
+
+.import-intro-card__media {
+    overflow: hidden;
+    border-radius: 8px;
+    min-height: 320px;
+}
+
+.import-intro-card__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.import-offer-section {
+    background:
+        radial-gradient(circle at top left, rgba(19, 62, 113, 0.06), transparent 28%),
+        linear-gradient(180deg, #f6f8fb, #eef3f8);
+}
+
+.import-offer-stack {
+    display: grid;
+    gap: clamp(22px, 3vw, 28px);
+}
+
+.import-quote-card {
+    padding: clamp(24px, 3vw, 32px);
+    background: #eaf4ff;
+}
+
+.import-quote-card p {
+    text-align: left;
+    font-size: clamp(20px, 2.2vw, 28px);
+}
+
+.import-form-card {
+    position: static;
+}
+
+.import-gallery-caption {
+    max-width: 880px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.import-section-heading {
+    display: grid;
+    gap: 10px;
+}
+
+.import-advantage-card p {
+    margin: 0;
+    line-height: 1.75;
+}
+
+.import-contact-band {
+    padding: clamp(22px, 3vw, 30px);
+    border: 1px solid var(--app-border);
+    border-radius: 8px;
+    background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(245, 247, 250, 0.96)),
+        #ffffff;
+    box-shadow: 0 12px 28px rgba(13, 31, 54, 0.08);
+}
+
+.why-we-hero {
+    background: var(--app-blue-dark);
+}
+
+.why-we-intro {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(320px, 480px);
+    gap: clamp(24px, 4vw, 40px);
+    align-items: center;
+}
+
+.why-we-intro__content p {
+    margin: 0;
+    color: #22324a;
+    line-height: 1.75;
+}
+
+.why-we-intro__media {
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.why-we-intro__media img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+}
+
+.why-we-form-card {
+    position: static;
 }
 
 .contacts-hero {
@@ -2151,7 +2315,8 @@ img {
     }
 
     .about-company-grid,
-    .about-map-layout {
+    .about-map-layout,
+    .vacancy-intro {
         grid-template-columns: 1fr;
     }
 
@@ -2168,7 +2333,8 @@ img {
     .catalog-layout,
     .contacts-layout,
     .product-show-layout,
-    .instrument-layout,
+    .why-we-intro,
+    .import-intro-card,
     .buyout-hero__layout,
     .buyout-regions-layout {
         grid-template-columns: 1fr;
@@ -2176,7 +2342,6 @@ img {
 
     .catalog-sidebar,
     .product-show-aside,
-    .instrument-card--sticky,
     .buyout-form-card {
         position: static;
     }
@@ -2219,7 +2384,16 @@ img {
         height: auto;
     }
 
+    .vacancy-intro__image {
+        order: -1;
+    }
+
     .about-company-image img {
+        height: auto;
+        aspect-ratio: 4 / 3;
+    }
+
+    .vacancy-intro__image img {
         height: auto;
         aspect-ratio: 4 / 3;
     }
@@ -2295,6 +2469,9 @@ img {
     .sales-summary-card,
     .sales-remote-card,
     .sales-advantage-card,
+    .vacancy-card,
+    .vacancy-contact-card,
+    .import-intro-card,
     .instrument-card,
     .buyout-regions-card,
     .buyout-form-card,
@@ -2322,6 +2499,14 @@ img {
 
     .buyout-hero__media {
         min-height: 260px;
+    }
+
+    .import-intro-card__media {
+        min-height: 240px;
+    }
+
+    .import-quote-card p {
+        text-align: center;
     }
 
     .otgruzki-step {
