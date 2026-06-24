@@ -1128,6 +1128,7 @@ img {
     position: relative;
     overflow: hidden;
     isolation: isolate;
+    min-height: clamp(420px, 42vw, 520px);
 }
 
 .catalog-hero::before {
@@ -1135,8 +1136,8 @@ img {
     position: absolute;
     inset: 0;
     z-index: -2;
-    background: url('/assets/img/catalog.jpeg') center / cover;
-    opacity: 0.2;
+    background: url('/assets/img/catalog-banner.png') center / cover no-repeat;
+    opacity: 1;
 }
 
 .catalog-hero::after {
@@ -1144,7 +1145,7 @@ img {
     position: absolute;
     inset: 0;
     z-index: -1;
-    background: linear-gradient(135deg, rgba(8, 27, 51, 0.95), rgba(19, 62, 113, 0.86));
+    background: linear-gradient(135deg, rgba(8, 27, 51, 0.72), rgba(19, 62, 113, 0.52));
 }
 
 .catalog-breadcrumbs {
@@ -1216,10 +1217,8 @@ img {
     position: absolute;
     inset: 0;
     z-index: -2;
-    background:
-        linear-gradient(90deg, rgba(8, 27, 51, 0.36), rgba(8, 27, 51, 0.18)),
-        url('/assets/img/serv-1.jpeg') center / cover;
-    opacity: 0.36;
+    background: url('/assets/img/catalog-banner.png') center / cover no-repeat;
+    opacity: 1;
 }
 
 .sales-hero::after {
@@ -1227,9 +1226,7 @@ img {
     position: absolute;
     inset: 0;
     z-index: -1;
-    background:
-        radial-gradient(circle at top right, rgba(240, 163, 47, 0.18), transparent 24%),
-        linear-gradient(135deg, rgba(8, 27, 51, 0.96), rgba(19, 62, 113, 0.9));
+    background: linear-gradient(135deg, rgba(8, 27, 51, 0.72), rgba(19, 62, 113, 0.52));
 }
 
 .sales-intro-card,
@@ -1285,6 +1282,16 @@ img {
 .sales-list-item--surface {
     height: 100%;
     background: #ffffff;
+}
+
+.sales-list-item--fullwidth {
+    width: 100%;
+}
+
+.instrument-section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
 .sales-list-item__dot {
@@ -1440,8 +1447,9 @@ img {
     inset: 0;
     z-index: -2;
     background:
-        radial-gradient(circle at top right, rgba(240, 163, 47, 0.24), transparent 28%),
-        linear-gradient(135deg, rgba(8, 27, 51, 0.92), rgba(19, 62, 113, 0.84));
+        linear-gradient(90deg, rgba(8, 27, 51, 0.36), rgba(8, 27, 51, 0.14)),
+        url('/assets/img/slide-2.jpg') center 28% / cover no-repeat;
+    opacity: 0.36;
 }
 
 .buyout-hero__layout {

@@ -174,7 +174,7 @@ function RegionsSection() {
                                 следующих регионах:
                             </Title>
 
-                            <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
+                            <SimpleGrid cols={1} spacing="md">
                                 {regionList.map((item) => (
                                     <div key={item} className="buyout-list-item buyout-list-item--compact">
                                         <span className="buyout-list-item__dot" />

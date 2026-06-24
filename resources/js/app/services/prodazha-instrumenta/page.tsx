@@ -3,24 +3,23 @@ import Link from 'next/link';
 import { ProductGallery } from '@/components/catalog/ProductGallery';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
+import { ToolCategoriesSection } from './components/ToolCategoriesSection';
+import { SuppliersSection } from './components/SuppliersSection';
 import {
     Button,
     Container,
     Group,
-    SimpleGrid,
     Stack,
     Text,
     Title,
 } from '@mantine/core';
 import {
     IconBrandTelegram,
-    IconBuildingFactory2,
     IconCertificate,
     IconCheck,
     IconMail,
     IconMapPin,
     IconPhone,
-    IconTool,
     IconTruckDelivery,
 } from '@tabler/icons-react';
 import type { TablerIcon } from '@tabler/icons-react';
@@ -31,35 +30,6 @@ export const metadata: Metadata = {
 };
 
 const galleryImages = Array.from({ length: 15 }, (_, index) => `/assets/img/services/instrument-page/${index + 1}.jpg`);
-
-const toolCategories = [
-    'Металлорежущий: метчики, плашки, сверла, фрезы, резцы, развертки',
-    'Алмазный: диски, бруски и другие позиции',
-    'Абразивный: отрезные, зачистные, шлифовальные, алмазные круги, карандаши',
-    'Мерительный: рулетки, линейки, индикаторы, микрометры, нутромеры',
-    'Пневмоинструмент: молотки, краскораспылители, шлифмашины',
-    'Электроинструмент: дрели, перфораторы, шлифмашины',
-    'Газовое оборудование: резаки, горелки, манометры, редукторы',
-    'Слесарный: молотки, плоскогубцы, напильники',
-    'Патроны, УДГ и прочее',
-] as const;
-
-const suppliers = [
-    'ООО НПК "Томский инструмент" (Томск)',
-    'ООО ПО "Волжский инструмент" (Самара)',
-    'ООО "Хоффманн Проф. Инструмент" (Санкт-Петербург)',
-    'ООО "Белый медведь" (Нижний Новгород)',
-    'ООО "Промцентр" (Чебоксары)',
-    'ООО "Алмазный Инструмент" (Белгород)',
-    'ОАО "Суксунский ОМЗ" (Пермский край)',
-    'АО "Канашский завод резцов" (Канаш)',
-    'АО "СТИЗ" (Ставрополь)',
-    'ООО "Нэфис Косметик" (Казань)',
-    'Волжский абразивный завод',
-    'ООО "Техоснастка-С" (Саранск)',
-    'ООО ПО "Инреко" (Йошкар-Ола)',
-    'Электроинструмент марки "Интерскол"',
-] as const;
 
 const contactItems: ReadonlyArray<{
     icon: TablerIcon;
@@ -129,24 +99,7 @@ export default function ToolSalesPage() {
                 <section className="content-section instrument-section">
                     <Container size="xl">
                         <div className="instrument-layout">
-                            <section className="instrument-card sales-intro-card">
-                                <Stack gap="md">
-                                    <Group gap="sm" align="center">
-                                        <span className="sales-search-card__icon">
-                                            <IconTool size={24} />
-                                        </span>
-                                        <Title order={2}>Коникс предлагает все основные виды инструмента</Title>
-                                    </Group>
-                                    <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
-                                        {toolCategories.map((item) => (
-                                            <div key={item} className="sales-list-item sales-list-item--surface">
-                                                <span className="sales-list-item__dot" />
-                                                <Text>{item}</Text>
-                                            </div>
-                                        ))}
-                                    </SimpleGrid>
-                                </Stack>
-                            </section>
+                            <ToolCategoriesSection />
 
                             <ProductGallery
                                 title="Продажа инструмента"
@@ -162,24 +115,7 @@ export default function ToolSalesPage() {
                                 </blockquote>
                             </section>
 
-                            <section className="instrument-card">
-                                <Stack gap="xl">
-                                    <Group gap="sm" align="center">
-                                        <span className="sales-search-card__icon">
-                                            <IconBuildingFactory2 size={24} />
-                                        </span>
-                                        <Title order={2}>От самых популярных поставщиков</Title>
-                                    </Group>
-                                    <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
-                                        {suppliers.map((supplier) => (
-                                            <div key={supplier} className="sales-list-item">
-                                                <span className="sales-list-item__dot" />
-                                                <Text>{supplier}</Text>
-                                            </div>
-                                        ))}
-                                    </SimpleGrid>
-                                </Stack>
-                            </section>
+                            <SuppliersSection />
 
                             <section className="instrument-card">
                                 <Stack gap="lg">

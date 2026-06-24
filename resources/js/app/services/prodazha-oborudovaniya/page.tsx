@@ -5,6 +5,7 @@ import { catalogProducts } from '@/lib/catalog-products';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
 import { ProductCard } from '@/components/catalog/ProductCard';
+import { SummarySection } from './components/SummarySection';
 import {
     Badge,
     Button,
@@ -23,7 +24,6 @@ import {
     IconMessageCircle,
     IconPhotoScan,
     IconReceiptTax,
-    IconSearch,
     IconShieldCheck,
     IconTruckDelivery,
     IconVideo,
@@ -36,21 +36,6 @@ export const metadata: Metadata = {
 
 const catalogHref = '/catalog';
 const telegramHref = 'https://telegram.me/uniqset_gen';
-
-const searchExamples = [
-    'токарный, токарно, винторезный, револьверный',
-    'фрезерный, вертикально, горизонтально',
-    'шлифовальный, плоско, кругло, внутри',
-    'листогиб, трубогиб, гильотина, вальцы',
-    'пресс, гидравлический, механический',
-    'тонн, 20, 100, 160, 200, 1000, усилие',
-    '16К20, ДИП 300, 1К625, 16А20, 1М65',
-    '6Р12, 676П, ВМ127, 6М76П, 6Р83',
-    '3У133, 3М151, 3А228, 3Е711В, 3Б722',
-    'И1330, ИВ3428, Н3118, МВ-412',
-    'КД2118, КД2124, КД2328, КЕ2330',
-    'Д2430Б, ДА2238, П6330, П6736, КА5535',
-];
 
 const advantages = [
     {
@@ -181,43 +166,6 @@ function LatestProductsSection() {
     );
 }
 
-function SearchGuideSection() {
-    return (
-        <section className="content-section content-section--white">
-            <Container size="xl">
-                <div className="sales-search-card">
-                    <Stack gap="md">
-                        <Group gap="sm" align="center">
-                            <span className="sales-search-card__icon">
-                                <IconSearch size={24} />
-                            </span>
-                            <Title order={2}>Используйте поиск и фильтры</Title>
-                        </Group>
-                        <Text c="dimmed" size="lg">
-                            Введите в строке поиска «ключевое слово» – название модели, ключевые слова, например:
-                        </Text>
-                    </Stack>
-
-                    <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md" mt="xl">
-                        {searchExamples.map((item) => (
-                            <div key={item} className="sales-list-item">
-                                <span className="sales-list-item__dot" />
-                                <Text>{item}</Text>
-                            </div>
-                        ))}
-                    </SimpleGrid>
-
-                    <Group mt="xl">
-                        <Button component="a" href={catalogHref} size="lg" rightSection={<IconArrowRight size={18} />}>
-                            В каталог
-                        </Button>
-                    </Group>
-                </div>
-            </Container>
-        </section>
-    );
-}
-
 function SloganSection() {
     return (
         <section className="content-section content-section--tight-top sales-quote-section">
@@ -258,30 +206,6 @@ function AdvantagesSection() {
                         })}
                     </SimpleGrid>
                 </Stack>
-            </Container>
-        </section>
-    );
-}
-
-function SummarySection() {
-    return (
-        <section className="content-section">
-            <Container size="xl">
-                <div className="sales-summary-card">
-                    <Stack gap="xl">
-                        <Title order={2} mb="md">
-                            Другими словами, мы уже:
-                        </Title>
-                        <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md" mt="md">
-                            {alreadyDoneList.map((item) => (
-                                <div key={item} className="sales-list-item">
-                                    <span className="sales-list-item__dot" />
-                                    <Text>{item}</Text>
-                                </div>
-                            ))}
-                        </SimpleGrid>
-                    </Stack>
-                </div>
             </Container>
         </section>
     );
@@ -431,10 +355,9 @@ export default function ProductSaleServicePage() {
             <main>
                 <HeroSection />
                 <LatestProductsSection />
-                <SearchGuideSection />
-                <SloganSection />
                 <AdvantagesSection />
-                <SummarySection />
+                <SloganSection />
+                <SummarySection items={alreadyDoneList} />
                 <SocialSection />
                 <RemotePurchaseSection />
             </main>

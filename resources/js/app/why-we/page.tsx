@@ -153,7 +153,7 @@ function AdvantagesSection() {
                 <Stack gap="xl">
                     <Title order={2}>Что вы получите, покупая оборудование у нас:</Title>
 
-                    <SimpleGrid cols={1} spacing="lg">
+                    <SimpleGrid cols={{ base: 1, md: 3 }} spacing="lg">
                         {advantages.map((item) => {
                             const Icon = item.icon;
 
