@@ -136,6 +136,11 @@ img {
     background: rgba(19, 62, 113, 0.08);
 }
 
+.site-nav__link--active {
+    color: var(--app-blue);
+    background: rgba(19, 62, 113, 0.1);
+}
+
 .site-header__contacts {
     display: flex;
     flex-direction: column;

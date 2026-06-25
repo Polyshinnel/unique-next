@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import {
     Anchor,
     Box,
@@ -16,13 +17,34 @@ import { useDisclosure } from '@mantine/hooks';
 import { IconMail, IconPhone } from '@tabler/icons-react';
 import { emailHref, navItems, phoneHref, siteContacts } from '@/lib/site-content';
 
+const headerInactiveRoutes = new Set(['/ohrana-truda', '/private-policy']);
+
+function isNavItemActive(currentPath: string, itemHref: string) {
+    if (headerInactiveRoutes.has(currentPath)) {
+        return false;
+    }
+
+    if (itemHref === '/') {
+        return currentPath === '/';
+    }
+
+    return currentPath === itemHref || currentPath.startsWith(`${itemHref}/`);
+}
+
 export function Header() {
     const [opened, { toggle, close }] = useDisclosure(false);
+    const pathname = usePathname() ?? '/';
 
     const menu = (
         <nav className="site-nav">
             {navItems.map((item) => (
-                <Link key={item.href} href={item.href} className="site-nav__link" onClick={close}>
+                <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`site-nav__link${isNavItemActive(pathname, item.href) ? ' site-nav__link--active' : ''}`}
+                    aria-current={isNavItemActive(pathname, item.href) ? 'page' : undefined}
+                    onClick={close}
+                >
                     {item.label}
                 </Link>
             ))}
