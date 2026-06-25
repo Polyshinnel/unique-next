@@ -1,3 +1,9 @@
+import {
+    type FlatCatalogCategory,
+    getCatalogCategoryBySlug,
+    getCatalogCategoryDescendantSlugs,
+} from '@/lib/catalog-categories';
+
 const defaultManager = {
     name: 'Нестеров Андрей',
     phone: '8(903)026-44-56',
@@ -23,13 +29,14 @@ export const catalogProducts = [
         id: 'demo-1',
         title: 'Токарный станок 16К20',
         sku: 'UNQ-2048',
-        category: 'Металлорежущие станки',
+        category: '16К20 и аналоги',
+        categorySlug: '16k20-i-analogi',
         location: 'Калуга',
         price: { amount: 1250000, isPublished: true },
         availability: 'В наличии',
         condition: 'Б/у',
         imageUrl: '/assets/img/products/demo-1/1.jpg',
-        url: '/catalog/demo-1',
+        url: '/catalog/tokarnie-stanki/16k20-i-analogi/demo-1',
         manager: createManager(),
         summary: 'Универсальный токарно-винторезный станок для обработки деталей из стали, чугуна и цветных металлов.',
         galleryImages: [
@@ -69,13 +76,14 @@ export const catalogProducts = [
         id: 'demo-2',
         title: 'Листогибочный пресс 100 т',
         sku: 'UNQ-2051',
-        category: 'Прессовое оборудование',
+        category: 'Листогибочные прессы',
+        categorySlug: 'listogibochnye-pressy',
         location: 'Москва',
         price: { amount: null, isPublished: false },
         availability: 'По запросу',
         condition: 'Б/у',
         imageUrl: '/assets/img/catalog.jpeg',
-        url: '/catalog/demo-2',
+        url: '/catalog/pressovoe-oborudovanie/listogibochnye-pressy/demo-2',
         manager: createManager(),
         summary: 'Гидравлический листогибочный пресс для гибки листового металла на производственных участках.',
         galleryImages: ['/assets/img/catalog.jpeg', '/assets/img/stanok.webp'],
@@ -104,13 +112,14 @@ export const catalogProducts = [
         id: 'demo-3',
         title: 'Фрезерный обрабатывающий центр',
         sku: 'UNQ-2074',
-        category: 'Станки с ЧПУ',
+        category: 'Фрезерные обрабатывающие центры',
+        categorySlug: 'frezernye-obrabatyvayushchie-centry',
         location: 'Тула',
         price: { amount: 3900000, isPublished: true },
         availability: 'В наличии',
         condition: 'После сервиса',
         imageUrl: '/assets/img/stanok.webp',
-        url: '/catalog/demo-3',
+        url: '/catalog/stanki-s-chpu/frezernye-obrabatyvayushchie-centry/demo-3',
         manager: createManager(),
         summary: 'Вертикальный обрабатывающий центр с ЧПУ для фрезерования корпусных деталей и оснастки.',
         galleryImages: ['/assets/img/stanok.webp', '/assets/img/catalog.jpeg'],
@@ -140,12 +149,13 @@ export const catalogProducts = [
         title: 'Погрузчик вилочный 3 т',
         sku: 'UNQ-2080',
         category: 'Складская техника',
+        categorySlug: 'skladskaya-tehnika',
         location: 'Калуга',
         price: { amount: 980000, isPublished: true },
         availability: 'В наличии',
         condition: 'Б/у',
         imageUrl: '/assets/img/catalog.jpeg',
-        url: '/catalog/demo-4',
+        url: '/catalog/skladskaya-tehnika/demo-4',
         manager: createManager(),
         summary: 'Вилочный погрузчик грузоподъемностью 3 тонны для склада, производства и погрузочных работ.',
         galleryImages: ['/assets/img/catalog.jpeg', '/assets/img/stanok.webp'],
@@ -175,12 +185,13 @@ export const catalogProducts = [
         title: 'Сверлильный станок 2Н125',
         sku: 'UNQ-2086',
         category: 'Сверлильные станки',
+        categorySlug: 'sverlilnye-stanki',
         location: 'Рязань',
         price: { amount: 640000, isPublished: true },
         availability: 'В наличии',
         condition: 'Б/у',
         imageUrl: '/assets/img/stanok.webp',
-        url: '/catalog/demo-5',
+        url: '/catalog/sverlilnye-stanki/demo-5',
         manager: createManager(),
         summary: 'Вертикально-сверлильный станок для сверления, рассверливания, зенкерования и нарезания резьбы.',
         galleryImages: ['/assets/img/stanok.webp', '/assets/img/catalog.jpeg'],
@@ -210,12 +221,13 @@ export const catalogProducts = [
         title: 'Гидравлический пресс 160 т',
         sku: 'UNQ-2091',
         category: 'Гидравлические прессы',
+        categorySlug: 'gidravlicheskie-pressy',
         location: 'Москва',
         price: { amount: 2150000, isPublished: true },
         availability: 'По запросу',
         condition: 'После сервиса',
         imageUrl: '/assets/img/catalog.jpeg',
-        url: '/catalog/demo-6',
+        url: '/catalog/pressovoe-oborudovanie/gidravlicheskie-pressy/demo-6',
         manager: createManager(),
         summary: 'Гидравлический пресс усилием 160 тонн для производственных, ремонтных и сборочных операций.',
         galleryImages: ['/assets/img/catalog.jpeg', '/assets/img/stanok.webp'],
@@ -245,12 +257,13 @@ export const catalogProducts = [
         title: 'Ленточнопильный станок',
         sku: 'UNQ-2097',
         category: 'Пильное оборудование',
+        categorySlug: 'pilnoe-oborudovanie',
         location: 'Калуга',
         price: { amount: 870000, isPublished: true },
         availability: 'В наличии',
         condition: 'Б/у',
         imageUrl: '/assets/img/stanok.webp',
-        url: '/catalog/demo-7',
+        url: '/catalog/pilnoe-oborudovanie/demo-7',
         manager: createManager(),
         summary: 'Ленточнопильный станок для резки сортового и профильного металлопроката.',
         galleryImages: ['/assets/img/stanok.webp', '/assets/img/catalog.jpeg'],
@@ -280,12 +293,13 @@ export const catalogProducts = [
         title: 'Компрессор винтовой 11 кВт',
         sku: 'UNQ-2102',
         category: 'Компрессорное оборудование',
+        categorySlug: 'kompressornoe-oborudovanie',
         location: 'Москва',
         price: { amount: null, isPublished: false },
         availability: 'По запросу',
         condition: 'Б/у',
         imageUrl: '/assets/img/catalog.jpeg',
-        url: '/catalog/demo-8',
+        url: '/catalog/kompressornoe-oborudovanie/demo-8',
         manager: createManager(),
         summary: 'Винтовой компрессор мощностью 11 кВт для стабильного снабжения производственной линии сжатым воздухом.',
         galleryImages: ['/assets/img/catalog.jpeg', '/assets/img/stanok.webp'],
@@ -316,6 +330,26 @@ export type CatalogProduct = (typeof catalogProducts)[number];
 
 export function getCatalogProduct(id: string) {
     return catalogProducts.find((product) => product.id === id);
+}
+
+export function getCatalogProductCategory(product: CatalogProduct) {
+    return getCatalogCategoryBySlug(product.categorySlug);
+}
+
+export function getCatalogProductHref(product: CatalogProduct) {
+    const category = getCatalogProductCategory(product);
+
+    return category ? `${category.href}/${product.id}` : product.url;
+}
+
+export function getCatalogProductsByCategory(category?: FlatCatalogCategory) {
+    if (!category) {
+        return [...catalogProducts];
+    }
+
+    const categorySlugs = getCatalogCategoryDescendantSlugs(category);
+
+    return catalogProducts.filter((product) => categorySlugs.includes(product.categorySlug));
 }
 
 export function formatCatalogPrice(price: CatalogProduct['price']) {

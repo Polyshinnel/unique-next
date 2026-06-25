@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
+import { CookieConsentBanner } from '@/components/layout/CookieConsentBanner';
 import { Providers } from './providers';
 import './globals.css';
 
@@ -17,7 +18,10 @@ export default function RootLayout({ children }: RootLayoutProps) {
     return (
         <html lang="ru" suppressHydrationWarning>
             <body>
-                <Providers>{children}</Providers>
+                <Providers>
+                    {children}
+                    <CookieConsentBanner />
+                </Providers>
             </body>
         </html>
     );

@@ -4,6 +4,7 @@ import { demoServices } from '@/lib/site-content';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
 import { ProductCard } from '@/components/catalog/ProductCard';
+import { FeedbackRequestModal } from '@/components/common/FeedbackRequestModal';
 import { ServiceCard } from '@/components/services/ServiceCard';
 import { HeroSlider } from '@/components/home/HeroSlider';
 import {
@@ -16,7 +17,7 @@ import {
     Text,
     Title,
 } from '@mantine/core';
-import { IconArrowRight, IconSearch } from '@tabler/icons-react';
+import { IconArrowRight } from '@tabler/icons-react';
 
 export const metadata: Metadata = {
     title: 'ЮНИК С - промышленное оборудование и станки',
@@ -81,9 +82,9 @@ function LatestProducts() {
                 <Group justify="space-between" align="end" mb="xl" gap="lg">
                     <Stack gap={6}>
                         <Title order={2}>Последние поступления</Title>
-                        <Text c="dimmed">Примеры карточек товаров для будущего наполнения каталога.</Text>
+                        <Text c="dimmed">Свежие новинки из нашего каталога.</Text>
                     </Stack>
-                    <Button component="a" href="/catalog" variant="outline" rightSection={<IconArrowRight size={18} />}>
+                    <Button component="a" href="/catalog" variant="filled" className="latest-products-section__button" rightSection={<IconArrowRight size={18} />}>
                         Перейти в каталог
                     </Button>
                 </Group>
@@ -106,9 +107,6 @@ function ServicesSection() {
                         <Title order={2}>Услуги</Title>
                         <Text c="dimmed">Основные направления работы с оборудованием и сделками.</Text>
                     </Stack>
-                    <Button component="a" href="/services" variant="outline" rightSection={<IconArrowRight size={18} />}>
-                        Все услуги
-                    </Button>
                 </Group>
                 <SimpleGrid cols={{ base: 1, sm: 2, xl: 4 }} spacing="lg">
                     {demoServices.map((service) => (
@@ -192,9 +190,10 @@ export default function HomePage() {
                                 <Title order={2}>Нужна конкретная позиция?</Title>
                                 <Text>Оставьте запрос, и менеджер подберет подходящее оборудование.</Text>
                             </Stack>
-                            <Button component="a" href="/contacts" size="lg" leftSection={<IconSearch size={19} />}>
-                                Оставить заявку
-                            </Button>
+                            <FeedbackRequestModal
+                                modalTitle="Оставьте заявку на подбор"
+                                description="Укажите ваши контакты и опишите запрос. Мы подберем подходящую позицию и свяжемся с вами."
+                            />
                         </Group>
                     </Container>
                 </section>

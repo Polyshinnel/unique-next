@@ -56,8 +56,8 @@ export function Footer() {
 
                     <Stack gap="sm">
                         <Text c="white" fw={700}>Документы</Text>
-                        <Anchor href="#" className="footer-link">Охрана труда</Anchor>
-                        <Anchor href="#" className="footer-link">Политика конфиденциальности</Anchor>
+                        <Anchor href="/ohrana-truda" className="footer-link">Охрана труда</Anchor>
+                        <Anchor href="/private-policy" className="footer-link">Политика конфиденциальности</Anchor>
                     </Stack>
 
                     <Stack gap="sm">
@@ -119,7 +119,7 @@ export function Footer() {
                         </Group>
                         <Text size="sm" c="gray.5" className="footer-consent">
                             Нажимая кнопку соглашаюсь с{' '}
-                            <Anchor href="#" className="footer-consent__link">
+                            <Anchor href="/private-policy" className="footer-consent__link">
                                 Политикой конфиденциальности
                             </Anchor>
                         </Text>

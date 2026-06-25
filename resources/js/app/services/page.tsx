@@ -4,8 +4,7 @@ import { demoServices } from '@/lib/site-content';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
 import { ServiceCard } from '@/components/services/ServiceCard';
-import { Button, Container, Group, SimpleGrid, Stack, Text, Title } from '@mantine/core';
-import { IconArrowRight } from '@tabler/icons-react';
+import { Container, Group, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 
 export const metadata: Metadata = {
     title: 'Услуги | ЮНИК С',
@@ -21,9 +20,6 @@ function ServicesSection() {
                         <Title order={2}>Услуги</Title>
                         <Text c="dimmed">Основные направления работы с оборудованием и сделками.</Text>
                     </Stack>
-                    <Button component="a" href="/services" variant="outline" rightSection={<IconArrowRight size={18} />}>
-                        Все услуги
-                    </Button>
                 </Group>
                 <SimpleGrid cols={{ base: 1, sm: 2, xl: 4 }} spacing="lg">
                     {demoServices.map((service) => (
@@ -40,7 +36,7 @@ export default function ServicesPage() {
         <>
             <Header />
             <main>
-                <section className="page-hero">
+                <section className="page-hero services-hero">
                     <Container size="xl">
                         <div className="catalog-breadcrumbs">
                             <Link href="/">Главная</Link>

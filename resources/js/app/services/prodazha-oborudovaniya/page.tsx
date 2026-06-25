@@ -150,9 +150,9 @@ function LatestProductsSection() {
                 <Group justify="space-between" align="end" mb="xl" gap="lg">
                     <Stack gap={6}>
                         <Title order={2}>Последние поступления</Title>
-                        <Text c="dimmed">Примеры карточек товаров для будущего наполнения каталога.</Text>
+                        <Text c="dimmed">Свежие новинки из нашего каталога.</Text>
                     </Stack>
-                    <Button component="a" href={catalogHref} variant="outline" rightSection={<IconArrowRight size={18} />}>
+                    <Button component="a" href={catalogHref} variant="filled" className="latest-products-section__button" rightSection={<IconArrowRight size={18} />}>
                         Перейти в каталог
                     </Button>
                 </Group>

@@ -267,7 +267,7 @@ export default async function OtgruzkiPage({ searchParams }: OtgruzkiPageProps) 
         <>
             <Header />
             <main>
-                <section className="page-hero">
+                <section className="page-hero otgruzki-hero">
                     <Container size="xl">
                         <div className="catalog-breadcrumbs">
                             <Link href="/">Главная</Link>

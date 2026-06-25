@@ -1,9 +1,19 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { notFound, permanentRedirect } from 'next/navigation';
+import { CatalogPageView } from '@/components/catalog/CatalogPageView';
 import { ProductGallery } from '@/components/catalog/ProductGallery';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
-import { catalogProducts, formatCatalogPrice, getCatalogProduct } from '@/lib/catalog-products';
+import { flatCatalogCategories, getCatalogCategoryAncestors, getCatalogCategoryByPath, type FlatCatalogCategory } from '@/lib/catalog-categories';
+import {
+    catalogProducts,
+    formatCatalogPrice,
+    getCatalogProduct,
+    getCatalogProductCategory,
+    getCatalogProductHref,
+    type CatalogProduct,
+} from '@/lib/catalog-products';
 import { emailHref, phoneHref } from '@/lib/site-content';
 import {
     Anchor,
@@ -16,75 +26,142 @@ import {
     Text,
     Title,
 } from '@mantine/core';
-import { IconArrowLeft, IconArrowRight, IconBrandTelegram, IconBrandWhatsapp, IconCheck, IconMessageCircle, IconMail, IconPhone } from '@tabler/icons-react';
+import { IconArrowRight, IconBrandTelegram, IconBrandWhatsapp, IconCheck, IconMessageCircle, IconMail, IconPhone } from '@tabler/icons-react';
 
-type ProductShowPageProps = {
+type CatalogSlugPageProps = {
     params: Promise<{
-        id: string;
+        slug: string[];
+    }>;
+    searchParams?: Promise<{
+        page?: string | string[];
+        region?: string | string[];
     }>;
 };
 
-export function generateStaticParams() {
-    return catalogProducts.map((product) => ({ id: product.id }));
+type ResolvedCatalogPath =
+    | {
+        type: 'category';
+        category: FlatCatalogCategory;
+    }
+    | {
+        type: 'product';
+        product: CatalogProduct;
+        category: FlatCatalogCategory;
+        canonicalPath: string[];
+        isCanonical: boolean;
+    };
+
+function pathsEqual(firstPath: string[], secondPath: string[]) {
+    return firstPath.length === secondPath.length && firstPath.every((segment, index) => segment === secondPath[index]);
 }
 
-export async function generateMetadata({ params }: ProductShowPageProps): Promise<Metadata> {
-    const { id } = await params;
-    const product = getCatalogProduct(id);
+function getProductCanonicalPath(product: CatalogProduct) {
+    const category = getCatalogProductCategory(product);
 
-    if (!product) {
+    return category ? [...category.path, product.id] : [product.id];
+}
+
+function resolveCatalogPath(slug: string[]): ResolvedCatalogPath | null {
+    const product = getCatalogProduct(slug.at(-1) ?? '');
+
+    if (product) {
+        const category = getCatalogProductCategory(product);
+
+        if (!category) {
+            return null;
+        }
+
+        const canonicalPath = getProductCanonicalPath(product);
+
         return {
-            title: 'Товар не найден | ЮНИК С',
-            description: 'Запрошенная позиция каталога не найдена.',
+            type: 'product',
+            product,
+            category,
+            canonicalPath,
+            isCanonical: pathsEqual(slug, canonicalPath),
+        };
+    }
+
+    const category = getCatalogCategoryByPath(slug);
+
+    if (category) {
+        return {
+            type: 'category',
+            category,
+        };
+    }
+
+    return null;
+}
+
+export function generateStaticParams() {
+    const categoryParams = flatCatalogCategories.map((category) => ({ slug: category.path }));
+    const productParams = catalogProducts
+        .map((product) => {
+            const category = getCatalogProductCategory(product);
+
+            return category ? { slug: [...category.path, product.id] } : null;
+        })
+        .filter((item): item is { slug: string[] } => Boolean(item));
+
+    return [...categoryParams, ...productParams];
+}
+
+export async function generateMetadata({ params }: CatalogSlugPageProps): Promise<Metadata> {
+    const { slug } = await params;
+    const resolvedPath = resolveCatalogPath(slug);
+
+    if (!resolvedPath) {
+        return {
+            title: 'Страница не найдена | ЮНИК С',
+            description: 'Запрошенная страница каталога не найдена.',
+        };
+    }
+
+    if (resolvedPath.type === 'category') {
+        return {
+            title: resolvedPath.category.seoTitle,
+            description: resolvedPath.category.seoDescription,
         };
     }
 
     return {
-        title: `${product.title} | ЮНИК С`,
-        description: product.summary,
+        title: `${resolvedPath.product.title} | ЮНИК С`,
+        description: resolvedPath.product.summary,
+        alternates: {
+            canonical: getCatalogProductHref(resolvedPath.product),
+        },
     };
 }
 
-export default async function ProductShowPage({ params }: ProductShowPageProps) {
-    const { id } = await params;
-    const product = getCatalogProduct(id);
+function ProductBreadcrumbs({ product, category }: { product: CatalogProduct; category: FlatCatalogCategory }) {
+    const ancestors = getCatalogCategoryAncestors(category);
 
-    if (!product) {
-        return (
-            <>
-                <Header />
-                <main>
-                    <section className="content-section product-show-section">
-                        <Container size="xl">
-                            <div className="product-show-empty">
-                                <Badge variant="light" color="orange">Каталог</Badge>
-                                <Title order={1}>Товар не найден</Title>
-                                <Text c="dimmed">Позиция могла быть снята с публикации или перемещена.</Text>
-                                <Button component="a" href="/catalog" leftSection={<IconArrowLeft size={18} />}>
-                                    Вернуться в каталог
-                                </Button>
-                            </div>
-                        </Container>
-                    </section>
-                </main>
-                <Footer />
-            </>
-        );
-    }
+    return (
+        <div className="catalog-breadcrumbs">
+            <Link href="/">Главная</Link>
+            <span>/</span>
+            <Link href="/catalog">Каталог оборудования</Link>
+            {ancestors.map((item) => (
+                <span key={item.href} className="catalog-breadcrumbs__group">
+                    <span>/</span>
+                    <Link href={item.href}>{item.title}</Link>
+                </span>
+            ))}
+            <span>/</span>
+            <span>{product.title}</span>
+        </div>
+    );
+}
 
+function ProductShowPage({ product, category }: { product: CatalogProduct; category: FlatCatalogCategory }) {
     return (
         <>
             <Header />
             <main>
-                <section className="page-hero catalog-hero product-show-hero">
+                <section className="page-hero">
                     <Container size="xl">
-                        <div className="catalog-breadcrumbs">
-                            <Link href="/">Главная</Link>
-                            <span>/</span>
-                            <Link href="/catalog">Каталог оборудования</Link>
-                            <span>/</span>
-                            <span>{product.title}</span>
-                        </div>
+                        <ProductBreadcrumbs product={product} category={category} />
                         <Title order={1}>{product.title}</Title>
                         <Text size="lg">{product.summary}</Text>
                     </Container>
@@ -140,7 +217,7 @@ export default async function ProductShowPage({ params }: ProductShowPageProps) 
                                             <div className="product-show-detail"><span>Состояние:</span><b>{product.condition}</b></div>
                                             <div className="product-show-detail"><span>Наличие:</span><b>{product.availability}</b></div>
                                             <div className="product-show-detail"><span>Локация:</span><b>{product.location}</b></div>
-                                            <div className="product-show-detail"><span>Категория:</span><b>{product.category}</b></div>
+                                            <div className="product-show-detail"><span>Категория:</span><b>{category.title}</b></div>
                                         </div>
                                         <Divider />
                                         <div className="product-manager-card">
@@ -213,4 +290,23 @@ export default async function ProductShowPage({ params }: ProductShowPageProps) 
             <Footer />
         </>
     );
+}
+
+export default async function CatalogSlugPage({ params, searchParams }: CatalogSlugPageProps) {
+    const [{ slug }, resolvedSearchParams] = await Promise.all([params, searchParams]);
+    const resolvedPath = resolveCatalogPath(slug);
+
+    if (!resolvedPath) {
+        notFound();
+    }
+
+    if (resolvedPath.type === 'category') {
+        return <CatalogPageView currentCategory={resolvedPath.category} searchParams={resolvedSearchParams} />;
+    }
+
+    if (!resolvedPath.isCanonical) {
+        permanentRedirect(getCatalogProductHref(resolvedPath.product));
+    }
+
+    return <ProductShowPage product={resolvedPath.product} category={resolvedPath.category} />;
 }
