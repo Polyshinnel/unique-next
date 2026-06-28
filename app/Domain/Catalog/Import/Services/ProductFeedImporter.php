@@ -3,31 +3,24 @@
 namespace App\Domain\Catalog\Import\Services;
 
 use App\Domain\Catalog\Import\Data\AdvertisementData;
-use App\Domain\Catalog\Import\Data\StatusWithCommentData;
 use App\Domain\Catalog\Import\Resolvers\CategoryResolver;
 use App\Domain\Catalog\Import\Resolvers\ManagerResolver;
 use App\Domain\Catalog\Import\Resolvers\RegionResolver;
 use App\Domain\Catalog\Import\Resolvers\StatusResolvers;
 use App\Domain\Catalog\Import\Resolvers\TagResolver;
+use App\Domain\Catalog\Import\Services\Concerns\WritesProductFromAdvertisement;
 use App\Domain\Catalog\Models\Product;
-use App\Domain\Catalog\Models\ProductAdditionalInfo;
-use App\Domain\Catalog\Models\ProductCheck;
-use App\Domain\Catalog\Models\ProductComplectation;
-use App\Domain\Catalog\Models\ProductDismantling;
-use App\Domain\Catalog\Models\ProductLoading;
-use App\Domain\Catalog\Models\ProductMainCharacteristic;
-use App\Domain\Catalog\Models\ProductMainInfo;
-use App\Domain\Catalog\Models\ProductTechnicalCharacteristic;
-use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use InvalidArgumentException;
 use Throwable;
 
 final class ProductFeedImporter
 {
+    use WritesProductFromAdvertisement;
+
+    private const PROGRESS_LOG_INTERVAL = 25;
+
     public function __construct(
         private FeedDownloader $downloader,
         private FeedParser $parser,
@@ -39,17 +32,49 @@ final class ProductFeedImporter
         private ImageDownloader $images,
     ) {}
 
-    public function import(string $url, bool $updateExisting = false): ImportResult
+    /**
+     * @param null|callable(string, array<string, mixed>): void $progress
+     */
+    public function import(string $url, bool $updateExisting = false, ?callable $progress = null): ImportResult
     {
+        Log::info('Catalog product feed import started.', [
+            'url' => $url,
+            'update_existing' => $updateExisting,
+        ]);
+        $this->reportProgress($progress, 'started', [
+            'url' => $url,
+            'update_existing' => $updateExisting,
+        ]);
+
         $path = $this->downloader->download($url);
+        $exportDate = $this->parser->exportDate($path);
         $created = 0;
         $skipped = 0;
         $failed = 0;
+        $processed = 0;
+
+        Log::info('Catalog product feed downloaded.', [
+            'url' => $url,
+            'export_date' => $exportDate,
+        ]);
+        $this->reportProgress($progress, 'feed_downloaded', [
+            'url' => $url,
+            'export_date' => $exportDate,
+        ]);
 
         try {
-            $this->importReferences($path);
+            $referenceCounts = $this->importReferences($path);
+
+            Log::info('Catalog import references imported.', [
+                'url' => $url,
+                'export_date' => $exportDate,
+                ...$referenceCounts,
+            ]);
+            $this->reportProgress($progress, 'references_imported', $referenceCounts);
 
             foreach ($this->parser->advertisements($path) as $advertisement) {
+                $processed++;
+
                 try {
                     $wasCreated = false;
 
@@ -75,10 +100,31 @@ final class ProductFeedImporter
                     if ($wasCreated) {
                         $created++;
                     }
+
+                    if ($processed === 1 || $processed % self::PROGRESS_LOG_INTERVAL === 0) {
+                        $this->logAdvertisementProgress(
+                            progress: $progress,
+                            processed: $processed,
+                            created: $created,
+                            skipped: $skipped,
+                            failed: $failed,
+                            advertisementExternalId: $advertisement->externalId,
+                            sku: $advertisement->sku,
+                        );
+                    }
                 } catch (Throwable $exception) {
                     $failed++;
 
                     Log::error('Catalog product import failed for advertisement.', [
+                        'advertisement_external_id' => $advertisement->externalId,
+                        'sku' => $advertisement->sku,
+                        'error' => $exception->getMessage(),
+                    ]);
+                    $this->reportProgress($progress, 'failed_item', [
+                        'processed' => $processed,
+                        'created' => $created,
+                        'skipped' => $skipped,
+                        'failed' => $failed,
                         'advertisement_external_id' => $advertisement->externalId,
                         'sku' => $advertisement->sku,
                         'error' => $exception->getMessage(),
@@ -91,6 +137,16 @@ final class ProductFeedImporter
 
         Log::info('Catalog product feed import finished.', [
             'url' => $url,
+            'export_date' => $exportDate,
+            'processed' => $processed,
+            'created' => $created,
+            'skipped' => $skipped,
+            'failed' => $failed,
+        ]);
+        $this->reportProgress($progress, 'finished', [
+            'url' => $url,
+            'export_date' => $exportDate,
+            'processed' => $processed,
             'created' => $created,
             'skipped' => $skipped,
             'failed' => $failed,
@@ -100,24 +156,49 @@ final class ProductFeedImporter
             created: $created,
             skipped: $skipped,
             failed: $failed,
+            message: sprintf(
+                'Processed %d advertisements: created=%d, skipped=%d, failed=%d.',
+                $processed,
+                $created,
+                $skipped,
+                $failed,
+            ),
         );
     }
 
-    private function importReferences(string $path): void
+    /**
+     * @param null|callable(string, array<string, mixed>): void $progress
+     */
+    private function logAdvertisementProgress(
+        ?callable $progress,
+        int $processed,
+        int $created,
+        int $skipped,
+        int $failed,
+        int $advertisementExternalId,
+        ?string $sku,
+    ): void {
+        $context = [
+            'processed' => $processed,
+            'created' => $created,
+            'skipped' => $skipped,
+            'failed' => $failed,
+            'advertisement_external_id' => $advertisementExternalId,
+            'sku' => $sku,
+        ];
+
+        Log::info('Catalog product feed import progress.', $context);
+        $this->reportProgress($progress, 'progress', $context);
+    }
+
+    /**
+     * @param null|callable(string, array<string, mixed>): void $progress
+     * @param array<string, mixed> $context
+     */
+    private function reportProgress(?callable $progress, string $event, array $context): void
     {
-        $this->categories->upsertMany($this->parser->categories($path));
-        $this->categories->linkParents($this->parser->categories($path));
-
-        foreach ($this->parser->advertisementStatuses($path) as $status) {
-            $this->statuses->productStatus($status);
-        }
-
-        foreach ($this->parser->checkStatuses($path) as $status) {
-            $this->statuses->checkStatus($status);
-        }
-
-        foreach ($this->parser->installStatuses($path) as $status) {
-            $this->statuses->installStatus($status);
+        if ($progress !== null) {
+            $progress($event, $context);
         }
     }
 
@@ -144,6 +225,7 @@ final class ProductFeedImporter
             $product = Product::query()->create(array_merge($attributes, [
                 'name' => $advertisement->name,
                 'sku' => $advertisement->sku,
+                'title' => $advertisement->name,
             ]));
 
             return [$product, true];
@@ -151,194 +233,10 @@ final class ProductFeedImporter
 
         $product->fill(array_merge($attributes, [
             'external_id' => $product->external_id ?? $advertisement->externalId,
+            'title' => $advertisement->name,
         ]));
         $product->save();
 
         return [$product->fresh(), false];
-    }
-
-    private function productAttributes(AdvertisementData $advertisement): array
-    {
-        $manager = $advertisement->manager !== null
-            ? $this->managers->upsert($advertisement->manager)
-            : null;
-
-        return [
-            'external_id' => $advertisement->externalId,
-            'description' => null,
-            'og_image' => null,
-            'category_id' => $advertisement->categoryExternalId !== null
-                ? $this->categories->resolveByExternalId($advertisement->categoryExternalId)?->getKey()
-                : null,
-            'manager_id' => $manager?->getKey(),
-            'equipment_state_id' => $this->resolveEquipmentStateId($advertisement),
-            'equipment_availability_id' => $this->resolveEquipmentAvailabilityId($advertisement),
-            'product_status_id' => $advertisement->statusExternalId !== null
-                ? $this->statuses->productStatusByExternalId($advertisement->statusExternalId)?->getKey()
-                : null,
-            'price' => $this->normalizePrice($advertisement->price),
-            'show_price' => $advertisement->showPrice,
-            'price_comment' => $advertisement->priceComment,
-            'product_address' => $advertisement->productAddress,
-            'published_at' => $this->normalizePublishedAt($advertisement->publishedAt),
-        ];
-    }
-
-    private function resolveEquipmentStateId(AdvertisementData $advertisement): ?int
-    {
-        if ($advertisement->stateExternalId === null || $advertisement->stateName === null) {
-            return null;
-        }
-
-        return $this->statuses
-            ->equipmentState($advertisement->stateExternalId, $advertisement->stateName)
-            ->getKey();
-    }
-
-    private function resolveEquipmentAvailabilityId(AdvertisementData $advertisement): ?int
-    {
-        if ($advertisement->availabilityExternalId === null || $advertisement->availabilityName === null) {
-            return null;
-        }
-
-        return $this->statuses
-            ->equipmentAvailability($advertisement->availabilityExternalId, $advertisement->availabilityName)
-            ->getKey();
-    }
-
-    private function syncRelations(Product $product, AdvertisementData $advertisement): void
-    {
-        $regionIds = [];
-
-        foreach ($advertisement->regions as $region) {
-            $regionIds[] = $this->regions->upsert($region)->getKey();
-        }
-
-        $product->regions()->sync($regionIds);
-
-        $tagIds = [];
-
-        foreach ($advertisement->tags as $tagName) {
-            $tagIds[] = $this->tags->resolve($tagName)->getKey();
-        }
-
-        $product->tags()->sync($tagIds);
-
-        if ($advertisement->manager !== null) {
-            $manager = $this->managers->upsert($advertisement->manager);
-
-            $product->managers()->syncWithoutDetaching([
-                $manager->getKey() => ['role' => 'product_owner'],
-            ]);
-
-            if ($product->manager_id !== $manager->getKey()) {
-                $product->forceFill(['manager_id' => $manager->getKey()])->save();
-            }
-        }
-    }
-
-    private function syncTextBlocks(Product $product, AdvertisementData $advertisement): void
-    {
-        $this->updateTextBlock(ProductMainCharacteristic::class, $product->id, $advertisement->mainCharacteristics);
-        $this->updateTextBlock(ProductComplectation::class, $product->id, $advertisement->complectation);
-        $this->updateTextBlock(ProductTechnicalCharacteristic::class, $product->id, $advertisement->technicalCharacteristics);
-        $this->updateTextBlock(ProductMainInfo::class, $product->id, $advertisement->mainInfo);
-        $this->updateTextBlock(ProductAdditionalInfo::class, $product->id, $advertisement->additionalInfo);
-    }
-
-    private function syncStatusBlocks(Product $product, AdvertisementData $advertisement): void
-    {
-        $this->updateStatusBlock(
-            ProductCheck::class,
-            'check_status_id',
-            $product->id,
-            $advertisement->check,
-            fn (string $name): int => $this->statuses->checkStatusByName($name)->getKey(),
-        );
-
-        $this->updateStatusBlock(
-            ProductLoading::class,
-            'shipment_status_id',
-            $product->id,
-            $advertisement->loading,
-            fn (string $name): int => $this->statuses->shipmentStatusByName($name)->getKey(),
-        );
-
-        $this->updateStatusBlock(
-            ProductDismantling::class,
-            'dismantle_status_id',
-            $product->id,
-            $advertisement->removal,
-            fn (string $name): int => $this->statuses->dismantleStatusByName($name)->getKey(),
-        );
-    }
-
-    /**
-     * @param class-string<Model> $modelClass
-     */
-    private function updateTextBlock(string $modelClass, int $productId, ?string $content): void
-    {
-        $modelClass::query()->updateOrCreate(
-            ['product_id' => $productId],
-            ['content' => $content],
-        );
-    }
-
-    /**
-     * @param class-string<Model> $modelClass
-     * @param callable(string): int $statusResolver
-     */
-    private function updateStatusBlock(
-        string $modelClass,
-        string $statusColumn,
-        int $productId,
-        ?StatusWithCommentData $statusWithComment,
-        callable $statusResolver,
-    ): void {
-        if ($statusWithComment === null) {
-            $modelClass::query()->where('product_id', $productId)->delete();
-
-            return;
-        }
-
-        $statusId = $statusWithComment->name !== ''
-            ? $statusResolver($statusWithComment->name)
-            : null;
-
-        $modelClass::query()->updateOrCreate(
-            ['product_id' => $productId],
-            [
-                $statusColumn => $statusId,
-                'comment' => $statusWithComment?->comment,
-            ],
-        );
-    }
-
-    private function normalizePrice(?string $price): ?string
-    {
-        if ($price === null || $price === '') {
-            return null;
-        }
-
-        if (! is_numeric($price)) {
-            throw new InvalidArgumentException(sprintf('Invalid price [%s].', $price));
-        }
-
-        return number_format((float) $price, 2, '.', '');
-    }
-
-    private function normalizePublishedAt(?string $publishedAt): ?CarbonImmutable
-    {
-        if ($publishedAt === null || $publishedAt === '') {
-            return null;
-        }
-
-        $date = CarbonImmutable::createFromFormat('Y-m-d H:i:s', $publishedAt);
-
-        if ($date === false) {
-            throw new InvalidArgumentException(sprintf('Invalid published_at [%s].', $publishedAt));
-        }
-
-        return $date;
     }
 }

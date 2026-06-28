@@ -22,6 +22,7 @@ final class Product extends Model
         'external_id',
         'name',
         'sku',
+        'title',
         'description',
         'og_image',
         'category_id',
@@ -32,7 +33,7 @@ final class Product extends Model
         'price',
         'show_price',
         'price_comment',
-        'product_address',
+        'region_id',
         'published_at',
     ];
 
@@ -68,6 +69,11 @@ final class Product extends Model
     public function productStatus(): BelongsTo
     {
         return $this->belongsTo(ProductStatus::class);
+    }
+
+    public function region(): BelongsTo
+    {
+        return $this->belongsTo(Region::class);
     }
 
     public function mainCharacteristics(): HasOne

@@ -22,7 +22,6 @@ final readonly class AdvertisementData
         public ?string $price,
         public bool $showPrice,
         public ?string $priceComment,
-        public ?string $productAddress,
         public ?string $publishedAt,
         public ?ManagerData $manager,
         public array $regions,

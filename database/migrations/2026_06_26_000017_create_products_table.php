@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('external_id')->nullable()->unique();
             $table->string('name');
             $table->string('sku', 100)->nullable()->unique();
+            $table->string('title');
             $table->text('description')->nullable();
             $table->string('og_image', 512)->nullable();
             $table->foreignId('category_id')->nullable()->constrained()->nullOnDelete();
@@ -26,7 +27,7 @@ return new class extends Migration
             $table->decimal('price', 10, 2)->nullable();
             $table->boolean('show_price')->default(true);
             $table->text('price_comment')->nullable();
-            $table->string('product_address')->nullable();
+            $table->foreignId('region_id')->nullable()->constrained()->nullOnDelete();
             $table->timestamp('published_at')->nullable();
             $table->timestamps();
             $table->softDeletes();

@@ -59,15 +59,17 @@ final class ProductFeedImporterTest extends TestCase
 
         /** @var Product $product */
         $product = Product::query()->firstOrFail();
-        $product->load(['regions', 'tags', 'managers', 'images']);
+        $product->load(['region', 'regions', 'tags', 'managers', 'images']);
 
         self::assertSame(101, $product->external_id);
         self::assertSame('CASE CX210', $product->name);
+        self::assertSame('CASE CX210', $product->title);
         self::assertSame('cx210-001', $product->sku);
         self::assertSame('12500000.00', $product->price);
         self::assertTrue($product->show_price);
         self::assertSame('С НДС', $product->price_comment);
-        self::assertSame('Москва, склад 1', $product->product_address);
+        self::assertNotNull($product->region);
+        self::assertSame('Москва', $product->region->name);
         self::assertSame('2026-06-20 09:00:00', $product->published_at?->format('Y-m-d H:i:s'));
         self::assertNull($product->description);
         self::assertNull($product->og_image);
@@ -93,6 +95,10 @@ final class ProductFeedImporterTest extends TestCase
         self::assertDatabaseHas('equipment_availabilities', [
             'external_id' => 21,
             'name' => 'В наличии',
+        ]);
+        self::assertDatabaseHas('products', [
+            'external_id' => 101,
+            'region_id' => $product->region->id,
         ]);
         self::assertDatabaseHas('managers', [
             'external_id' => 501,
@@ -205,6 +211,7 @@ final class ProductFeedImporterTest extends TestCase
         self::assertSame('13000000.00', $product->price);
         self::assertFalse($product->show_price);
         self::assertSame('Без НДС', $product->price_comment);
+        self::assertSame('CASE CX210 updated name', $product->title);
         self::assertSame('2026-06-25 18:30:00', $product->published_at?->format('Y-m-d H:i:s'));
         self::assertSame(['обновлено'], $product->tags->pluck('name')->all());
     }

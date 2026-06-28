@@ -59,7 +59,7 @@ final class ImportProductsJob implements ShouldQueue, ShouldBeUnique
 
 ## Definition of Done
 
-- [ ] `ImportProductsJob` реализует `ShouldQueue` и `ShouldBeUnique`.
-- [ ] `timeout`/`tries`/`backoff` заданы; job уходит в очередь `imports`.
-- [ ] `handle()` вызывает `ProductFeedImporter::import()` и логирует итог.
-- [ ] `uniqueId()`/`uniqueFor()` исключают параллельные прогоны.
+- [x] `ImportProductsJob` реализует `ShouldQueue` и `ShouldBeUnique`.
+- [x] `timeout`/`tries`/`backoff` заданы; job уходит в очередь `imports`.
+- [x] `handle()` вызывает `ProductFeedImporter::import()` и логирует итог.
+- [x] `uniqueId()`/`uniqueFor()` исключают параллельные прогоны.

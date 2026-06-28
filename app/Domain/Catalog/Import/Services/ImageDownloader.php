@@ -86,6 +86,28 @@ final class ImageDownloader
         return $image->fresh();
     }
 
+    public function fileExists(?string $filePath): bool
+    {
+        if ($filePath === null || $filePath === '') {
+            return false;
+        }
+
+        return Storage::disk(config('catalog_import.image_disk'))->exists($filePath);
+    }
+
+    public function deleteFile(?string $filePath): void
+    {
+        if ($filePath === null || $filePath === '') {
+            return;
+        }
+
+        $disk = Storage::disk(config('catalog_import.image_disk'));
+
+        if ($disk->exists($filePath)) {
+            $disk->delete($filePath);
+        }
+    }
+
     private function buildStoragePath(Product $product, MediaItemData $media, ?string $contentType): string
     {
         $directory = "products/{$product->id}";

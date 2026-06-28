@@ -101,6 +101,54 @@ curl http://localhost:28080/api/health
 docker compose exec app php artisan tinker --execute="Cache::put('test', 'ok', 60); echo Cache::get('test');"
 ```
 
+## Импорт товаров и заполнение данных
+
+### Импорт и обновление товаров
+
+```bash
+# Импорт товаров из XML-фида в очередь
+docker compose exec app php artisan catalog:import-products
+
+# Импорт товаров синхронно с выводом прогресса в консоль
+docker compose exec app php artisan catalog:import-products --sync
+
+# Импорт товаров с обновлением изменившихся полей существующих записей
+docker compose exec app php artisan catalog:import-products --update-existing
+
+# Импорт/обновление из произвольного фида
+docker compose exec app php artisan catalog:import-products --url="https://example.com/feed.xml" --sync
+
+# Быстрое обновление существующих товаров: статусы и цены
+docker compose exec app php artisan catalog:update-existing-products
+
+# Быстрое обновление существующих товаров синхронно
+docker compose exec app php artisan catalog:update-existing-products --sync
+
+# Полное обновление существующих товаров: поля и фото
+docker compose exec app php artisan catalog:update-revision-products
+
+# Полное обновление существующих товаров синхронно
+docker compose exec app php artisan catalog:update-revision-products --sync
+```
+
+### Пользователь для Filament
+
+```bash
+docker compose exec app php artisan make:filament-user
+```
+
+Команда интерактивно попросит указать имя, email и пароль пользователя для входа в админ-панель Filament.
+
+### Сиды базы данных
+
+```bash
+# Запустить все сиды из DatabaseSeeder
+docker compose exec app php artisan db:seed
+
+# Пересоздать таблицы, прогнать миграции и заново заполнить данными
+docker compose exec app php artisan migrate:fresh --seed
+```
+
 ## Переменные окружения и порты
 
 Основные значения для локального запуска уже описаны в `.env.example`.

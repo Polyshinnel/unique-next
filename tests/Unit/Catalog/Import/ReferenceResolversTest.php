@@ -22,6 +22,7 @@ use App\Domain\Catalog\Models\ProductStatus;
 use App\Domain\Catalog\Models\Region;
 use App\Domain\Catalog\Models\ShipmentStatus;
 use App\Domain\Catalog\Models\Tag;
+use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -66,6 +67,67 @@ final class ReferenceResolversTest extends TestCase
             'external_id' => 20,
             'name' => 'Фронтальные погрузчики',
         ]);
+    }
+
+    public function test_category_resolver_generates_unique_slugs_and_keeps_slug_on_rename_or_noop(): void
+    {
+        CarbonImmutable::setTestNow('2026-06-28 10:00:00');
+
+        $resolver = new CategoryResolver();
+
+        $resolver->upsertMany([
+            new CategoryData(externalId: 10, name: 'Экскаваторы', parentExternalId: null),
+            new CategoryData(externalId: 11, name: 'Экскаваторы', parentExternalId: null),
+            new CategoryData(externalId: 12, name: '!!!', parentExternalId: null),
+        ]);
+
+        self::assertDatabaseHas('categories', [
+            'external_id' => 10,
+            'slug' => 'ekskavatory',
+        ]);
+        self::assertDatabaseHas('categories', [
+            'external_id' => 11,
+            'slug' => 'ekskavatory-2',
+        ]);
+        self::assertDatabaseHas('categories', [
+            'external_id' => 12,
+            'slug' => 'category',
+        ]);
+
+        $originalUpdatedAt = Category::query()
+            ->where('external_id', 10)
+            ->value('updated_at');
+
+        CarbonImmutable::setTestNow('2026-06-28 11:00:00');
+
+        $resolver->upsertMany([
+            new CategoryData(externalId: 10, name: 'Гусеничные экскаваторы', parentExternalId: null),
+        ]);
+
+        self::assertDatabaseHas('categories', [
+            'external_id' => 10,
+            'name' => 'Гусеничные экскаваторы',
+            'slug' => 'ekskavatory',
+        ]);
+
+        $renamedUpdatedAt = Category::query()
+            ->where('external_id', 10)
+            ->value('updated_at');
+
+        self::assertNotSame($originalUpdatedAt, $renamedUpdatedAt);
+
+        CarbonImmutable::setTestNow('2026-06-28 12:00:00');
+
+        $resolver->upsertMany([
+            new CategoryData(externalId: 10, name: 'Гусеничные экскаваторы', parentExternalId: null),
+        ]);
+
+        self::assertEquals(
+            $renamedUpdatedAt,
+            Category::query()->where('external_id', 10)->value('updated_at'),
+        );
+
+        CarbonImmutable::setTestNow();
     }
 
     public function test_status_resolvers_are_idempotent_and_support_name_matching(): void
@@ -178,5 +240,24 @@ final class ReferenceResolversTest extends TestCase
         ]);
         self::assertSame($manager->id, Manager::query()->where('external_id', 501)->value('id'));
         self::assertSame($tag->id, $sameTag->id);
+    }
+
+    public function test_manager_resolver_treats_russian_manager_role_as_owner_for_product_owner_import(): void
+    {
+        $managerResolver = new ManagerResolver();
+
+        $manager = $managerResolver->upsert(new ManagerData(
+            externalId: 6,
+            name: 'Семенкин Кирилл',
+            email: 'kirill.semenkin@uniqset.com',
+            phone: '+79611215565',
+            role: 'Менеджер',
+        ));
+
+        self::assertSame(ManagerRole::Owner->value, $manager->role);
+        self::assertDatabaseHas('managers', [
+            'external_id' => 6,
+            'role' => ManagerRole::Owner->value,
+        ]);
     }
 }

@@ -78,13 +78,39 @@ final class FeedParser
      */
     public function advertisements(string $path): iterable
     {
-        return $this->iterateTopLevelItems(
-            $path,
-            'advertisements_export',
-            'advertisement',
-            fn (SimpleXMLElement $node): AdvertisementData => $this->mapAdvertisement($node),
-            'advertisement'
-        );
+        $reader = $this->openReader($path);
+        $insideAdvertisementsContainer = false;
+
+        try {
+            while ($reader->read()) {
+                if ($reader->nodeType !== XMLReader::ELEMENT) {
+                    continue;
+                }
+
+                if ($reader->depth === 1) {
+                    $insideAdvertisementsContainer = $reader->localName === 'advertisements';
+                }
+
+                if ($reader->localName !== 'advertisement') {
+                    continue;
+                }
+
+                $isDirectAdvertisement = $reader->depth === 1;
+                $isNestedAdvertisement = $insideAdvertisementsContainer && $reader->depth === 2;
+
+                if (! $isDirectAdvertisement && ! $isNestedAdvertisement) {
+                    continue;
+                }
+
+                try {
+                    yield $this->mapAdvertisement($this->expandCurrentNode($reader));
+                } catch (Throwable $exception) {
+                    $this->logSkippedNode('advertisement', $path, $exception);
+                }
+            }
+        } finally {
+            $reader->close();
+        }
     }
 
     public function exportDate(string $path): ?string
@@ -196,7 +222,6 @@ final class FeedParser
             price: $price ? $this->stringOrNull($price->adv_price) : null,
             showPrice: $price ? $this->boolFromValue($price->show_price) : false,
             priceComment: $price ? $this->contentOrNull($price->adv_price_comment) : null,
-            productAddress: $location ? $this->stringOrNull($location->product_address) : null,
             publishedAt: $dates ? $this->stringOrNull($dates->published_at) : null,
             manager: $this->mapManager($node),
             regions: $this->mapRegions($node),
@@ -205,11 +230,11 @@ final class FeedParser
             check: $this->mapStatusWithComment($node->check),
             loading: $this->mapStatusWithComment($node->loading),
             removal: $this->mapStatusWithComment($node->removal),
-            mainCharacteristics: $this->contentOrNull($node->main_characteristics),
-            complectation: $this->contentOrNull($node->complectation),
-            technicalCharacteristics: $this->contentOrNull($node->technical_characteristics),
-            mainInfo: $this->contentOrNull($node->main_info),
-            additionalInfo: $this->contentOrNull($node->additional_info),
+            mainCharacteristics: $this->htmlContentOrNull($node->main_characteristics),
+            complectation: $this->htmlContentOrNull($node->complectation),
+            technicalCharacteristics: $this->htmlContentOrNull($node->technical_characteristics),
+            mainInfo: $this->htmlContentOrNull($node->main_info),
+            additionalInfo: $this->htmlContentOrNull($node->additional_info),
         );
     }
 
@@ -390,6 +415,13 @@ final class FeedParser
         $content = (string) $value;
 
         return trim($content) === '' ? null : $content;
+    }
+
+    private function htmlContentOrNull(mixed $value): ?string
+    {
+        $content = trim((string) $value);
+
+        return $content === '' ? null : $content;
     }
 
     private function intOrNull(mixed $value): ?int

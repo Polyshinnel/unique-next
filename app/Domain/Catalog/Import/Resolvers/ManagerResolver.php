@@ -51,6 +51,8 @@ final class ManagerResolver
     {
         return match ($role) {
             'product_owner' => ManagerRole::Owner->value,
+            'Менеджер' => ManagerRole::Owner->value,
+            'менеджер' => ManagerRole::Owner->value,
             default => $role,
         };
     }

@@ -25,7 +25,7 @@ final class ImageDownloaderTest extends TestCase
             ]),
         ]);
 
-        $product = Product::query()->create(['name' => 'CASE CX210']);
+        $product = Product::query()->create(['name' => 'CASE CX210', 'title' => 'CASE CX210']);
         $media = new MediaItemData(
             externalId: 9001,
             fileName: 'main.jpg',
@@ -62,7 +62,7 @@ final class ImageDownloaderTest extends TestCase
         Storage::fake('public');
         Http::fake();
 
-        $product = Product::query()->create(['name' => 'CASE CX210']);
+        $product = Product::query()->create(['name' => 'CASE CX210', 'title' => 'CASE CX210']);
         $path = "products/{$product->id}/9001_main.jpg";
 
         Storage::disk('public')->put($path, 'existing-image');
@@ -106,7 +106,7 @@ final class ImageDownloaderTest extends TestCase
             ]),
         ]);
 
-        $product = Product::query()->create(['name' => 'CASE CX210']);
+        $product = Product::query()->create(['name' => 'CASE CX210', 'title' => 'CASE CX210']);
         $media = new MediaItemData(
             externalId: 9002,
             fileName: 'manual.txt',

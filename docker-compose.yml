@@ -14,7 +14,6 @@ services:
     ports:
       - "${APP_HTTP_PORT:-28080}:80"
     environment:
-      - APP_ENV=local
       - APP_DEBUG=true
       - BACKEND_URL=http://127.0.0.1
       - NEXT_PUBLIC_API_URL=/api
@@ -40,6 +39,7 @@ services:
     volumes:
       - ./:/var/www/html
     environment:
+      - APP_DEBUG=true
       - DB_HOST=mysql
       - REDIS_HOST=redis
     networks:

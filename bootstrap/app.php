@@ -1,5 +1,8 @@
 <?php
 
+use App\Domain\Catalog\Import\Commands\ImportProductsCommand;
+use App\Domain\Catalog\Import\Commands\UpdateExistingProductsCommand;
+use App\Domain\Catalog\Import\Commands\UpdateRevisionProductsCommand;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -12,6 +15,11 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
+    ->withCommands([
+        ImportProductsCommand::class,
+        UpdateExistingProductsCommand::class,
+        UpdateRevisionProductsCommand::class,
+    ])
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->statefulApi();
     })
