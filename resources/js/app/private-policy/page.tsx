@@ -1,16 +1,21 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { getPageSeo, toMetadata } from '@/lib/seo';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
 import { Anchor, Container, Stack, Text, Title } from '@mantine/core';
 
-export const metadata: Metadata = {
-    title: 'Политика конфиденциальности | ЮНИК С',
-    description: 'Политика в отношении обработки персональных данных ООО «Юник С».',
-    alternates: {
-        canonical: 'https://uniqset.com/private-policy',
-    },
-};
+export async function generateMetadata(): Promise<Metadata> {
+    const seo = await getPageSeo('privacy_policy');
+
+    return toMetadata(seo, {
+        title: 'Политика конфиденциальности | ЮНИК С',
+        description: 'Политика в отношении обработки персональных данных ООО «Юник С».',
+        alternates: {
+            canonical: 'https://uniqset.com/private-policy',
+        },
+    });
+}
 
 const terms = [
     ['2.1.', 'Автоматизированная обработка персональных данных', 'обработка персональных данных с помощью средств вычислительной техники.'],

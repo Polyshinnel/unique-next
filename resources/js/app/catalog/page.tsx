@@ -1,10 +1,15 @@
 import type { Metadata } from 'next';
+import { getPageSeo, toMetadata } from '@/lib/seo';
 import { CatalogPageView } from '@/components/catalog/CatalogPageView';
 
-export const metadata: Metadata = {
-    title: 'Каталог оборудования | ЮНИК С',
-    description: 'Каталог промышленного оборудования, станков, спецтехники и инструмента с карточками товаров и контактами менеджера.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+    const seo = await getPageSeo('catalog');
+
+    return toMetadata(seo, {
+        title: 'Каталог оборудования | ЮНИК С',
+        description: 'Каталог промышленного оборудования, станков, спецтехники и инструмента с карточками товаров и контактами менеджера.',
+    });
+}
 
 type CatalogPageProps = {
     searchParams?: Promise<{

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import ImageView from 'next/image';
+import { getPageSeo, toMetadata } from '@/lib/seo';
 import { catalogProducts } from '@/lib/catalog-products';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
@@ -29,10 +30,14 @@ import {
     IconVideo,
 } from '@tabler/icons-react';
 
-export const metadata: Metadata = {
-    title: 'Продажа оборудования | ЮНИК С',
-    description: 'Продажа б/у промышленного оборудования по всей России с понятным состоянием, сопровождением сделки и логистики.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+    const seo = await getPageSeo('equipment_sale');
+
+    return toMetadata(seo, {
+        title: 'Продажа оборудования | ЮНИК С',
+        description: 'Продажа б/у промышленного оборудования по всей России с понятным состоянием, сопровождением сделки и логистики.',
+    });
+}
 
 const catalogHref = '/catalog';
 const telegramHref = 'https://telegram.me/uniqset_gen';

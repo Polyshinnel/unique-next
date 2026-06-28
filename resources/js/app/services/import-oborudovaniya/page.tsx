@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { getPageSeo, toMetadata } from '@/lib/seo';
 import { ProductGallery } from '@/components/catalog/ProductGallery';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
@@ -26,10 +27,14 @@ import {
     IconTruckDelivery,
 } from '@tabler/icons-react';
 
-export const metadata: Metadata = {
-    title: 'Импорт оборудования | ЮНИК С',
-    description: 'Ввоз, растаможка и поставка промышленного оборудования из стран ЕС и Азии с сопровождением под ключ.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+    const seo = await getPageSeo('equipment_import');
+
+    return toMetadata(seo, {
+        title: 'Импорт оборудования | ЮНИК С',
+        description: 'Ввоз, растаможка и поставка промышленного оборудования из стран ЕС и Азии с сопровождением под ключ.',
+    });
+}
 
 const galleryImages = Array.from({ length: 9 }, (_, index) => `/assets/img/services/import-page/gallery/${index + 1}.jpg`);
 

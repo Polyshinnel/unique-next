@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { getPageSeo, toMetadata } from '@/lib/seo';
 import { catalogProducts } from '@/lib/catalog-products';
 import { demoServices } from '@/lib/site-content';
 import { Footer } from '@/components/layout/Footer';
@@ -19,10 +20,14 @@ import {
 } from '@mantine/core';
 import { IconArrowRight } from '@tabler/icons-react';
 
-export const metadata: Metadata = {
-    title: 'ЮНИК С - промышленное оборудование и станки',
-    description: 'Продажа, выкуп, подбор и поставка промышленного оборудования, станков и инструмента по России.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+    const seo = await getPageSeo('home');
+
+    return toMetadata(seo, {
+        title: 'ЮНИК С - промышленное оборудование и станки',
+        description: 'Продажа, выкуп, подбор и поставка промышленного оборудования, станков и инструмента по России.',
+    });
+}
 
 function CompanySection() {
     return (

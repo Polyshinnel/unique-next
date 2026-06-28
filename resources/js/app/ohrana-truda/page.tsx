@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { getPageSeo, toMetadata } from '@/lib/seo';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
 import { Button, Container, Stack, Text, Title } from '@mantine/core';
@@ -8,13 +9,17 @@ import { IconFileTypePdf } from '@tabler/icons-react';
 const pdfFileName = 'Svodnaya_vedomost_rezultatov_provedeniya_spec_ocenki_uslovij_truda.pdf';
 const pdfHref = `/assets/${pdfFileName}`;
 
-export const metadata: Metadata = {
-    title: 'Охрана труда | ЮНИК С',
-    description: 'Сводная ведомость результатов проведения специальной оценки условий труда ООО «Юник С».',
-    alternates: {
-        canonical: 'https://uniqset.com/ohrana-truda',
-    },
-};
+export async function generateMetadata(): Promise<Metadata> {
+    const seo = await getPageSeo('labor_safety');
+
+    return toMetadata(seo, {
+        title: 'Охрана труда | ЮНИК С',
+        description: 'Сводная ведомость результатов проведения специальной оценки условий труда ООО «Юник С».',
+        alternates: {
+            canonical: 'https://uniqset.com/ohrana-truda',
+        },
+    });
+}
 
 export default function OccupationalSafetyPage() {
     return (

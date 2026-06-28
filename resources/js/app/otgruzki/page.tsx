@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import ImageView from 'next/image';
 import Link from 'next/link';
+import { getPageSeo, toMetadata } from '@/lib/seo';
 import { Pagination } from '@/components/common/Pagination';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
@@ -28,10 +29,14 @@ import {
 } from '@tabler/icons-react';
 import { shipments } from '@/lib/shipments';
 
-export const metadata: Metadata = {
-    title: 'Отгрузки оборудования | ЮНИК С',
-    description: 'Кейсы и отгрузки промышленного оборудования ЮНИК С с описанием этапов сделки и логистики.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+    const seo = await getPageSeo('shipments');
+
+    return toMetadata(seo, {
+        title: 'Отгрузки оборудования | ЮНИК С',
+        description: 'Кейсы и отгрузки промышленного оборудования ЮНИК С с описанием этапов сделки и логистики.',
+    });
+}
 
 const remoteSupportSteps = [
     'Дополнительные фото и видео конкретных узлов по запросу.',

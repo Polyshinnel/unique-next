@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<advertisements_export export_date="2026-06-28 10:11:12">
+    <categories>
+        <category id="10">
+            <name>Экскаваторы</name>
+            <parent_id>2</parent_id>
+        </category>
+        <category>
+            <name>Broken category</name>
+        </category>
+    </categories>
+    <advertisement_statuses>
+        <status id="4">
+            <name>Опубликовано</name>
+            <color>#00ff00</color>
+        </status>
+    </advertisement_statuses>
+    <check_statuses>
+        <status id="7">
+            <name>Проверено</name>
+            <color>#111111</color>
+        </status>
+    </check_statuses>
+    <install_statuses>
+        <status id="9">
+            <name>Готово к погрузке</name>
+        </status>
+    </install_statuses>
+    <advertisement id="101">
+        <title>CASE CX210</title>
+        <sku>cx210-001</sku>
+        <category id="10">Экскаваторы</category>
+        <status id="4">Опубликовано</status>
+        <product_state id="15">Б/у</product_state>
+        <product_available id="21">В наличии</product_available>
+        <price>
+            <adv_price>12500000</adv_price>
+            <show_price>1</show_price>
+            <adv_price_comment><![CDATA[С НДС]]></adv_price_comment>
+        </price>
+        <location>
+            <product_address>Москва, склад 1</product_address>
+            <regions>
+                <region id="77">
+                    <name>Москва</name>
+                </region>
+                <region>
+                    <name>Broken region</name>
+                </region>
+            </regions>
+        </location>
+        <dates>
+            <published_at>2026-06-20 09:00:00</published_at>
+        </dates>
+        <manager>
+            <product_owner id="501">
+                <name>Иван Иванов</name>
+                <email>ivan@example.com</email>
+                <phone>+7 900 000-00-00</phone>
+                <role>product_owner</role>
+            </product_owner>
+        </manager>
+        <tags>
+            <tag>лизинг</tag>
+            <tag>в наличии</tag>
+        </tags>
+        <media>
+            <media_item id="9001">
+                <file_name>main.jpg</file_name>
+                <file_url>https://example.com/main.jpg</file_url>
+                <mime_type>image/jpeg</mime_type>
+                <file_size>2048</file_size>
+                <sort_order>1</sort_order>
+                <is_main_image>1</is_main_image>
+            </media_item>
+            <media_item id="9002">
+                <file_name>extra.jpg</file_name>
+                <file_url>https://example.com/extra.jpg</file_url>
+                <mime_type>image/jpeg</mime_type>
+                <file_size>1024</file_size>
+                <sort_order>2</sort_order>
+                <is_main_image>0</is_main_image>
+            </media_item>
+            <media_item id="broken">
+                <file_name></file_name>
+            </media_item>
+        </media>
+        <check>
+            <status>Проверено</status>
+            <comment><![CDATA[Осмотр завершен]]></comment>
+        </check>
+        <loading>
+            <status>Готово к погрузке</status>
+            <comment><![CDATA[Погрузка завтра]]></comment>
+        </loading>
+        <removal>
+            <status>Демонтаж не требуется</status>
+            <comment><![CDATA[Установлено на складе]]></comment>
+        </removal>
+        <main_characteristics><![CDATA[Основные <b>характеристики</b>]]></main_characteristics>
+        <complectation><![CDATA[Полная комплектация]]></complectation>
+        <technical_characteristics><![CDATA[Технические характеристики]]></technical_characteristics>
+        <main_info><![CDATA[Главная информация]]></main_info>
+        <additional_info><![CDATA[Дополнительная информация]]></additional_info>
+    </advertisement>
+    <advertisement>
+        <title>Broken advertisement</title>
+    </advertisement>
+</advertisements_export>

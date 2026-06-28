@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { getPageSeo, toMetadata } from '@/lib/seo';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
 import { phoneHref, siteContacts } from '@/lib/site-content';
@@ -25,10 +26,14 @@ import {
     IconUsersGroup,
 } from '@tabler/icons-react';
 
-export const metadata: Metadata = {
-    title: 'Выкуп оборудования | ЮНИК С',
-    description: 'Выкуп и реализация промышленного оборудования по рыночным ценам с сопровождением сделки по всей России.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+    const seo = await getPageSeo('equipment_buyout');
+
+    return toMetadata(seo, {
+        title: 'Выкуп оборудования | ЮНИК С',
+        description: 'Выкуп и реализация промышленного оборудования по рыночным ценам с сопровождением сделки по всей России.',
+    });
+}
 
 const equipmentList = [
     'Металлорежущие и металлообрабатывающие станки',

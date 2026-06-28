@@ -1,15 +1,20 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { getPageSeo, toMetadata } from '@/lib/seo';
 import { demoServices } from '@/lib/site-content';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
 import { ServiceCard } from '@/components/services/ServiceCard';
 import { Container, Group, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 
-export const metadata: Metadata = {
-    title: 'Услуги | ЮНИК С',
-    description: 'Услуги ЮНИК С: продажа, выкуп, поставка, импорт и сопровождение сделок с промышленным оборудованием.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+    const seo = await getPageSeo('services');
+
+    return toMetadata(seo, {
+        title: 'Услуги | ЮНИК С',
+        description: 'Услуги ЮНИК С: продажа, выкуп, поставка, импорт и сопровождение сделок с промышленным оборудованием.',
+    });
+}
 
 function ServicesSection() {
     return (

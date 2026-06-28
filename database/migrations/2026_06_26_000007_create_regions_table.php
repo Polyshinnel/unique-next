@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('external_id')->nullable()->unique();
             $table->string('name');
-            $table->string('city_name')->nullable();
             $table->timestamps();
         });
     }

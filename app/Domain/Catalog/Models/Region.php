@@ -15,7 +15,6 @@ final class Region extends Model
     protected $fillable = [
         'external_id',
         'name',
-        'city_name',
     ];
 
     public function products(): BelongsToMany

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { getPageSeo, toMetadata } from '@/lib/seo';
 import { ProductGallery } from '@/components/catalog/ProductGallery';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
@@ -24,10 +25,14 @@ import {
 } from '@tabler/icons-react';
 import type { TablerIcon } from '@tabler/icons-react';
 
-export const metadata: Metadata = {
-    title: 'Продажа инструмента | ЮНИК С',
-    description: 'Инструмент от компании Коникс: поставка со склада в Йошкар-Оле, консультации, прайс и отправка по России.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+    const seo = await getPageSeo('tools_sale');
+
+    return toMetadata(seo, {
+        title: 'Продажа инструмента | ЮНИК С',
+        description: 'Инструмент от компании Коникс: поставка со склада в Йошкар-Оле, консультации, прайс и отправка по России.',
+    });
+}
 
 const galleryImages = Array.from({ length: 15 }, (_, index) => `/assets/img/services/instrument-page/${index + 1}.jpg`);
 

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { getPageSeo, toMetadata } from '@/lib/seo';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
 import { siteContacts } from '@/lib/site-content';
@@ -16,10 +17,14 @@ import {
 } from '@mantine/core';
 import { IconPhotoScan, IconReceiptTax, IconTruckDelivery } from '@tabler/icons-react';
 
-export const metadata: Metadata = {
-    title: 'Почему мы | ЮНИК С',
-    description: 'Почему клиенты выбирают ЮНИК С при покупке б/у промышленного оборудования.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+    const seo = await getPageSeo('why_we');
+
+    return toMetadata(seo, {
+        title: 'Почему мы | ЮНИК С',
+        description: 'Почему клиенты выбирают ЮНИК С при покупке б/у промышленного оборудования.',
+    });
+}
 
 const questionItems = [
     'Кто поставщик, какова его репутация. Как давно он на рынке и насколько прозрачен.',

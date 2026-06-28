@@ -1,13 +1,18 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { getPageSeo, toMetadata } from '@/lib/seo';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
 import { Anchor, Container, Image, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 
-export const metadata: Metadata = {
-    title: 'Вакансии | ЮНИК С',
-    description: 'Актуальные вакансии компании ЮНИК С и условия сотрудничества для региональных представителей.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+    const seo = await getPageSeo('vacancy');
+
+    return toMetadata(seo, {
+        title: 'Вакансии | ЮНИК С',
+        description: 'Актуальные вакансии компании ЮНИК С и условия сотрудничества для региональных представителей.',
+    });
+}
 
 const interestList = [
     'если вам интересно работать с оборудованием',
