@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\ProtectHorizonWithBasicAuth;
 use Illuminate\Support\Str;
 
 return [
@@ -17,7 +18,12 @@ return [
         Str::slug(env('APP_NAME', 'laravel'), '_').'_horizon:'
     ),
 
-    'middleware' => ['web'],
+    'middleware' => ['web', ProtectHorizonWithBasicAuth::class],
+
+    'basic_auth' => [
+        'username' => env('HORIZON_BASIC_AUTH_USERNAME'),
+        'password' => env('HORIZON_BASIC_AUTH_PASSWORD'),
+    ],
 
     'waits' => [
         'redis:default' => 60,
