@@ -18,7 +18,8 @@ import {
     IconMessageCircle,
     IconPhone,
 } from '@tabler/icons-react';
-import { demoServices, emailHref, navItems, phoneHref, siteContacts } from '@/lib/site-content';
+import { demoServices, emailHref, navItems, phoneHref } from '@/lib/site-content';
+import { formatOfficeAddress, getSiteContacts } from '@/lib/site-contacts';
 
 function SocialButton({ href, icon: Icon, label }: { href: string; icon: typeof IconBrandVk; label: string }) {
     return (
@@ -31,8 +32,9 @@ function SocialButton({ href, icon: Icon, label }: { href: string; icon: typeof 
     );
 }
 
-export function Footer() {
+export async function Footer() {
     const year = new Date().getFullYear();
+    const contacts = await getSiteContacts();
 
     return (
         <footer className="site-footer">
@@ -41,8 +43,8 @@ export function Footer() {
                     <Stack gap="md">
                         <Image src="/assets/img/unique-logo.png" alt="ЮНИК С" className="footer-logo" />
                         <Text c="white" fw={700}>ООО “Юник С”</Text>
-                        <Text c="gray.4" size="sm">ИНН: 4027139409</Text>
-                        <Text c="gray.4" size="sm">ОГРН: 1194027002861</Text>
+                        <Text c="gray.4" size="sm">ИНН: {contacts.inn}</Text>
+                        <Text c="gray.4" size="sm">ОГРН: {contacts.ogrn}</Text>
                     </Stack>
 
                     <Stack gap="sm">
@@ -75,28 +77,28 @@ export function Footer() {
 
                     <Stack gap="md">
                         <Text c="white" fw={700}>Контакты</Text>
-                        <Anchor href={phoneHref(siteContacts.phone)} className="footer-contact">
+                        <Anchor href={phoneHref(contacts.phone)} className="footer-contact">
                             <span className="footer-contact__row">
                                 <IconPhone size={18} className="footer-contact__icon" />
-                                <span className="footer-contact__text">{siteContacts.phone}</span>
+                                <span className="footer-contact__text">{contacts.phone}</span>
                             </span>
                         </Anchor>
-                        <Anchor href={emailHref(siteContacts.email)} className="footer-contact">
+                        <Anchor href={emailHref(contacts.email)} className="footer-contact">
                             <span className="footer-contact__row">
                                 <IconMail size={18} className="footer-contact__icon" />
-                                <span className="footer-contact__text">{siteContacts.email}</span>
+                                <span className="footer-contact__text">{contacts.email}</span>
                             </span>
                         </Anchor>
                         <span className="footer-contact">
                             <span className="footer-contact__row">
                                 <IconMapPin size={18} className="footer-contact__icon" />
-                                <span className="footer-contact__text">{siteContacts.address}</span>
+                                <span className="footer-contact__text">{formatOfficeAddress(contacts)}</span>
                             </span>
                         </span>
                         <Group gap="xs">
-                            <SocialButton href={siteContacts.socialLinks.max} icon={IconMessageCircle} label="Max" />
-                            <SocialButton href={siteContacts.socialLinks.vk} icon={IconBrandVk} label="VK" />
-                            <SocialButton href={siteContacts.socialLinks.telegram} icon={IconBrandTelegram} label="Telegram" />
+                            <SocialButton href={contacts.max} icon={IconMessageCircle} label="Max" />
+                            <SocialButton href={contacts.vk} icon={IconBrandVk} label="VK" />
+                            <SocialButton href={contacts.telegram} icon={IconBrandTelegram} label="Telegram" />
                         </Group>
                     </Stack>
                 </SimpleGrid>

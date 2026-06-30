@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { getPageSeo, toMetadata } from '@/lib/seo';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
-import { siteContacts } from '@/lib/site-content';
+import { getSiteContacts, type SiteContacts } from '@/lib/site-contacts';
 import {
     Button,
     Container,
@@ -201,7 +201,7 @@ function SummarySection() {
     );
 }
 
-function ContactFormSection() {
+function ContactFormSection({ contacts }: { contacts: SiteContacts }) {
     return (
         <section className="content-section content-section--white">
             <Container size="xl">
@@ -230,7 +230,7 @@ function ContactFormSection() {
                         Отправить сообщение
                     </Button>
                     <Text size="sm" c="dimmed" className="buyout-form-card__hint">
-                        Также можно написать на {siteContacts.email} или позвонить по номеру {siteContacts.phone}.
+                        Также можно написать на {contacts.email} или позвонить по номеру {contacts.phone}.
                     </Text>
                 </section>
             </Container>
@@ -238,7 +238,9 @@ function ContactFormSection() {
     );
 }
 
-export default function WhyWePage() {
+export default async function WhyWePage() {
+    const contacts = await getSiteContacts();
+
     return (
         <>
             <Header />
@@ -249,7 +251,7 @@ export default function WhyWePage() {
                 <SloganSection />
                 <AdvantagesSection />
                 <SummarySection />
-                <ContactFormSection />
+                <ContactFormSection contacts={contacts} />
             </main>
             <Footer />
         </>

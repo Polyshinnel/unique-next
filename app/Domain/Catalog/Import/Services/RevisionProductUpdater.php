@@ -38,6 +38,7 @@ final class RevisionProductUpdater
         private RegionResolver $regions,
         private TagResolver $tags,
         private ProductImageSynchronizer $images,
+        private ProductOgImageSynchronizer $ogImages,
     ) {}
 
     /**
@@ -162,6 +163,7 @@ final class RevisionProductUpdater
         $this->syncTextBlocks($product, $advertisement);
         $this->syncStatusBlocks($product, $advertisement);
         $this->images->sync($product, $advertisement->media);
+        $this->ogImages->sync($product);
     }
 
     private function findExistingProduct(AdvertisementData $advertisement): ?Product

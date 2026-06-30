@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Categories\Schemas;
 
 use App\Domain\Catalog\Models\Category;
+use App\Filament\Support\ImageUpload;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -58,7 +59,10 @@ class CategoryForm
                             ->disk('public')
                             ->directory('catalog')
                             ->visibility('public')
-                            ->image()
+                            ->rules([ImageUpload::rule()])
+                            ->extraInputAttributes([
+                                'accept' => ImageUpload::ACCEPT_ATTRIBUTE,
+                            ])
                             ->imagePreviewHeight('200')
                             ->openable()
                             ->downloadable()

@@ -17,6 +17,8 @@ import {
 } from '@mantine/core';
 import {
     IconArrowRight,
+    IconBrandTelegram,
+    IconBrandVk,
     IconChevronLeft,
     IconChevronRight,
     IconChevronsLeft,
@@ -44,6 +46,9 @@ const remoteSupportSteps = [
     'Демонстрации в работе через мессенджеры.',
     'Контроль погрузки специалистами с фотофиксацией крепления оборудования в транспорте.',
 ];
+
+const vkHref = 'https://vk.com/uniqset';
+const telegramHref = 'https://telegram.me/uniqset_gen';
 
 const followCards = [
     {
@@ -279,11 +284,37 @@ export default async function OtgruzkiPage({ searchParams }: OtgruzkiPageProps) 
                             <span>/</span>
                             <span>Отгрузки</span>
                         </div>
-                        <Title order={1}>Отгрузки оборудования</Title>
-                        <Text size="lg">
-                            В современном рынке доверие особенно важно: поэтому мы показываем реальные отгрузки,
-                            публикуем кейсы и фиксируем ключевые этапы сделки.
-                        </Text>
+                        <Stack gap="lg" align="flex-start" maw={900}>
+                            <Title order={1}>Отгрузки оборудования</Title>
+                            <Text size="lg">
+                                В современном рынке доверие особенно важно: поэтому мы показываем реальные отгрузки,
+                                публикуем кейсы и фиксируем ключевые этапы сделки.
+                            </Text>
+                            <Group gap="md" wrap="wrap">
+                                <Button
+                                    component="a"
+                                    href={vkHref}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    size="lg"
+                                    leftSection={<IconBrandVk size={18} />}
+                                >
+                                    VK
+                                </Button>
+                                <Button
+                                    component="a"
+                                    href={telegramHref}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    size="lg"
+                                    variant="white"
+                                    color="dark"
+                                    leftSection={<IconBrandTelegram size={18} />}
+                                >
+                                    Telegram
+                                </Button>
+                            </Group>
+                        </Stack>
                     </Container>
                 </section>
 

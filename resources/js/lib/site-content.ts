@@ -17,8 +17,8 @@ export const siteContacts = {
         weekends: 'Сб, Вск - выходные',
     },
     coordinates: {
-        longitude: 36.272417,
-        latitude: 54.50619307014406,
+        longitude: 36.27238477976226,
+        latitude: 54.505882234159415,
     },
     socialLinks: {
         max: '#',

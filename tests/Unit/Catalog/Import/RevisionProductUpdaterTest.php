@@ -11,6 +11,7 @@ use App\Domain\Catalog\Import\Services\FeedDownloader;
 use App\Domain\Catalog\Import\Services\FeedParser;
 use App\Domain\Catalog\Import\Services\ImageDownloader;
 use App\Domain\Catalog\Import\Services\ProductImageSynchronizer;
+use App\Domain\Catalog\Import\Services\ProductOgImageSynchronizer;
 use App\Domain\Catalog\Import\Services\RevisionProductUpdater;
 use App\Domain\Catalog\Models\Product;
 use App\Domain\Catalog\Models\ProductMainCharacteristic;
@@ -76,6 +77,7 @@ final class RevisionProductUpdaterTest extends TestCase
         self::assertSame('С НДС', $product->price_comment);
         self::assertNotNull($product->region);
         self::assertSame('Москва', $product->region->name);
+        self::assertSame("products/{$product->id}/9001_9001.jpg", $product->og_image);
 
         // Relations + text blocks updated.
         self::assertSame(['лизинг'], $product->tags->pluck('name')->all());
@@ -110,6 +112,7 @@ final class RevisionProductUpdaterTest extends TestCase
             new RegionResolver(),
             new TagResolver(),
             new ProductImageSynchronizer(new ImageDownloader()),
+            new ProductOgImageSynchronizer(),
         );
     }
 
@@ -164,7 +167,7 @@ final class RevisionProductUpdaterTest extends TestCase
                 <file_url>https://example.com/9001.jpg</file_url>
                 <mime_type>image/jpeg</mime_type>
                 <file_size>2048</file_size>
-                <sort_order>1</sort_order>
+                <sort_order>0</sort_order>
                 <is_main_image>1</is_main_image>
             </media_item>
         </media>

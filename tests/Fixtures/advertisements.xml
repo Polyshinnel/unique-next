@@ -78,7 +78,7 @@
                 <file_url>https://example.com/extra.jpg</file_url>
                 <mime_type>image/jpeg</mime_type>
                 <file_size>1024</file_size>
-                <sort_order>2</sort_order>
+                <sort_order>0</sort_order>
                 <is_main_image>0</is_main_image>
             </media_item>
             <media_item id="broken">

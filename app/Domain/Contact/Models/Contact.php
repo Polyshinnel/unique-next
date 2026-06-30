@@ -11,9 +11,11 @@ final class Contact extends Model
      */
     protected $fillable = [
         'address',
+        'address2',
         'phone',
         'email',
         'work_schedule',
+        'work_schedule2',
         'latitude',
         'longitude',
         'telegram',

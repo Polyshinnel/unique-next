@@ -6,7 +6,7 @@ import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
 import { catalogCategoryTree, getCatalogCategoryAncestors, getCatalogCategoryByPath, type CatalogCategory, type FlatCatalogCategory } from '@/lib/catalog-categories';
 import { catalogProducts, type CatalogProduct, getCatalogProductsByCategory } from '@/lib/catalog-products';
-import { siteContacts } from '@/lib/site-content';
+import { getSiteContacts } from '@/lib/site-contacts';
 import {
     Badge,
     Button,
@@ -252,7 +252,8 @@ function CatalogBreadcrumbs({ currentCategory }: { currentCategory?: FlatCatalog
     );
 }
 
-export function CatalogPageView({ currentCategory, searchParams }: CatalogPageViewProps) {
+export async function CatalogPageView({ currentCategory, searchParams }: CatalogPageViewProps) {
+    const contacts = await getSiteContacts();
     const baseHref = currentCategory?.href ?? '/catalog';
     const activeRegion = getSearchValue(searchParams?.region);
     const categoryProducts = getCatalogProductsByCategory(currentCategory);
@@ -290,7 +291,7 @@ export function CatalogPageView({ currentCategory, searchParams }: CatalogPageVi
                                 </Button>
                                 <Button
                                     component="a"
-                                    href={siteContacts.socialLinks.max}
+                                    href={contacts.max}
                                     target="_blank"
                                     rel="noreferrer"
                                     variant="white"

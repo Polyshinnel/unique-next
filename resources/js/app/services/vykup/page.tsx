@@ -3,7 +3,8 @@ import Link from 'next/link';
 import { getPageSeo, toMetadata } from '@/lib/seo';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
-import { phoneHref, siteContacts } from '@/lib/site-content';
+import { phoneHref } from '@/lib/site-content';
+import { getSiteContacts, type SiteContacts } from '@/lib/site-contacts';
 import {
     Button,
     Container,
@@ -101,7 +102,7 @@ const partnerCards = [
     },
 ] as const;
 
-function HeroSection() {
+function HeroSection({ contacts }: { contacts: SiteContacts }) {
     return (
         <section className="page-hero buyout-hero">
             <Container size="xl">
@@ -123,7 +124,7 @@ function HeroSection() {
                     <Group gap="md">
                         <Button
                             component="a"
-                            href={phoneHref(siteContacts.phone)}
+                            href={phoneHref(contacts.phone)}
                             size="lg"
                             leftSection={<IconPhone size={18} />}
                         >
@@ -167,7 +168,7 @@ function ListSection({
     );
 }
 
-function RegionsSection() {
+function RegionsSection({ contacts }: { contacts: SiteContacts }) {
     return (
         <section className="content-section buyout-regions-section">
             <Container size="xl">
@@ -192,7 +193,7 @@ function RegionsSection() {
                                 <div className="buyout-note__row">
                                     <IconMapPin size={20} />
                                     <Text>
-                                        Мы постоянно расширяемся, позвоните нам: {siteContacts.phone}, возможно мы уже
+                                        Мы постоянно расширяемся, позвоните нам: {contacts.phone}, возможно мы уже
                                         работаем в вашем регионе.
                                     </Text>
                                 </div>
@@ -265,7 +266,7 @@ function PartnersSection() {
     );
 }
 
-function SummarySection() {
+function SummarySection({ contacts }: { contacts: SiteContacts }) {
     return (
         <section className="content-section buyout-summary-section">
             <Container size="xl">
@@ -297,7 +298,7 @@ function SummarySection() {
                         <Group mt="md">
                             <Button
                                 component="a"
-                                href={phoneHref(siteContacts.phone)}
+                                href={phoneHref(contacts.phone)}
                                 size="lg"
                                 leftSection={<IconPhone size={18} />}
                             >
@@ -311,16 +312,18 @@ function SummarySection() {
     );
 }
 
-export default function EquipmentBuyoutPage() {
+export default async function EquipmentBuyoutPage() {
+    const contacts = await getSiteContacts();
+
     return (
         <>
             <Header />
             <main>
-                <HeroSection />
+                <HeroSection contacts={contacts} />
                 <ListSection title="Берем на реализацию следующее оборудование:" items={equipmentList} />
-                <RegionsSection />
+                <RegionsSection contacts={contacts} />
                 <PartnersSection />
-                <SummarySection />
+                <SummarySection contacts={contacts} />
             </main>
             <Footer />
         </>

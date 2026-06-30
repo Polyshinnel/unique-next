@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { getHomeBanners } from '@/lib/banners';
 import { getPageSeo, toMetadata } from '@/lib/seo';
 import { catalogProducts } from '@/lib/catalog-products';
 import { demoServices } from '@/lib/site-content';
@@ -178,12 +179,14 @@ function BusinessEquipmentSection() {
     );
 }
 
-export default function HomePage() {
+export default async function HomePage() {
+    const banners = await getHomeBanners();
+
     return (
         <>
             <Header />
             <main>
-                <HeroSlider />
+                <HeroSlider slides={banners} />
                 <CompanySection />
                 <LatestProducts />
                 <ServicesSection />

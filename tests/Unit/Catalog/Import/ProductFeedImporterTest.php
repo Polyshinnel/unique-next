@@ -11,6 +11,7 @@ use App\Domain\Catalog\Import\Services\FeedDownloader;
 use App\Domain\Catalog\Import\Services\FeedParser;
 use App\Domain\Catalog\Import\Services\ImageDownloader;
 use App\Domain\Catalog\Import\Services\ProductFeedImporter;
+use App\Domain\Catalog\Import\Services\ProductOgImageSynchronizer;
 use App\Domain\Catalog\Models\CheckStatus;
 use App\Domain\Catalog\Models\Manager;
 use App\Domain\Catalog\Models\Product;
@@ -72,7 +73,7 @@ final class ProductFeedImporterTest extends TestCase
         self::assertSame('Москва', $product->region->name);
         self::assertSame('2026-06-20 09:00:00', $product->published_at?->format('Y-m-d H:i:s'));
         self::assertNull($product->description);
-        self::assertNull($product->og_image);
+        self::assertSame("products/{$product->id}/9002_extra.jpg", $product->og_image);
 
         self::assertSame(['Москва'], $product->regions->pluck('name')->all());
         self::assertSame(['лизинг', 'в наличии'], $product->tags->pluck('name')->all());
@@ -250,6 +251,7 @@ final class ProductFeedImporterTest extends TestCase
             new RegionResolver(),
             new TagResolver(),
             new ImageDownloader(),
+            new ProductOgImageSynchronizer(),
         );
     }
 
@@ -336,7 +338,7 @@ final class ProductFeedImporterTest extends TestCase
                 <file_url>https://example.com/main.jpg</file_url>
                 <mime_type>image/jpeg</mime_type>
                 <file_size>2048</file_size>
-                <sort_order>1</sort_order>
+                <sort_order>0</sort_order>
                 <is_main_image>1</is_main_image>
             </media_item>
         </media>
@@ -395,7 +397,7 @@ XML;
                 <file_url>https://example.com/second.jpg</file_url>
                 <mime_type>image/jpeg</mime_type>
                 <file_size>100</file_size>
-                <sort_order>1</sort_order>
+                <sort_order>0</sort_order>
                 <is_main_image>1</is_main_image>
             </media_item>
         </media>

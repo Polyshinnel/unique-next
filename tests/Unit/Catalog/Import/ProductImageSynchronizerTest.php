@@ -5,6 +5,7 @@ namespace Tests\Unit\Catalog\Import;
 use App\Domain\Catalog\Import\Data\MediaItemData;
 use App\Domain\Catalog\Import\Services\ImageDownloader;
 use App\Domain\Catalog\Import\Services\ProductImageSynchronizer;
+use App\Domain\Catalog\Import\Services\ProductOgImageSynchronizer;
 use App\Domain\Catalog\Models\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
@@ -130,6 +131,26 @@ final class ProductImageSynchronizerTest extends TestCase
         $main = $product->images()->where('is_main', true)->firstOrFail();
         self::assertSame(2, $main->external_id);
         self::assertSame(1, $main->sort_order);
+    }
+
+    public function test_it_allows_choosing_og_image_from_sort_order_zero(): void
+    {
+        Storage::fake('public');
+        Http::fake([
+            'https://example.com/1.jpg' => Http::response('image-1', 200, ['Content-Type' => 'image/jpeg']),
+            'https://example.com/2.jpg' => Http::response('image-2', 200, ['Content-Type' => 'image/jpeg']),
+        ]);
+
+        $product = Product::query()->create(['name' => 'CASE CX210', 'title' => 'CASE CX210']);
+        $media = [
+            $this->media(1, sortOrder: 1, isMain: true),
+            $this->media(2, sortOrder: 0, isMain: false),
+        ];
+
+        $this->synchronizer()->sync($product, $media);
+        (new ProductOgImageSynchronizer())->sync($product->fresh());
+
+        self::assertSame("products/{$product->id}/2_2.jpg", $product->fresh()->og_image);
     }
 
     public function test_it_removes_all_images_when_feed_has_no_media(): void

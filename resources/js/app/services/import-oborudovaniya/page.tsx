@@ -4,7 +4,8 @@ import { getPageSeo, toMetadata } from '@/lib/seo';
 import { ProductGallery } from '@/components/catalog/ProductGallery';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
-import { emailHref, phoneHref, siteContacts } from '@/lib/site-content';
+import { emailHref, phoneHref } from '@/lib/site-content';
+import { getSiteContacts, type SiteContacts } from '@/lib/site-contacts';
 import {
     Button,
     Container,
@@ -67,7 +68,7 @@ const advantageCards = [
     },
 ] as const;
 
-function HeroSection() {
+function HeroSection({ contacts }: { contacts: SiteContacts }) {
     return (
         <section className="page-hero buyout-hero import-hero">
             <Container size="xl">
@@ -92,7 +93,7 @@ function HeroSection() {
                     <Group gap="md">
                         <Button
                             component="a"
-                            href={phoneHref(siteContacts.phone)}
+                            href={phoneHref(contacts.phone)}
                             size="lg"
                             leftSection={<IconPhone size={18} />}
                         >
@@ -100,7 +101,7 @@ function HeroSection() {
                         </Button>
                         <Button
                             component="a"
-                            href={`mailto:${siteContacts.email}?subject=%D0%98%D0%BC%D0%BF%D0%BE%D1%80%D1%82%20%D0%BE%D0%B1%D0%BE%D1%80%D1%83%D0%B4%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F`}
+                            href={`mailto:${contacts.email}?subject=%D0%98%D0%BC%D0%BF%D0%BE%D1%80%D1%82%20%D0%BE%D0%B1%D0%BE%D1%80%D1%83%D0%B4%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F`}
                             size="lg"
                             variant="white"
                             color="dark"
@@ -150,7 +151,7 @@ function IntroSection() {
     );
 }
 
-function OfferSection() {
+function OfferSection({ contacts }: { contacts: SiteContacts }) {
     return (
         <section className="content-section import-offer-section">
             <Container size="xl">
@@ -202,7 +203,7 @@ function OfferSection() {
                             Отправить заявку
                         </Button>
                         <Text size="sm" c="dimmed" className="buyout-form-card__hint">
-                            Также можно написать на {siteContacts.email} или позвонить по номеру {siteContacts.phone}.
+                            Также можно написать на {contacts.email} или позвонить по номеру {contacts.phone}.
                         </Text>
                     </section>
                 </div>
@@ -231,7 +232,7 @@ function GallerySection() {
     );
 }
 
-function AdvantagesSection() {
+function AdvantagesSection({ contacts }: { contacts: SiteContacts }) {
     return (
         <section className="content-section">
             <Container size="xl">
@@ -270,12 +271,12 @@ function AdvantagesSection() {
                                 переговорам, таможне, логистике и документам.
                             </Text>
                             <Group gap="md">
-                                <Button component="a" href={phoneHref(siteContacts.phone)} leftSection={<IconPhone size={18} />}>
+                                <Button component="a" href={phoneHref(contacts.phone)} leftSection={<IconPhone size={18} />}>
                                     Связаться по телефону
                                 </Button>
                                 <Button
                                     component="a"
-                                    href={emailHref(siteContacts.email)}
+                                    href={emailHref(contacts.email)}
                                     variant="default"
                                     leftSection={<IconMail size={18} />}
                                 >
@@ -290,16 +291,18 @@ function AdvantagesSection() {
     );
 }
 
-export default function EquipmentImportPage() {
+export default async function EquipmentImportPage() {
+    const contacts = await getSiteContacts();
+
     return (
         <>
             <Header />
             <main>
-                <HeroSection />
+                <HeroSection contacts={contacts} />
                 <IntroSection />
-                <OfferSection />
+                <OfferSection contacts={contacts} />
                 <GallerySection />
-                <AdvantagesSection />
+                <AdvantagesSection contacts={contacts} />
             </main>
             <Footer />
         </>

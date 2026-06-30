@@ -1,5 +1,6 @@
 'use client';
 
+import type { ComponentProps, ReactNode } from 'react';
 import { Button, Modal, SimpleGrid, Stack, Text, TextInput, Textarea, Title } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconSearch } from '@tabler/icons-react';
@@ -9,6 +10,9 @@ type FeedbackRequestModalProps = {
     description?: string;
     modalTitle?: string;
     size?: 'compact' | 'md' | 'lg';
+    buttonColor?: ComponentProps<typeof Button>['color'];
+    buttonVariant?: ComponentProps<typeof Button>['variant'];
+    buttonLeftSection?: ReactNode;
 };
 
 export function FeedbackRequestModal({
@@ -16,12 +20,15 @@ export function FeedbackRequestModal({
     description = 'Заполните форму, и мы свяжемся с вами для уточнения деталей.',
     modalTitle = 'Форма обратной связи',
     size = 'lg',
+    buttonColor,
+    buttonVariant,
+    buttonLeftSection = <IconSearch size={19} />,
 }: FeedbackRequestModalProps) {
     const [opened, { open, close }] = useDisclosure(false);
 
     return (
         <>
-            <Button size={size} leftSection={<IconSearch size={19} />} onClick={open}>
+            <Button size={size} color={buttonColor} variant={buttonVariant} leftSection={buttonLeftSection} onClick={open}>
                 {buttonLabel}
             </Button>
 

@@ -96,6 +96,47 @@ final class ImageDownloaderTest extends TestCase
         self::assertDatabaseCount('product_images', 1);
     }
 
+    public function test_it_updates_existing_image_metadata_without_redownloading_when_file_exists(): void
+    {
+        Storage::fake('public');
+        Http::fake();
+
+        $product = Product::query()->create(['name' => 'CASE CX210', 'title' => 'CASE CX210']);
+        $path = "products/{$product->id}/9001_main.jpg";
+
+        Storage::disk('public')->put($path, 'existing-image');
+
+        $product->images()->create([
+            'external_id' => 9001,
+            'file_name' => 'main.jpg',
+            'file_path' => $path,
+            'file_url' => 'https://example.com/main.jpg',
+            'mime_type' => 'image/jpeg',
+            'file_size' => 12,
+            'sort_order' => 1,
+            'is_main' => true,
+        ]);
+
+        $media = new MediaItemData(
+            externalId: 9001,
+            fileName: 'main-renamed.jpg',
+            fileUrl: 'https://example.com/main.jpg',
+            mimeType: 'image/jpeg',
+            fileSize: 13,
+            sortOrder: 0,
+            isMain: false,
+        );
+
+        $image = (new ImageDownloader)->download($product, $media);
+
+        self::assertNotNull($image);
+        self::assertSame('main-renamed.jpg', $image->file_name);
+        self::assertSame(13, $image->file_size);
+        self::assertSame(0, $image->sort_order);
+        self::assertFalse($image->is_main);
+        Http::assertNothingSent();
+    }
+
     public function test_it_logs_and_skips_invalid_downloads_without_failing_the_import(): void
     {
         Storage::fake('public');

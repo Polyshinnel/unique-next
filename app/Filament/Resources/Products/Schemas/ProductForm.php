@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Products\Schemas;
 
 use App\Domain\Catalog\Models\Product;
+use App\Filament\Support\ImageUpload;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -71,7 +72,10 @@ class ProductForm
                             ->disk('public')
                             ->directory('catalog')
                             ->visibility('public')
-                            ->image()
+                            ->rules([ImageUpload::rule()])
+                            ->extraInputAttributes([
+                                'accept' => ImageUpload::ACCEPT_ATTRIBUTE,
+                            ])
                             ->imagePreviewHeight('200')
                             ->openable()
                             ->downloadable()

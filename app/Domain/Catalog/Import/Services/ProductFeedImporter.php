@@ -30,6 +30,7 @@ final class ProductFeedImporter
         private RegionResolver $regions,
         private TagResolver $tags,
         private ImageDownloader $images,
+        private ProductOgImageSynchronizer $ogImages,
     ) {}
 
     /**
@@ -95,6 +96,8 @@ final class ProductFeedImporter
                         foreach ($advertisement->media as $mediaItem) {
                             $this->images->download($product, $mediaItem);
                         }
+
+                        $this->ogImages->sync($product);
                     });
 
                     if ($wasCreated) {

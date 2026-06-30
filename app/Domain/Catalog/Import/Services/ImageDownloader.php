@@ -24,7 +24,20 @@ final class ImageDownloader
         ]);
 
         if ($image->exists && $image->file_path !== null && $disk->exists($image->file_path)) {
-            return $image;
+            $image->fill([
+                'file_name' => $media->fileName,
+                'file_url' => $media->fileUrl,
+                'mime_type' => $this->normalizeMimeType($media->mimeType) ?? $image->mime_type,
+                'file_size' => $media->fileSize ?? $image->file_size,
+                'sort_order' => $media->sortOrder,
+                'is_main' => $media->isMain,
+            ]);
+
+            if ($image->isDirty()) {
+                $image->save();
+            }
+
+            return $image->fresh();
         }
 
         if (! $this->looksLikeImage($media->mimeType)) {

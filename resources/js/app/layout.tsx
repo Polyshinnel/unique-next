@@ -11,6 +11,11 @@ export const metadata: Metadata = {
     metadataBase: new URL(metadataBaseUrl),
     title: 'ЮНИК С - каталог промышленного оборудования',
     description: 'Продажа, подбор и сопровождение сделок с промышленным оборудованием.',
+    icons: {
+        icon: '/favicon.png',
+        shortcut: '/favicon.png',
+        apple: '/favicon.png',
+    },
 };
 
 type RootLayoutProps = {

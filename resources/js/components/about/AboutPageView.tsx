@@ -39,10 +39,20 @@ export function AboutPageView() {
                             <span>/</span>
                             <span>О компании</span>
                         </div>
-                        <Title order={1}>О компании</Title>
-                        <Text size="lg">
-                            ЮНИК С помогает промышленным компаниям решать сложные задачи в поставках, оборудовании и сопровождении проектов по всей России.
-                        </Text>
+                        <Stack gap="lg" maw={760}>
+                            <Title order={1}>О компании</Title>
+                            <Text size="lg">
+                                ЮНИК С помогает промышленным компаниям решать сложные задачи в поставках, оборудовании и сопровождении проектов по всей России.
+                            </Text>
+                            <Group gap="md">
+                                <Button component="a" href="/why-we" size="lg">
+                                    Почему мы
+                                </Button>
+                                <Button component="a" href="/vacancy" size="lg" variant="white" color="dark">
+                                    Вакансии
+                                </Button>
+                            </Group>
+                        </Stack>
                     </Container>
                 </section>
 

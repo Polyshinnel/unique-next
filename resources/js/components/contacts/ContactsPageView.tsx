@@ -1,14 +1,14 @@
 import Link from 'next/link';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
-import { getOfficeMapEmbedUrl, getOfficeMapImageUrl, getOfficeMapLink } from '@/lib/site-config';
-import { emailHref, phoneHref, siteContacts } from '@/lib/site-content';
+import { YandexMap } from '@/components/contacts/YandexMap';
+import { getOfficeMapLink, siteConfig } from '@/lib/site-config';
+import { emailHref, phoneHref } from '@/lib/site-content';
+import { formatCoordinates, formatOfficeAddress, type SiteContacts } from '@/lib/site-contacts';
 import {
-    Anchor,
     Button,
     Container,
     Group,
-    Image,
     SimpleGrid,
     Stack,
     Text,
@@ -22,38 +22,39 @@ import {
     IconRoute,
 } from '@tabler/icons-react';
 
-const mapImageUrl = getOfficeMapImageUrl();
-const mapEmbedUrl = getOfficeMapEmbedUrl();
-const mapLink = getOfficeMapLink();
+type ContactsPageViewProps = {
+    contacts: SiteContacts;
+};
 
-const contactCards = [
-    {
-        title: 'Телефон',
-        value: siteContacts.phone,
-        description: 'Свяжитесь с нами для консультации, подбора оборудования и обсуждения сделки.',
-        href: phoneHref(siteContacts.phone),
-        action: 'Позвонить',
-        icon: IconPhone,
-    },
-    {
-        title: 'Email',
-        value: siteContacts.email,
-        description: 'Отправьте запрос на подбор, коммерческое предложение или документы по сделке.',
-        href: emailHref(siteContacts.email),
-        action: 'Написать',
-        icon: IconMail,
-    },
-    {
-        title: 'Адрес офиса',
-        value: siteContacts.address,
-        description: 'Принимаем в офисе по предварительному согласованию времени визита.',
-        href: mapLink,
-        action: 'Открыть маршрут',
-        icon: IconMapPin,
-    },
-];
+export function ContactsPageView({ contacts }: ContactsPageViewProps) {
+    const mapLink = getOfficeMapLink(contacts);
+    const contactCards = [
+        {
+            title: 'Телефон',
+            value: contacts.phone,
+            description: 'Свяжитесь с нами для консультации, подбора оборудования и обсуждения сделки.',
+            href: phoneHref(contacts.phone),
+            action: 'Позвонить',
+            icon: IconPhone,
+        },
+        {
+            title: 'Email',
+            value: contacts.email,
+            description: 'Отправьте запрос на подбор, коммерческое предложение или документы по сделке.',
+            href: emailHref(contacts.email),
+            action: 'Написать',
+            icon: IconMail,
+        },
+        {
+            title: 'Адрес офиса',
+            value: formatOfficeAddress(contacts),
+            description: 'Принимаем в офисе по предварительному согласованию времени визита.',
+            href: mapLink,
+            action: 'Открыть маршрут',
+            icon: IconMapPin,
+        },
+    ];
 
-export function ContactsPageView() {
     return (
         <>
             <Header />
@@ -71,10 +72,10 @@ export function ContactsPageView() {
                             Свяжитесь с нами удобным способом или приезжайте в офис в Калуге.
                         </Text>
                         <Group mt="xl" gap="sm">
-                            <Button component="a" href={phoneHref(siteContacts.phone)} size="lg" leftSection={<IconPhone size={18} />}>
+                            <Button component="a" href={phoneHref(contacts.phone)} size="lg" leftSection={<IconPhone size={18} />}>
                                 Позвонить
                             </Button>
-                            <Button component="a" href={emailHref(siteContacts.email)} size="lg" variant="white" leftSection={<IconMail size={18} />}>
+                            <Button component="a" href={emailHref(contacts.email)} size="lg" variant="white" leftSection={<IconMail size={18} />}>
                                 Написать на email
                             </Button>
                         </Group>
@@ -117,8 +118,8 @@ export function ContactsPageView() {
                                                 <div className="contacts-info-row">
                                                     <IconClockHour4 size={20} />
                                                     <div>
-                                                        <b>{siteContacts.workingHours.weekdays}</b>
-                                                        <span>{siteContacts.workingHours.weekends}</span>
+                                                        <b>{contacts.workSchedule}</b>
+                                                        <span>{contacts.workSchedule2}</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -130,17 +131,15 @@ export function ContactsPageView() {
                                                 <div className="contacts-info-row">
                                                     <IconMapPin size={20} />
                                                     <div>
-                                                        <b>{siteContacts.shortAddress}</b>
-                                                        <span>248002, 3 этаж, офисы 313, 314</span>
+                                                        <b>{contacts.address}</b>
+                                                        <span>{contacts.address2}</span>
                                                     </div>
                                                 </div>
                                                 <div className="contacts-info-row">
                                                     <IconRoute size={20} />
                                                     <div>
                                                         <b>Координаты</b>
-                                                        <span>
-                                                            {siteContacts.coordinates.longitude}, {siteContacts.coordinates.latitude}
-                                                        </span>
+                                                        <span>{formatCoordinates(contacts)}</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -154,7 +153,7 @@ export function ContactsPageView() {
                                             </Text>
                                             <Button
                                                 component="a"
-                                                href={phoneHref(siteContacts.phone)}
+                                                href={phoneHref(contacts.phone)}
                                                 className="contacts-note__button"
                                                 color="green"
                                                 leftSection={<IconPhone size={18} />}
@@ -183,24 +182,13 @@ export function ContactsPageView() {
                                         </Button>
                                     </div>
 
-                                    {mapImageUrl ? (
-                                        <Anchor href={mapLink} target="_blank" rel="noreferrer" className="contacts-map-card__media">
-                                            <Image
-                                                src={mapImageUrl}
-                                                alt={`Карта офиса ЮНИК С: ${siteContacts.address}`}
-                                            />
-                                        </Anchor>
-                                    ) : (
-                                        <div className="contacts-map-card__fallback">
-                                            <iframe
-                                                title={`Карта офиса ЮНИК С: ${siteContacts.address}`}
-                                                src={mapEmbedUrl}
-                                                className="contacts-map-card__iframe"
-                                                loading="lazy"
-                                                referrerPolicy="no-referrer-when-downgrade"
-                                            />
-                                        </div>
-                                    )}
+                                    <YandexMap
+                                        longitude={contacts.longitude}
+                                        latitude={contacts.latitude}
+                                        zoom={siteConfig.yandexMapsZoom}
+                                        title={`Офис ЮНИК С: ${formatOfficeAddress(contacts)}`}
+                                        className="contacts-map-card__media"
+                                    />
                                 </section>
                             </div>
                         </Stack>

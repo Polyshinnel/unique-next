@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\PageSeos\Schemas;
 
+use App\Filament\Support\ImageUpload;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
@@ -58,7 +59,10 @@ class PageSeoForm
                             ->disk('public')
                             ->directory('seo')
                             ->visibility('public')
-                            ->image()
+                            ->rules([ImageUpload::rule()])
+                            ->extraInputAttributes([
+                                'accept' => ImageUpload::ACCEPT_ATTRIBUTE,
+                            ])
                             ->imagePreviewHeight('200')
                             ->openable()
                             ->downloadable()

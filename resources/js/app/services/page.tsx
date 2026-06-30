@@ -1,11 +1,14 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { getPageSeo, toMetadata } from '@/lib/seo';
-import { demoServices } from '@/lib/site-content';
+import { demoServices, phoneHref } from '@/lib/site-content';
+import { getSiteContacts } from '@/lib/site-contacts';
+import { FeedbackRequestModal } from '@/components/common/FeedbackRequestModal';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
 import { ServiceCard } from '@/components/services/ServiceCard';
-import { Container, Group, SimpleGrid, Stack, Text, Title } from '@mantine/core';
+import { Button, Container, Group, SimpleGrid, Stack, Text, Title } from '@mantine/core';
+import { IconPhone } from '@tabler/icons-react';
 
 export async function generateMetadata(): Promise<Metadata> {
     const seo = await getPageSeo('services');
@@ -36,7 +39,9 @@ function ServicesSection() {
     );
 }
 
-export default function ServicesPage() {
+export default async function ServicesPage() {
+    const contacts = await getSiteContacts();
+
     return (
         <>
             <Header />
@@ -48,10 +53,30 @@ export default function ServicesPage() {
                             <span>/</span>
                             <span>Услуги</span>
                         </div>
-                        <Title order={1}>Услуги</Title>
-                        <Text size="lg">
-                            Помогаем подобрать, купить, продать и доставить промышленное оборудование с понятными условиями сделки.
-                        </Text>
+                        <Stack gap="lg" maw={760}>
+                            <Title order={1}>Услуги</Title>
+                            <Text size="lg">
+                                Помогаем подобрать, купить, продать и доставить промышленное оборудование с понятными условиями сделки.
+                            </Text>
+                            <Group gap="md">
+                                <Button
+                                    component="a"
+                                    href={phoneHref(contacts.phone)}
+                                    size="lg"
+                                    leftSection={<IconPhone size={18} />}
+                                >
+                                    Позвонить
+                                </Button>
+                                <FeedbackRequestModal
+                                    buttonLabel="Оставить заявку"
+                                    modalTitle="Закажите обратный звонок"
+                                    description="Оставьте контакты, и мы перезвоним вам, чтобы обсудить нужную услугу."
+                                    buttonVariant="white"
+                                    buttonColor="dark"
+                                    buttonLeftSection={null}
+                                />
+                            </Group>
+                        </Stack>
                     </Container>
                 </section>
                 <ServicesSection />
