@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import ImageView from 'next/image';
 import Link from 'next/link';
-import { getPageSeo, toMetadata } from '@/lib/seo';
+import { canonicalUrl, getPageSeo, toMetadata } from '@/lib/seo';
 import { Pagination } from '@/components/common/Pagination';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
@@ -29,7 +29,7 @@ import {
     IconTruckDelivery,
     IconVideo,
 } from '@tabler/icons-react';
-import { shipments } from '@/lib/shipments';
+import { getShipmentHref, getShipmentsPage, type Shipment } from '@/lib/shipments';
 
 export async function generateMetadata(): Promise<Metadata> {
     const seo = await getPageSeo('shipments');
@@ -37,6 +37,9 @@ export async function generateMetadata(): Promise<Metadata> {
     return toMetadata(seo, {
         title: 'Отгрузки оборудования | ЮНИК С',
         description: 'Кейсы и отгрузки промышленного оборудования ЮНИК С с описанием этапов сделки и логистики.',
+        alternates: {
+            canonical: canonicalUrl('/otgruzki'),
+        },
     });
 }
 
@@ -78,10 +81,8 @@ function shortText(text: string, maxLength = 150) {
         return text;
     }
 
-    return `${text.slice(0, maxLength - 1).trimEnd()}…`;
+    return `${text.slice(0, maxLength - 1).trimEnd()}...`;
 }
-
-const SHIPMENTS_PER_PAGE = 8;
 
 type OtgruzkiPageProps = {
     searchParams?: Promise<{
@@ -89,7 +90,7 @@ type OtgruzkiPageProps = {
     }>;
 };
 
-function getCurrentPage(pageParam: string | string[] | undefined, totalPages: number) {
+function getRequestedPage(pageParam: string | string[] | undefined) {
     const pageValue = Array.isArray(pageParam) ? pageParam[0] : pageParam;
     const parsedPage = Number(pageValue ?? 1);
 
@@ -97,18 +98,22 @@ function getCurrentPage(pageParam: string | string[] | undefined, totalPages: nu
         return 1;
     }
 
-    return Math.min(Math.floor(parsedPage), totalPages);
+    return Math.floor(parsedPage);
 }
 
 function getShipmentsPageHref(page: number) {
     return page === 1 ? '/otgruzki' : `/otgruzki?page=${page}`;
 }
 
-function ShipmentsSection({ page }: { page: number }) {
-    const totalPages = Math.ceil(shipments.length / SHIPMENTS_PER_PAGE);
-    const startIndex = (page - 1) * SHIPMENTS_PER_PAGE;
-    const visibleShipments = shipments.slice(startIndex, startIndex + SHIPMENTS_PER_PAGE);
-
+function ShipmentsSection({
+    shipments,
+    page,
+    totalPages,
+}: {
+    shipments: Shipment[];
+    page: number;
+    totalPages: number;
+}) {
     return (
         <section className="content-section content-section--white">
             <Container size="xl">
@@ -120,18 +125,18 @@ function ShipmentsSection({ page }: { page: number }) {
                 </Group>
 
                 <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="lg">
-                    {visibleShipments.map((shipment) => (
+                    {shipments.map((shipment) => (
                         <article key={shipment.id} className="shipment-card">
-                            <Link href={`/otgruzki/${shipment.id}`} className="shipment-card__image">
-                                <ImageView src={shipment.image} alt={shipment.title} width={768} height={576} />
+                            <Link href={getShipmentHref(shipment)} className="shipment-card__image">
+                                <ImageView src={shipment.image} alt={shipment.title} width={768} height={576} unoptimized />
                             </Link>
                             <div className="shipment-card__body">
                                 <Text size="sm" c="dimmed">{shipment.date}</Text>
 
-                                <Text size="sm" c="dimmed">{shipment.location}</Text>
+                                {shipment.location ? <Text size="sm" c="dimmed">{shipment.location}</Text> : null}
 
                                 <Title order={3}>
-                                    <Link href={`/otgruzki/${shipment.id}`}>{shipment.title}</Link>
+                                    <Link href={getShipmentHref(shipment)}>{shipment.title}</Link>
                                 </Title>
 
                                 <Text>{shortText(shipment.summary)}</Text>
@@ -144,7 +149,7 @@ function ShipmentsSection({ page }: { page: number }) {
 
                                 <Button
                                     component="a"
-                                    href={`/otgruzki/${shipment.id}`}
+                                    href={getShipmentHref(shipment)}
                                     className="product-card__more shipment-card__more"
                                     rightSection={<IconArrowRight size={17} />}
                                 >
@@ -155,17 +160,21 @@ function ShipmentsSection({ page }: { page: number }) {
                     ))}
                 </SimpleGrid>
 
-                <Pagination
-                    currentPage={page}
-                    totalPages={totalPages}
-                    getPageHref={getShipmentsPageHref}
-                    ariaLabel="Пагинация отгрузок"
-                    className="shipments-pagination"
-                    firstControl={<IconChevronsLeft size={18} />}
-                    previousControl={<IconChevronLeft size={18} />}
-                    nextControl={<IconChevronRight size={18} />}
-                    lastControl={<IconChevronsRight size={18} />}
-                />
+                {shipments.length ? (
+                    <Pagination
+                        currentPage={page}
+                        totalPages={totalPages}
+                        getPageHref={getShipmentsPageHref}
+                        ariaLabel="Пагинация отгрузок"
+                        className="shipments-pagination"
+                        firstControl={<IconChevronsLeft size={18} />}
+                        previousControl={<IconChevronLeft size={18} />}
+                        nextControl={<IconChevronRight size={18} />}
+                        lastControl={<IconChevronsRight size={18} />}
+                    />
+                ) : (
+                    <Text c="dimmed">Пока нет опубликованных отгрузок.</Text>
+                )}
             </Container>
         </section>
     );
@@ -212,7 +221,13 @@ function FollowSection() {
 
                                     <div className="otgruzki-follow-card__qr">
                                         <div className="otgruzki-follow-card__qr-frame">
-                                            <ImageView src={card.qrSrc} alt={card.qrAlt} width={220} height={220} />
+                                            <ImageView
+                                                src={card.qrSrc}
+                                                alt={card.qrAlt}
+                                                width={220}
+                                                height={220}
+                                                unoptimized
+                                            />
                                         </div>
                                         <Text size="sm" c="dimmed" ta="center">
                                             Сканируйте QR-код, чтобы открыть страницу сразу на телефоне.
@@ -270,8 +285,8 @@ function RemoteShipmentSection() {
 
 export default async function OtgruzkiPage({ searchParams }: OtgruzkiPageProps) {
     const params = await searchParams;
-    const totalPages = Math.max(1, Math.ceil(shipments.length / SHIPMENTS_PER_PAGE));
-    const page = getCurrentPage(params?.page, totalPages);
+    const requestedPage = getRequestedPage(params?.page);
+    const { shipments, pagination } = await getShipmentsPage(requestedPage);
 
     return (
         <>
@@ -318,7 +333,11 @@ export default async function OtgruzkiPage({ searchParams }: OtgruzkiPageProps) 
                     </Container>
                 </section>
 
-                <ShipmentsSection page={page} />
+                <ShipmentsSection
+                    shipments={shipments}
+                    page={pagination.currentPage}
+                    totalPages={Math.max(1, pagination.totalPages)}
+                />
                 <FollowSection />
                 <RemoteShipmentSection />
             </main>

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { getPageSeo, toMetadata } from '@/lib/seo';
+import { canonicalUrl, getPageSeo, toMetadata } from '@/lib/seo';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
 import { Anchor, Container, Image, SimpleGrid, Stack, Text, Title } from '@mantine/core';
@@ -11,6 +11,9 @@ export async function generateMetadata(): Promise<Metadata> {
     return toMetadata(seo, {
         title: 'Вакансии | ЮНИК С',
         description: 'Актуальные вакансии компании ЮНИК С и условия сотрудничества для региональных представителей.',
+        alternates: {
+            canonical: canonicalUrl('/vacancy'),
+        },
     });
 }
 
@@ -131,24 +134,28 @@ export default function VacancyPage() {
                                     </Stack>
 
                                     <Stack gap="lg">
-                                        <Text className="vacancy-card__subtitle">Мы предлагаем:</Text>
+                                        <Title order={4} className="visually-hidden">Мы предлагаем</Title>
+                                        <Text className="vacancy-card__subtitle" aria-hidden="true">Мы предлагаем:</Text>
                                         <BulletList items={benefitsList} />
                                     </Stack>
 
                                     <Stack gap="lg">
-                                        <Text className="vacancy-card__subtitle">Обязанности сотрудника:</Text>
+                                        <Title order={4} className="visually-hidden">Обязанности сотрудника</Title>
+                                        <Text className="vacancy-card__subtitle" aria-hidden="true">Обязанности сотрудника:</Text>
                                         <BulletList items={responsibilitiesList} />
                                     </Stack>
 
                                     <Stack gap="lg">
-                                        <Text className="vacancy-card__subtitle">
+                                        <Title order={4} className="visually-hidden">Профессиональные требования к соискателю</Title>
+                                        <Text className="vacancy-card__subtitle" aria-hidden="true">
                                             Профессиональные требования к соискателю:
                                         </Text>
                                         <BulletList items={professionalRequirementsList} />
                                     </Stack>
 
                                     <Stack gap="lg">
-                                        <Text className="vacancy-card__subtitle">Личностные требования к соискателю:</Text>
+                                        <Title order={4} className="visually-hidden">Личностные требования к соискателю</Title>
+                                        <Text className="vacancy-card__subtitle" aria-hidden="true">Личностные требования к соискателю:</Text>
                                         <BulletList items={personalRequirementsList} />
                                     </Stack>
 

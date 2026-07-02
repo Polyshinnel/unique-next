@@ -140,6 +140,7 @@ export function AboutPageView() {
 
                 <section className="content-section content-section--white">
                     <Container size="xl">
+                        <Title order={2} className="visually-hidden">Дополнительные разделы</Title>
                         <SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg">
                             {bottomLinks.map((item) => (
                                 <article key={item.href} className="about-link-card">

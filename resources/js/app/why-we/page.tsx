@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { getPageSeo, toMetadata } from '@/lib/seo';
+import { canonicalUrl, getPageSeo, toMetadata } from '@/lib/seo';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
 import { getSiteContacts, type SiteContacts } from '@/lib/site-contacts';
@@ -23,6 +23,9 @@ export async function generateMetadata(): Promise<Metadata> {
     return toMetadata(seo, {
         title: 'Почему мы | ЮНИК С',
         description: 'Почему клиенты выбирают ЮНИК С при покупке б/у промышленного оборудования.',
+        alternates: {
+            canonical: canonicalUrl('/why-we'),
+        },
     });
 }
 

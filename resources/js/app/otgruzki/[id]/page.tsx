@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ShipmentDetailPageView } from '@/components/shipments/ShipmentDetailPageView';
-import { shipments } from '@/lib/shipments';
+import { canonicalUrl } from '@/lib/seo';
+import { getShipment, getShipmentHref } from '@/lib/shipments';
 
 type ShipmentPageProps = {
     params: Promise<{
@@ -9,13 +10,9 @@ type ShipmentPageProps = {
     }>;
 };
 
-export function generateStaticParams() {
-    return shipments.map((shipment) => ({ id: shipment.id }));
-}
-
 export async function generateMetadata({ params }: ShipmentPageProps): Promise<Metadata> {
     const { id } = await params;
-    const shipment = shipments.find((item) => item.id === id);
+    const shipment = await getShipment(id).catch(() => null);
 
     if (!shipment) {
         return {
@@ -25,14 +22,17 @@ export async function generateMetadata({ params }: ShipmentPageProps): Promise<M
     }
 
     return {
-        title: `${shipment.title} | ЮНИК С`,
-        description: shipment.summary,
+        title: `${shipment.seoTitle ?? shipment.title} | ЮНИК С`,
+        description: shipment.seoDescription ?? shipment.summary,
+        alternates: {
+            canonical: canonicalUrl(getShipmentHref(shipment)),
+        },
     };
 }
 
 export default async function ShipmentPage({ params }: ShipmentPageProps) {
     const { id } = await params;
-    const shipment = shipments.find((item) => item.id === id);
+    const shipment = await getShipment(id).catch(() => null);
 
     if (!shipment) {
         notFound();

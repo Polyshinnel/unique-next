@@ -85,6 +85,7 @@ export function ContactsPageView({ contacts }: ContactsPageViewProps) {
                 <section className="content-section contacts-section">
                     <Container size="xl">
                         <Stack gap="xl">
+                            <Title order={2} className="visually-hidden">Контактная информация</Title>
                             <SimpleGrid cols={{ base: 1, md: 3 }} spacing="lg">
                                 {contactCards.map(({ title, value, description, href, action, icon: Icon }) => (
                                     <article key={title} className="contact-card">
@@ -92,7 +93,8 @@ export function ContactsPageView({ contacts }: ContactsPageViewProps) {
                                             <Icon size={22} />
                                         </span>
                                         <Stack gap="sm" className="contact-card__content">
-                                            <Text className="contact-card__eyebrow">{title}</Text>
+                                            <Title order={3} className="visually-hidden">{title}</Title>
+                                            <Text className="contact-card__eyebrow" aria-hidden="true">{title}</Text>
                                             <Text className="contact-card__value">{value}</Text>
                                             <Text c="dimmed">{description}</Text>
                                         </Stack>
@@ -112,8 +114,10 @@ export function ContactsPageView({ contacts }: ContactsPageViewProps) {
                             <div className="contacts-layout">
                                 <section className="contacts-panel">
                                     <Stack gap="xl">
+                                        <Title order={3} className="visually-hidden">Режим работы и навигация</Title>
                                         <div>
-                                            <Text className="contact-card__eyebrow">Режим работы</Text>
+                                            <Title order={4} className="visually-hidden">Режим работы</Title>
+                                            <Text className="contact-card__eyebrow" aria-hidden="true">Режим работы</Text>
                                             <div className="contacts-info-list">
                                                 <div className="contacts-info-row">
                                                     <IconClockHour4 size={20} />
@@ -126,7 +130,8 @@ export function ContactsPageView({ contacts }: ContactsPageViewProps) {
                                         </div>
 
                                         <div>
-                                            <Text className="contact-card__eyebrow">Как нас найти</Text>
+                                            <Title order={4} className="visually-hidden">Как нас найти</Title>
+                                            <Text className="contact-card__eyebrow" aria-hidden="true">Как нас найти</Text>
                                             <div className="contacts-info-list">
                                                 <div className="contacts-info-row">
                                                     <IconMapPin size={20} />
@@ -146,7 +151,7 @@ export function ContactsPageView({ contacts }: ContactsPageViewProps) {
                                         </div>
 
                                         <div className="contacts-note">
-                                            <Title order={3}>Поможем быстро сориентироваться</Title>
+                                            <Title order={4}>Поможем быстро сориентироваться</Title>
                                             <Text c="dimmed">
                                                 Если вам удобнее начать с короткого звонка или письма, мы уточним задачу
                                                 и подскажем дальнейший формат работы без лишних шагов.
@@ -168,7 +173,7 @@ export function ContactsPageView({ contacts }: ContactsPageViewProps) {
                                     <div className="contacts-map-card__header">
                                         <div>
                                             <Text className="contact-card__eyebrow">Карта</Text>
-                                            <Title order={2}>Офис ЮНИК С в Калуге</Title>
+                                            <Title order={3}>Офис ЮНИК С в Калуге</Title>
                                         </div>
                                         <Button
                                             component="a"

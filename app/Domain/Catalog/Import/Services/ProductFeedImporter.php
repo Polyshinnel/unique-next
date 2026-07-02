@@ -29,7 +29,7 @@ final class ProductFeedImporter
         private ManagerResolver $managers,
         private RegionResolver $regions,
         private TagResolver $tags,
-        private ImageDownloader $images,
+        private ProductImageSynchronizer $images,
         private ProductOgImageSynchronizer $ogImages,
     ) {}
 
@@ -93,10 +93,7 @@ final class ProductFeedImporter
                         $this->syncTextBlocks($product, $advertisement);
                         $this->syncStatusBlocks($product, $advertisement);
 
-                        foreach ($advertisement->media as $mediaItem) {
-                            $this->images->download($product, $mediaItem);
-                        }
-
+                        $this->images->sync($product, $advertisement->media);
                         $this->ogImages->sync($product);
                     });
 

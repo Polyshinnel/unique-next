@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { getPageSeo, toMetadata } from '@/lib/seo';
+import { canonicalUrl, getPageSeo, toMetadata } from '@/lib/seo';
 import { getSiteContacts } from '@/lib/site-contacts';
 import { ContactsPageView } from '@/components/contacts/ContactsPageView';
 
@@ -9,6 +9,9 @@ export async function generateMetadata(): Promise<Metadata> {
     return toMetadata(seo, {
         title: 'Контакты | ЮНИК С',
         description: 'Контакты компании ЮНИК С: телефон, email, адрес офиса в Калуге, режим работы и карта проезда.',
+        alternates: {
+            canonical: canonicalUrl('/contacts'),
+        },
     });
 }
 

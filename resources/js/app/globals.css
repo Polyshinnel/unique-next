@@ -36,6 +36,18 @@ body {
     background: var(--app-bg);
 }
 
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
 .cookie-consent-banner {
     position: fixed;
     right: 24px;
@@ -1325,14 +1337,47 @@ img {
     box-shadow: 0 12px 28px rgba(13, 31, 54, 0.08);
 }
 
-.catalog-filter-card__title {
-    margin-bottom: 14px;
+.catalog-filter-card h2.catalog-filter-card__title {
+    margin: 0 0 14px;
     color: var(--app-blue-dark);
+    font-size: 16px;
+    line-height: 1.3;
+    letter-spacing: 0;
+}
+
+.catalog-search-form {
+    display: grid;
+    gap: 10px;
+}
+
+.catalog-search-form__input {
+    width: 100%;
+}
+
+.catalog-search-form__button {
+    width: 100%;
+    padding-right: 18px;
+    padding-left: 18px;
+    border: 1px solid #133e71;
+    background: #133e71;
+    color: #ffffff;
+}
+
+.catalog-search-form__button:hover {
+    border-color: #0f315a;
+    background: #0f315a;
+    color: #ffffff;
 }
 
 .catalog-category-tree,
 .catalog-category-tree__children {
     display: grid;
+    gap: 6px;
+}
+
+.catalog-category-tree__row {
+    display: flex;
+    align-items: stretch;
     gap: 6px;
 }
 
@@ -1359,6 +1404,11 @@ img {
     border: 1px solid transparent;
 }
 
+.catalog-category-link {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
 .catalog-category-link:hover,
 .catalog-region-link:hover {
     background: #eef4fb;
@@ -1373,6 +1423,27 @@ img {
 .catalog-region-link.is-active {
     border-color: rgba(19, 62, 113, 0.22);
     background: rgba(19, 62, 113, 0.1);
+    color: var(--app-blue-dark);
+}
+
+.catalog-category-tree__toggle {
+    width: 38px;
+    min-width: 38px;
+    min-height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(19, 62, 113, 0.14);
+    border-radius: 8px;
+    background: #ffffff;
+    color: #24364a;
+    cursor: pointer;
+    transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
+}
+
+.catalog-category-tree__toggle:hover {
+    border-color: rgba(19, 62, 113, 0.26);
+    background: #eef4fb;
     color: var(--app-blue-dark);
 }
 
@@ -1454,8 +1525,27 @@ img {
     margin-bottom: 22px;
 }
 
-.catalog-toolbar .mantine-Select-root {
-    width: 220px;
+.catalog-sort-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 34px;
+    padding: 7px 11px;
+    border: 1px solid var(--app-border);
+    border-radius: 8px;
+    background: #ffffff;
+    color: #24364a;
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1.2;
+    text-decoration: none;
+    transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
+}
+
+.catalog-sort-link:hover,
+.catalog-sort-link.is-active {
+    border-color: rgba(19, 62, 113, 0.24);
+    background: rgba(19, 62, 113, 0.1);
+    color: var(--app-blue-dark);
 }
 
 .catalog-empty {
@@ -2512,21 +2602,51 @@ img {
 
 .product-info-block__content {
     display: grid;
-    gap: 12px;
-}
-
-.product-info-row {
-    display: grid;
-    grid-template-columns: 22px 1fr;
     gap: 10px;
-    align-items: start;
     color: var(--app-muted);
     line-height: 1.65;
 }
 
-.product-info-row svg {
-    margin-top: 4px;
+.product-info-block__content p,
+.product-show-summary p {
+    margin: 0;
+}
+
+.product-info-block__content strong,
+.product-info-block__content b,
+.product-show-summary strong,
+.product-show-summary b {
+    color: var(--app-ink);
+    font-weight: 800;
+}
+
+.product-info-block__content ul,
+.product-info-block__content ol {
+    margin: 0;
+    padding-left: 1.35rem;
+}
+
+.product-info-block__content li + li {
+    margin-top: 6px;
+}
+
+.product-info-block__content .product-sale-price {
     color: var(--app-orange-dark);
+    font-size: clamp(24px, 3vw, 34px);
+    font-weight: 900;
+    line-height: 1.15;
+}
+
+.product-info-block__content .product-sale-price strong {
+    color: inherit;
+}
+
+.product-show-summary {
+    max-width: 860px;
+    margin-top: 14px;
+    color: rgba(255, 255, 255, 0.86);
+    font-size: 18px;
+    line-height: 1.65;
 }
 
 .product-show-aside {

@@ -11,6 +11,7 @@ use App\Domain\Catalog\Import\Services\FeedDownloader;
 use App\Domain\Catalog\Import\Services\FeedParser;
 use App\Domain\Catalog\Import\Services\ImageDownloader;
 use App\Domain\Catalog\Import\Services\ProductFeedImporter;
+use App\Domain\Catalog\Import\Services\ProductImageSynchronizer;
 use App\Domain\Catalog\Import\Services\ProductOgImageSynchronizer;
 use App\Domain\Catalog\Models\CheckStatus;
 use App\Domain\Catalog\Models\Manager;
@@ -134,6 +135,8 @@ final class ProductFeedImporterTest extends TestCase
         self::assertSame('Установлено на складе', ProductDismantling::query()->value('comment'));
 
         self::assertSame(2, ProductImage::query()->count());
+        self::assertSame(1, $product->images()->where('is_main', true)->count());
+        self::assertSame(9001, $product->images()->where('is_main', true)->value('external_id'));
         Storage::disk('public')->assertExists("products/{$product->id}/9001_main.jpg");
         Storage::disk('public')->assertExists("products/{$product->id}/9002_extra.jpg");
     }
@@ -250,7 +253,7 @@ final class ProductFeedImporterTest extends TestCase
             new ManagerResolver(),
             new RegionResolver(),
             new TagResolver(),
-            new ImageDownloader(),
+            new ProductImageSynchronizer(new ImageDownloader()),
             new ProductOgImageSynchronizer(),
         );
     }

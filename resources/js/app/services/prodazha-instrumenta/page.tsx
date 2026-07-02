@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { getPageSeo, toMetadata } from '@/lib/seo';
+import { canonicalUrl, getPageSeo, toMetadata } from '@/lib/seo';
 import { ProductGallery } from '@/components/catalog/ProductGallery';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
@@ -31,6 +31,9 @@ export async function generateMetadata(): Promise<Metadata> {
     return toMetadata(seo, {
         title: 'Продажа инструмента | ЮНИК С',
         description: 'Инструмент от компании Коникс: поставка со склада в Йошкар-Оле, консультации, прайс и отправка по России.',
+        alternates: {
+            canonical: canonicalUrl('/services/prodazha-instrumenta'),
+        },
     });
 }
 
@@ -124,6 +127,7 @@ export default function ToolSalesPage() {
 
                             <section className="instrument-card">
                                 <Stack gap="lg">
+                                    <Title order={2}>Отгрузка и условия поставки</Title>
                                     <div className="instrument-side-note">
                                         <span className="instrument-side-note__icon">
                                             <IconTruckDelivery size={22} />

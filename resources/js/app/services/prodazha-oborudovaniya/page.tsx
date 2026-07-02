@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import ImageView from 'next/image';
-import { getPageSeo, toMetadata } from '@/lib/seo';
-import { catalogProducts } from '@/lib/catalog-products';
+import { canonicalUrl, getPageSeo, toMetadata } from '@/lib/seo';
+import { getCatalogPage, type CatalogProductCard } from '@/lib/catalog-api';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
 import { ProductCard } from '@/components/catalog/ProductCard';
@@ -36,6 +36,9 @@ export async function generateMetadata(): Promise<Metadata> {
     return toMetadata(seo, {
         title: 'Продажа оборудования | ЮНИК С',
         description: 'Продажа б/у промышленного оборудования по всей России с понятным состоянием, сопровождением сделки и логистики.',
+        alternates: {
+            canonical: canonicalUrl('/services/prodazha-oborudovaniya'),
+        },
     });
 }
 
@@ -148,7 +151,11 @@ function HeroSection() {
     );
 }
 
-function LatestProductsSection() {
+function LatestProductsSection({ products }: { products: CatalogProductCard[] }) {
+    if (products.length === 0) {
+        return null;
+    }
+
     return (
         <section className="content-section content-section--tight-top latest-products-section">
             <Container size="xl">
@@ -162,7 +169,7 @@ function LatestProductsSection() {
                     </Button>
                 </Group>
                 <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="lg">
-                    {catalogProducts.slice(0, 4).map((product) => (
+                    {products.slice(0, 4).map((product) => (
                         <ProductCard key={product.id} product={product} />
                     ))}
                 </SimpleGrid>
@@ -257,7 +264,13 @@ function SocialSection() {
 
                                     <div className="otgruzki-follow-card__qr">
                                         <div className="otgruzki-follow-card__qr-frame">
-                                            <ImageView src={card.qrSrc} alt={card.qrAlt} width={220} height={220} />
+                                            <ImageView
+                                                src={card.qrSrc}
+                                                alt={card.qrAlt}
+                                                width={220}
+                                                height={220}
+                                                unoptimized
+                                            />
                                         </div>
                                         <Text size="sm" c="dimmed" ta="center">
                                             Сканируйте QR-код, чтобы открыть страницу сразу на телефоне.
@@ -353,13 +366,15 @@ function RemotePurchaseSection() {
     );
 }
 
-export default function ProductSaleServicePage() {
+export default async function ProductSaleServicePage() {
+    const catalogPage = await getCatalogPage();
+
     return (
         <>
             <Header />
             <main>
                 <HeroSection />
-                <LatestProductsSection />
+                <LatestProductsSection products={catalogPage.products} />
                 <AdvantagesSection />
                 <SloganSection />
                 <SummarySection items={alreadyDoneList} />

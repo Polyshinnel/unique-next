@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { getPageSeo, toMetadata } from '@/lib/seo';
+import { canonicalUrl, getPageSeo, toMetadata } from '@/lib/seo';
 import { ProductGallery } from '@/components/catalog/ProductGallery';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
@@ -34,6 +34,9 @@ export async function generateMetadata(): Promise<Metadata> {
     return toMetadata(seo, {
         title: 'Импорт оборудования | ЮНИК С',
         description: 'Ввоз, растаможка и поставка промышленного оборудования из стран ЕС и Азии с сопровождением под ключ.',
+        alternates: {
+            canonical: canonicalUrl('/services/import-oborudovaniya'),
+        },
     });
 }
 

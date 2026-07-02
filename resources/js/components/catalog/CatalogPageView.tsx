@@ -1,19 +1,17 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
+import { CatalogCategoryTree } from '@/components/catalog/CatalogCategoryTree';
 import { FeedbackRequestModal } from '@/components/common/FeedbackRequestModal';
 import { Pagination } from '@/components/common/Pagination';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
-import { catalogCategoryTree, getCatalogCategoryAncestors, getCatalogCategoryByPath, type CatalogCategory, type FlatCatalogCategory } from '@/lib/catalog-categories';
-import { catalogProducts, type CatalogProduct, getCatalogProductsByCategory } from '@/lib/catalog-products';
+import type { CatalogCategoryBreadcrumb, CatalogFilterOption, CatalogPageResponse, CatalogSearchParams } from '@/lib/catalog-api';
 import { getSiteContacts } from '@/lib/site-contacts';
 import {
     Badge,
     Button,
     Container,
     Group,
-    NumberInput,
-    Select,
     SimpleGrid,
     Stack,
     Text,
@@ -31,220 +29,291 @@ import {
 } from '@tabler/icons-react';
 import { ProductCard } from './ProductCard';
 
-const availability = ['В наличии', 'По запросу', 'Резерв'];
-const conditions = ['Новое', 'Б/у', 'После сервиса'];
-const catalogRegions = Array.from(new Set(['Москва', 'Калуга', 'Тула', 'Рязань', ...catalogProducts.map((product) => product.location)]));
-const CATALOG_PRODUCTS_PER_PAGE = 12;
-
-type CatalogSearchParams = {
-    page?: string | string[];
-    region?: string | string[];
-};
-
 type CatalogPageViewProps = {
-    currentCategory?: FlatCatalogCategory;
+    data: CatalogPageResponse;
     searchParams?: CatalogSearchParams;
 };
 
-function getCurrentPage(pageParam: string | string[] | undefined, totalPages: number) {
-    const pageValue = Array.isArray(pageParam) ? pageParam[0] : pageParam;
-    const parsedPage = Number(pageValue ?? 1);
+type CatalogFilterKey = 'region' | 'availability' | 'state';
+type CatalogParamKey = keyof CatalogSearchParams;
 
-    if (!Number.isFinite(parsedPage) || parsedPage < 1) {
-        return 1;
+const catalogTitleFallback = 'Каталог оборудования';
+const catalogDescriptionFallback = 'Все оборудование, которое мы берем в работу, моментально попадает сюда в наш каталог. Информацию о новых поступлениях, акциях и изменениях цен мы размещаем в своих каналах в Телеграм и в МАКСе.';
+
+function getParamValue(value: CatalogSearchParams[CatalogParamKey] | undefined): string | undefined {
+    if (value === null || value === undefined) {
+        return undefined;
     }
 
-    return Math.min(Math.floor(parsedPage), totalPages);
+    const normalizedValue = String(value).trim();
+
+    return normalizedValue === '' ? undefined : normalizedValue;
 }
 
-function getSearchValue(value: string | string[] | undefined) {
-    return Array.isArray(value) ? value[0] : value;
+function setCatalogParam(params: URLSearchParams, key: CatalogParamKey, value: CatalogSearchParams[CatalogParamKey] | undefined) {
+    const normalizedValue = getParamValue(value);
+
+    params.delete(key);
+
+    if (!normalizedValue) {
+        return;
+    }
+
+    if (key === 'page' && Number(normalizedValue) === 1) {
+        return;
+    }
+
+    if (key === 'sort' && normalizedValue === 'default') {
+        return;
+    }
+
+    if (key === 'category_path') {
+        return;
+    }
+
+    params.set(key, normalizedValue);
 }
 
-function getPageHref(baseHref: string, page: number, region?: string) {
+function getCatalogHref(
+    baseHref: string,
+    searchParams: CatalogSearchParams | undefined,
+    changes: Partial<CatalogSearchParams> = {},
+) {
     const params = new URLSearchParams();
+    const keys: CatalogParamKey[] = ['page', 'region', 'availability', 'state', 'sort', 'search'];
 
-    if (page > 1) {
-        params.set('page', String(page));
-    }
-
-    if (region) {
-        params.set('region', region);
-    }
+    keys.forEach((key) => {
+        setCatalogParam(params, key, Object.prototype.hasOwnProperty.call(changes, key) ? changes[key] : searchParams?.[key]);
+    });
 
     const query = params.toString();
 
     return query ? `${baseHref}?${query}` : baseHref;
 }
 
-function getRegionCounts(products: CatalogProduct[]) {
-    return products.reduce((counts, product) => {
-        counts.set(product.location, (counts.get(product.location) ?? 0) + 1);
+function getOptionValue(option: CatalogFilterOption): string {
+    return option.slug ?? String(option.id);
+}
 
-        return counts;
-    }, new Map<string, number>());
+function getFilterHref(baseHref: string, key: CatalogFilterKey, value: string, searchParams?: CatalogSearchParams) {
+    return getCatalogHref(baseHref, searchParams, {
+        [key]: value,
+        page: null,
+    });
 }
 
 function FilterCard({ title, children }: { title: string; children: ReactNode }) {
     return (
         <div className="catalog-filter-card">
-            <Text fw={800} className="catalog-filter-card__title">{title}</Text>
+            <Text component="h2" fw={800} className="catalog-filter-card__title">{title}</Text>
             <Stack gap="xs">{children}</Stack>
         </div>
     );
 }
 
-function CatalogCategoryTreeItem({
-    category,
-    currentCategory,
-    parentPath = [],
-    level = 0,
+function HiddenCatalogInputs({
+    searchParams,
+    exclude = [],
 }: {
-    category: CatalogCategory;
-    currentCategory?: FlatCatalogCategory;
-    parentPath?: string[];
-    level?: number;
+    searchParams?: CatalogSearchParams;
+    exclude?: CatalogParamKey[];
 }) {
-    const path = [...parentPath, category.slug];
-    const flatCategory = getCatalogCategoryByPath(path);
-
-    if (!flatCategory) {
-        return null;
-    }
-
-    const isCurrent = currentCategory?.href === flatCategory.href;
-    const isInCurrentPath = currentCategory?.path.slice(0, path.length).join('/') === path.join('/');
-    const productCount = getCatalogProductsByCategory(flatCategory).length;
+    const keys: CatalogParamKey[] = ['region', 'availability', 'state', 'sort', 'search'];
 
     return (
-        <div className="catalog-category-tree__item">
-            <Link
-                href={flatCategory.href}
-                className={`catalog-category-link${isCurrent ? ' is-active' : ''}${isInCurrentPath ? ' is-open' : ''}`}
-                aria-current={isCurrent ? 'page' : undefined}
-                style={{ paddingLeft: `${level * 14}px` }}
-            >
-                <span>{flatCategory.title}</span>
-                <Badge variant="light" color="gray" radius="sm">{productCount}</Badge>
-            </Link>
-            {category.children?.length ? (
-                <div className="catalog-category-tree__children">
-                    {category.children.map((child) => (
-                        <CatalogCategoryTreeItem
-                            key={child.slug}
-                            category={child}
-                            currentCategory={currentCategory}
-                            parentPath={path}
-                            level={level + 1}
-                        />
-                    ))}
-                </div>
-            ) : null}
-        </div>
+        <>
+            {keys.map((key) => {
+                if (exclude.includes(key)) {
+                    return null;
+                }
+
+                const value = getParamValue(searchParams?.[key]);
+
+                if (!value || (key === 'sort' && value === 'default')) {
+                    return null;
+                }
+
+                return <input key={key} type="hidden" name={key} value={value} />;
+            })}
+        </>
+    );
+}
+
+function FilterOptionLink({
+    option,
+    filterKey,
+    activeValue,
+    baseHref,
+    searchParams,
+}: {
+    option: CatalogFilterOption;
+    filterKey: CatalogFilterKey;
+    activeValue?: string;
+    baseHref: string;
+    searchParams?: CatalogSearchParams;
+}) {
+    const value = getOptionValue(option);
+    const isActive = activeValue === value;
+    const content = (
+        <>
+            <span>{option.name}</span>
+            <Badge variant="light" color="gray" radius="sm">{option.count}</Badge>
+        </>
+    );
+
+    if (option.count === 0) {
+        return (
+            <span className="catalog-region-link is-disabled" aria-disabled="true">
+                {content}
+            </span>
+        );
+    }
+
+    return (
+        <Link
+            href={getFilterHref(baseHref, filterKey, value, searchParams)}
+            className={`catalog-region-link${isActive ? ' is-active' : ''}`}
+            aria-current={isActive ? 'page' : undefined}
+        >
+            {content}
+        </Link>
     );
 }
 
 function CatalogFilters({
     baseHref,
-    currentCategory,
-    regionCounts,
-    activeRegion,
+    data,
+    searchParams,
 }: {
     baseHref: string;
-    currentCategory?: FlatCatalogCategory;
-    regionCounts: Map<string, number>;
-    activeRegion?: string;
+    data: CatalogPageResponse;
+    searchParams?: CatalogSearchParams;
 }) {
+    const activeRegion = getParamValue(searchParams?.region);
+    const activeAvailability = getParamValue(searchParams?.availability);
+    const activeState = getParamValue(searchParams?.state);
+    const currentCategoryHref = data.category?.href;
+
     return (
         <aside className="catalog-sidebar">
             <FilterCard title="Поиск">
-                <TextInput placeholder="Введите запрос..." leftSection={<IconSearch size={17} />} />
-                <Button className="product-card__more">Найти</Button>
-            </FilterCard>
-            <FilterCard title="По цене">
-                <Group grow>
-                    <NumberInput label="От" placeholder="0" suffix=" ₽" min={0} hideControls />
-                    <NumberInput label="До" placeholder="5 000 000" suffix=" ₽" min={0} hideControls />
-                </Group>
+                <form action={baseHref} method="get" className="catalog-search-form">
+                    <HiddenCatalogInputs searchParams={searchParams} exclude={['search']} />
+                    <TextInput
+                        className="catalog-search-form__input"
+                        placeholder="Введите запрос..."
+                        leftSection={<IconSearch size={17} />}
+                        name="search"
+                        defaultValue={getParamValue(searchParams?.search)}
+                    />
+                    <Button type="submit" className="catalog-search-form__button">Найти</Button>
+                </form>
             </FilterCard>
             <FilterCard title="По региону">
                 <Link
-                    href={baseHref}
+                    href={getCatalogHref(baseHref, searchParams, { region: null, page: null })}
                     className={`catalog-region-link${!activeRegion ? ' is-active' : ''}`}
                     aria-current={!activeRegion ? 'page' : undefined}
                 >
                     <span>Все регионы</span>
-                    <Badge variant="light" color="gray" radius="sm">
-                        {Array.from(regionCounts.values()).reduce((sum, count) => sum + count, 0)}
-                    </Badge>
+                    <Badge variant="light" color="gray" radius="sm">{data.pagination.total}</Badge>
                 </Link>
-                {catalogRegions.map((region) => {
-                    const count = regionCounts.get(region) ?? 0;
-                    const isActive = activeRegion === region;
-
-                    if (count === 0) {
-                        return (
-                            <span key={region} className="catalog-region-link is-disabled" aria-disabled="true">
-                                <span>{region}</span>
-                                <Badge variant="light" color="gray" radius="sm">0</Badge>
-                            </span>
-                        );
-                    }
-
-                    return (
-                        <Link
-                            key={region}
-                            href={getPageHref(baseHref, 1, region)}
-                            className={`catalog-region-link${isActive ? ' is-active' : ''}`}
-                            aria-current={isActive ? 'page' : undefined}
-                        >
-                            <span>{region}</span>
-                            <Badge variant="light" color="gray" radius="sm">{count}</Badge>
-                        </Link>
-                    );
-                })}
+                {data.filters.regions.map((region) => (
+                    <FilterOptionLink
+                        key={getOptionValue(region)}
+                        option={region}
+                        filterKey="region"
+                        activeValue={activeRegion}
+                        baseHref={baseHref}
+                        searchParams={searchParams}
+                    />
+                ))}
             </FilterCard>
             <FilterCard title="По категориям">
                 <Link
-                    href="/catalog"
-                    className={`catalog-category-link${!currentCategory ? ' is-active' : ''}`}
-                    aria-current={!currentCategory ? 'page' : undefined}
+                    href={getCatalogHref('/catalog', searchParams, { page: null })}
+                    className={`catalog-category-link${!currentCategoryHref ? ' is-active' : ''}`}
+                    aria-current={!currentCategoryHref ? 'page' : undefined}
                 >
                     <span>Все категории</span>
-                    <Badge variant="light" color="gray" radius="sm">{catalogProducts.length}</Badge>
                 </Link>
-                <div className="catalog-category-tree">
-                    {catalogCategoryTree.map((category) => (
-                        <CatalogCategoryTreeItem key={category.slug} category={category} currentCategory={currentCategory} />
-                    ))}
-                </div>
+                <CatalogCategoryTree
+                    categories={data.filters.categories}
+                    currentHref={currentCategoryHref}
+                    searchParams={searchParams}
+                />
             </FilterCard>
             <FilterCard title="По доступности">
-                {availability.map((item) => <span key={item} className="catalog-filter-static">{item}</span>)}
+                <Link
+                    href={getCatalogHref(baseHref, searchParams, { availability: null, page: null })}
+                    className={`catalog-region-link${!activeAvailability ? ' is-active' : ''}`}
+                    aria-current={!activeAvailability ? 'page' : undefined}
+                >
+                    <span>Любая доступность</span>
+                    <Badge variant="light" color="gray" radius="sm">{data.pagination.total}</Badge>
+                </Link>
+                {data.filters.availabilities.map((item) => (
+                    <FilterOptionLink
+                        key={getOptionValue(item)}
+                        option={item}
+                        filterKey="availability"
+                        activeValue={activeAvailability}
+                        baseHref={baseHref}
+                        searchParams={searchParams}
+                    />
+                ))}
             </FilterCard>
             <FilterCard title="По состоянию">
-                {conditions.map((item) => <span key={item} className="catalog-filter-static">{item}</span>)}
+                <Link
+                    href={getCatalogHref(baseHref, searchParams, { state: null, page: null })}
+                    className={`catalog-region-link${!activeState ? ' is-active' : ''}`}
+                    aria-current={!activeState ? 'page' : undefined}
+                >
+                    <span>Любое состояние</span>
+                    <Badge variant="light" color="gray" radius="sm">{data.pagination.total}</Badge>
+                </Link>
+                {data.filters.states.map((item) => (
+                    <FilterOptionLink
+                        key={getOptionValue(item)}
+                        option={item}
+                        filterKey="state"
+                        activeValue={activeState}
+                        baseHref={baseHref}
+                        searchParams={searchParams}
+                    />
+                ))}
             </FilterCard>
             <Button fullWidth component="a" href={baseHref} variant="default">Сбросить фильтры</Button>
         </aside>
     );
 }
 
-function CatalogBreadcrumbs({ currentCategory }: { currentCategory?: FlatCatalogCategory }) {
-    const ancestors = currentCategory ? getCatalogCategoryAncestors(currentCategory) : [];
+function CatalogBreadcrumbs({ data }: { data: CatalogPageResponse }) {
+    const currentCategory: CatalogCategoryBreadcrumb | null = data.category
+        ? {
+            id: data.category.id,
+            name: data.category.name,
+            slug: data.category.slug,
+            path: data.category.path,
+            pathString: data.category.path.join('/'),
+            href: data.category.href,
+            level: data.category.breadcrumbs.length,
+        }
+        : null;
+    const breadcrumbs = data.category && currentCategory ? [...data.category.breadcrumbs, currentCategory] : [];
 
     return (
         <div className="catalog-breadcrumbs">
             <Link href="/">Главная</Link>
             <span>/</span>
-            {currentCategory ? <Link href="/catalog">Каталог оборудования</Link> : <span>Каталог оборудования</span>}
-            {ancestors.map((category, index) => (
+            {breadcrumbs.length ? <Link href="/catalog">Каталог оборудования</Link> : <span>Каталог оборудования</span>}
+            {breadcrumbs.map((category, index) => (
                 <span key={category.href} className="catalog-breadcrumbs__group">
                     <span>/</span>
-                    {index === ancestors.length - 1 ? (
-                        <span>{category.title}</span>
+                    {index === breadcrumbs.length - 1 ? (
+                        <span>{category.name}</span>
                     ) : (
-                        <Link href={category.href}>{category.title}</Link>
+                        <Link href={category.href}>{category.name}</Link>
                     )}
                 </span>
             ))}
@@ -252,22 +321,42 @@ function CatalogBreadcrumbs({ currentCategory }: { currentCategory?: FlatCatalog
     );
 }
 
-export async function CatalogPageView({ currentCategory, searchParams }: CatalogPageViewProps) {
+function CatalogSorting({
+    baseHref,
+    data,
+    searchParams,
+}: {
+    baseHref: string;
+    data: CatalogPageResponse;
+    searchParams?: CatalogSearchParams;
+}) {
+    return (
+        <Group justify="flex-start" align="center" gap="sm" wrap="wrap" className="catalog-toolbar">
+            <Text fw={700}>Сортировка:</Text>
+            {data.sorting.options.map((option) => {
+                const isActive = option.value === data.sorting.active;
+
+                return (
+                    <Link
+                        key={option.value}
+                        href={getCatalogHref(baseHref, searchParams, { sort: option.value, page: null })}
+                        className={`catalog-sort-link${isActive ? ' is-active' : ''}`}
+                        aria-current={isActive ? 'page' : undefined}
+                    >
+                        {option.label}
+                    </Link>
+                );
+            })}
+        </Group>
+    );
+}
+
+export async function CatalogPageView({ data, searchParams }: CatalogPageViewProps) {
     const contacts = await getSiteContacts();
-    const baseHref = currentCategory?.href ?? '/catalog';
-    const activeRegion = getSearchValue(searchParams?.region);
-    const categoryProducts = getCatalogProductsByCategory(currentCategory);
-    const regionCounts = getRegionCounts(categoryProducts);
-    const filteredProducts = activeRegion
-        ? categoryProducts.filter((product) => product.location === activeRegion)
-        : categoryProducts;
-    const totalPages = Math.max(1, Math.ceil(filteredProducts.length / CATALOG_PRODUCTS_PER_PAGE));
-    const currentPage = getCurrentPage(searchParams?.page, totalPages);
-    const startIndex = (currentPage - 1) * CATALOG_PRODUCTS_PER_PAGE;
-    const visibleProducts = filteredProducts.slice(startIndex, startIndex + CATALOG_PRODUCTS_PER_PAGE);
-    const title = currentCategory?.title ?? 'Каталог оборудования';
-    const description = currentCategory?.description
-        ?? 'Все оборудование, которое мы берем в работу, моментально попадает сюда в наш каталог. Информацию о новых поступлениях, акциях и изменениях цен мы размещаем в своих каналах в Телеграм и в МАКСе.';
+    const baseHref = data.category?.href ?? '/catalog';
+    const title = data.category ? (data.category.title || data.category.name) : catalogTitleFallback;
+    const description = data.category?.description ?? catalogDescriptionFallback;
+    const activeRegion = getParamValue(searchParams?.region);
 
     return (
         <>
@@ -275,7 +364,7 @@ export async function CatalogPageView({ currentCategory, searchParams }: Catalog
             <main>
                 <section className="page-hero catalog-hero">
                     <Container size="xl">
-                        <CatalogBreadcrumbs currentCategory={currentCategory} />
+                        <CatalogBreadcrumbs data={data} />
                         <Title order={1}>{title}</Title>
                         <Stack gap="xs" align="flex-start">
                             <Text size="lg">{description}</Text>
@@ -307,45 +396,30 @@ export async function CatalogPageView({ currentCategory, searchParams }: Catalog
                 <section className="content-section catalog-section">
                     <Container size="xl">
                         <div className="catalog-layout">
-                            <CatalogFilters
-                                baseHref={baseHref}
-                                currentCategory={currentCategory}
-                                regionCounts={regionCounts}
-                                activeRegion={activeRegion}
-                            />
+                            <CatalogFilters baseHref={baseHref} data={data} searchParams={searchParams} />
                             <div className="catalog-main">
-                                <Group justify="flex-start" align="center" gap="sm" wrap="nowrap" className="catalog-toolbar">
-                                    <Text fw={700}>Сортировка:</Text>
-                                    <Select
-                                        defaultValue="default"
-                                        data={[
-                                            { value: 'default', label: 'По умолчанию' },
-                                            { value: 'price_desc', label: 'По убыванию цены' },
-                                            { value: 'price_asc', label: 'По возрастанию цены' },
-                                            { value: 'newest', label: 'Самые новые' },
-                                        ]}
-                                    />
-                                </Group>
+                                <Title order={2} className="visually-hidden">Результаты каталога</Title>
+                                <CatalogSorting baseHref={baseHref} data={data} searchParams={searchParams} />
                                 <Text size="sm" c="dimmed" mb="lg">
-                                    Найдено {filteredProducts.length} объявлений
+                                    Найдено {data.pagination.total} объявлений
                                     {activeRegion ? `, регион: ${activeRegion}` : ''}
                                 </Text>
-                                {visibleProducts.length ? (
+                                {data.products.length ? (
                                     <SimpleGrid cols={{ base: 1, sm: 2, xl: 3 }} spacing="lg">
-                                        {visibleProducts.map((product) => (
+                                        {data.products.map((product) => (
                                             <ProductCard key={product.id} product={product} />
                                         ))}
                                     </SimpleGrid>
                                 ) : (
                                     <div className="catalog-empty">
                                         <Title order={2}>В этой выборке пока нет станков</Title>
-                                        <Text c="dimmed">Выберите другую категорию или регион.</Text>
+                                        <Text c="dimmed">Выберите другую категорию или измените фильтры.</Text>
                                     </div>
                                 )}
                                 <Pagination
-                                    currentPage={currentPage}
-                                    totalPages={totalPages}
-                                    getPageHref={(page) => getPageHref(baseHref, page, activeRegion)}
+                                    currentPage={data.pagination.currentPage}
+                                    totalPages={data.pagination.totalPages}
+                                    getPageHref={(page) => getCatalogHref(baseHref, searchParams, { page })}
                                     ariaLabel="Пагинация каталога"
                                     className="catalog-pagination"
                                     firstControl={<IconChevronsLeft size={18} />}

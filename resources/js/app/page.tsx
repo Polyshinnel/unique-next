@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { getHomeBanners } from '@/lib/banners';
-import { getPageSeo, toMetadata } from '@/lib/seo';
-import { catalogProducts } from '@/lib/catalog-products';
+import { canonicalUrl, getPageSeo, toMetadata } from '@/lib/seo';
+import { getCatalogPage, type CatalogProductCard } from '@/lib/catalog-api';
 import { demoServices } from '@/lib/site-content';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
@@ -27,6 +27,9 @@ export async function generateMetadata(): Promise<Metadata> {
     return toMetadata(seo, {
         title: 'ЮНИК С - промышленное оборудование и станки',
         description: 'Продажа, выкуп, подбор и поставка промышленного оборудования, станков и инструмента по России.',
+        alternates: {
+            canonical: canonicalUrl('/'),
+        },
     });
 }
 
@@ -81,7 +84,11 @@ function CompanySection() {
     );
 }
 
-function LatestProducts() {
+function LatestProducts({ products }: { products: CatalogProductCard[] }) {
+    if (products.length === 0) {
+        return null;
+    }
+
     return (
         <section className="content-section content-section--tight-top latest-products-section">
             <Container size="xl">
@@ -95,7 +102,7 @@ function LatestProducts() {
                     </Button>
                 </Group>
                 <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="lg">
-                    {catalogProducts.map((product) => (
+                    {products.slice(0, 8).map((product) => (
                         <ProductCard key={product.id} product={product} />
                     ))}
                 </SimpleGrid>
@@ -180,7 +187,10 @@ function BusinessEquipmentSection() {
 }
 
 export default async function HomePage() {
-    const banners = await getHomeBanners();
+    const [banners, catalogPage] = await Promise.all([
+        getHomeBanners(),
+        getCatalogPage(),
+    ]);
 
     return (
         <>
@@ -188,7 +198,7 @@ export default async function HomePage() {
             <main>
                 <HeroSlider slides={banners} />
                 <CompanySection />
-                <LatestProducts />
+                <LatestProducts products={catalogPage.products} />
                 <ServicesSection />
                 <BusinessEquipmentSection />
                 <section className="search-band">

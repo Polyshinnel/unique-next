@@ -1,6 +1,6 @@
 'use client';
 
-import type { ComponentProps, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { Button, Modal, SimpleGrid, Stack, Text, TextInput, Textarea, Title } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconSearch } from '@tabler/icons-react';
@@ -10,8 +10,8 @@ type FeedbackRequestModalProps = {
     description?: string;
     modalTitle?: string;
     size?: 'compact' | 'md' | 'lg';
-    buttonColor?: ComponentProps<typeof Button>['color'];
-    buttonVariant?: ComponentProps<typeof Button>['variant'];
+    buttonColor?: string;
+    buttonVariant?: string;
     buttonLeftSection?: ReactNode;
 };
 

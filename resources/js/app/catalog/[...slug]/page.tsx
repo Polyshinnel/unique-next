@@ -1,19 +1,21 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound, permanentRedirect } from 'next/navigation';
+import { canonicalUrl } from '@/lib/seo';
 import { CatalogPageView } from '@/components/catalog/CatalogPageView';
 import { ProductGallery } from '@/components/catalog/ProductGallery';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
-import { flatCatalogCategories, getCatalogCategoryAncestors, getCatalogCategoryByPath, type FlatCatalogCategory } from '@/lib/catalog-categories';
 import {
-    catalogProducts,
-    formatCatalogPrice,
+    getCatalogPage,
     getCatalogProduct,
-    getCatalogProductCategory,
-    getCatalogProductHref,
-    type CatalogProduct,
-} from '@/lib/catalog-products';
+    type CatalogCategoryBreadcrumb,
+    type CatalogPageResponse,
+    type CatalogProductDetail,
+    type CatalogSearchParams,
+    type CatalogSortValue,
+} from '@/lib/catalog-api';
+import { formatCatalogPrice } from '@/lib/catalog-format';
 import { emailHref, phoneHref } from '@/lib/site-content';
 import {
     Anchor,
@@ -26,126 +28,195 @@ import {
     Text,
     Title,
 } from '@mantine/core';
-import { IconArrowRight, IconBrandTelegram, IconBrandWhatsapp, IconCheck, IconMessageCircle, IconMail, IconPhone } from '@tabler/icons-react';
+import {
+    IconArrowRight,
+    IconBrandTelegram,
+    IconBrandVk,
+    IconMessageCircle,
+    IconMail,
+    IconPhone,
+} from '@tabler/icons-react';
+
+type CatalogRouteSearchParams = {
+    page?: string | string[];
+    region?: string | string[];
+    availability?: string | string[];
+    state?: string | string[];
+    sort?: string | string[];
+    search?: string | string[];
+};
 
 type CatalogSlugPageProps = {
     params: Promise<{
         slug: string[];
     }>;
-    searchParams?: Promise<{
-        page?: string | string[];
-        region?: string | string[];
-    }>;
+    searchParams?: Promise<CatalogRouteSearchParams>;
 };
 
-type ResolvedCatalogPath =
-    | {
-        type: 'category';
-        category: FlatCatalogCategory;
-    }
-    | {
-        type: 'product';
-        product: CatalogProduct;
-        category: FlatCatalogCategory;
-        canonicalPath: string[];
-        isCanonical: boolean;
-    };
+const categoryDescriptionFallback = 'Каталог промышленного оборудования, станков, спецтехники и инструмента с карточками товаров и контактами менеджера.';
 
-function pathsEqual(firstPath: string[], secondPath: string[]) {
-    return firstPath.length === secondPath.length && firstPath.every((segment, index) => segment === secondPath[index]);
+function getSearchParamValue(value: string | string[] | undefined): string | undefined {
+    return Array.isArray(value) ? value[0] : value;
 }
 
-function getProductCanonicalPath(product: CatalogProduct) {
-    const category = getCatalogProductCategory(product);
-
-    return category ? [...category.path, product.id] : [product.id];
-}
-
-function resolveCatalogPath(slug: string[]): ResolvedCatalogPath | null {
-    const product = getCatalogProduct(slug.at(-1) ?? '');
-
-    if (product) {
-        const category = getCatalogProductCategory(product);
-
-        if (!category) {
-            return null;
-        }
-
-        const canonicalPath = getProductCanonicalPath(product);
-
-        return {
-            type: 'product',
-            product,
-            category,
-            canonicalPath,
-            isCanonical: pathsEqual(slug, canonicalPath),
-        };
-    }
-
-    const category = getCatalogCategoryByPath(slug);
-
-    if (category) {
-        return {
-            type: 'category',
-            category,
-        };
+function getCatalogSortValue(value: string | undefined): CatalogSortValue | null {
+    if (value === 'price_asc' || value === 'price_desc' || value === 'default') {
+        return value;
     }
 
     return null;
 }
 
-export function generateStaticParams() {
-    const categoryParams = flatCatalogCategories.map((category) => ({ slug: category.path }));
-    const productParams = catalogProducts
-        .map((product) => {
-            const category = getCatalogProductCategory(product);
+function getCatalogSearchParams(params: CatalogRouteSearchParams | undefined, categoryPath: string): CatalogSearchParams {
+    const sort = getCatalogSortValue(getSearchParamValue(params?.sort));
 
-            return category ? { slug: [...category.path, product.id] } : null;
-        })
-        .filter((item): item is { slug: string[] } => Boolean(item));
+    return {
+        category_path: categoryPath,
+        page: getSearchParamValue(params?.page),
+        region: getSearchParamValue(params?.region),
+        availability: getSearchParamValue(params?.availability),
+        state: getSearchParamValue(params?.state),
+        sort,
+        search: getSearchParamValue(params?.search),
+    };
+}
 
-    return [...categoryParams, ...productParams];
+function isProductRoute(slug: string[]): boolean {
+    return /^\d+$/.test(slug.at(-1) ?? '');
+}
+
+function isApiNotFoundError(error: unknown): boolean {
+    return error instanceof Error && error.message.includes('API Error: 404');
+}
+
+async function getCatalogPageOrNotFound(params: CatalogSearchParams): Promise<CatalogPageResponse> {
+    try {
+        return await getCatalogPage(params);
+    } catch (error) {
+        if (isApiNotFoundError(error)) {
+            notFound();
+        }
+
+        throw error;
+    }
+}
+
+async function getCatalogPageOrNull(params: CatalogSearchParams): Promise<CatalogPageResponse | null> {
+    try {
+        return await getCatalogPage(params);
+    } catch (error) {
+        if (isApiNotFoundError(error)) {
+            return null;
+        }
+
+        throw error;
+    }
+}
+
+async function getCatalogProductOrNotFound(id: string): Promise<CatalogProductDetail> {
+    try {
+        return await getCatalogProduct(id);
+    } catch (error) {
+        if (isApiNotFoundError(error)) {
+            notFound();
+        }
+
+        throw error;
+    }
+}
+
+async function getCatalogProductOrNull(id: string): Promise<CatalogProductDetail | null> {
+    try {
+        return await getCatalogProduct(id);
+    } catch (error) {
+        if (isApiNotFoundError(error)) {
+            return null;
+        }
+
+        throw error;
+    }
+}
+
+function getRoutePathname(slug: string[]): string {
+    return `/catalog/${slug.join('/')}`;
+}
+
+function htmlToPlainText(value: string | null): string | null {
+    if (!value) {
+        return null;
+    }
+
+    return value
+        .replace(/<[^>]*>/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim() || null;
 }
 
 export async function generateMetadata({ params }: CatalogSlugPageProps): Promise<Metadata> {
     const { slug } = await params;
-    const resolvedPath = resolveCatalogPath(slug);
+    const routeKey = slug.at(-1) ?? '';
 
-    if (!resolvedPath) {
+    try {
+        if (isProductRoute(slug)) {
+            const product = await getCatalogProduct(routeKey);
+
+            return {
+                title: `${product.title} | ЮНИК С`,
+                description: htmlToPlainText(product.summary ?? product.description) ?? categoryDescriptionFallback,
+                alternates: {
+                    canonical: canonicalUrl(product.canonicalHref),
+                },
+            };
+        }
+
+        const data = await getCatalogPage({ category_path: slug.join('/') });
+        const category = data.category;
+
         return {
-            title: 'Страница не найдена | ЮНИК С',
-            description: 'Запрошенная страница каталога не найдена.',
+            title: category?.title || category?.name || 'Каталог оборудования',
+            description: category?.description || categoryDescriptionFallback,
+            alternates: {
+                canonical: canonicalUrl(category?.href ?? getRoutePathname(slug)),
+            },
         };
-    }
+    } catch (error) {
+        if (isApiNotFoundError(error)) {
+            const product = routeKey === '' ? null : await getCatalogProductOrNull(routeKey);
 
-    if (resolvedPath.type === 'category') {
-        return {
-            title: resolvedPath.category.seoTitle,
-            description: resolvedPath.category.seoDescription,
-        };
-    }
+            if (product !== null) {
+                return {
+                    title: `${product.title} | ЮНИК С`,
+                    description: htmlToPlainText(product.summary ?? product.description) ?? categoryDescriptionFallback,
+                    alternates: {
+                        canonical: canonicalUrl(product.canonicalHref),
+                    },
+                };
+            }
 
-    return {
-        title: `${resolvedPath.product.title} | ЮНИК С`,
-        description: resolvedPath.product.summary,
-        alternates: {
-            canonical: getCatalogProductHref(resolvedPath.product),
-        },
-    };
+            return {
+                title: 'Страница не найдена | ЮНИК С',
+                description: 'Запрошенная страница каталога не найдена.',
+            };
+        }
+
+        throw error;
+    }
 }
 
-function ProductBreadcrumbs({ product, category }: { product: CatalogProduct; category: FlatCatalogCategory }) {
-    const ancestors = getCatalogCategoryAncestors(category);
+function ProductBreadcrumbs({ product }: { product: CatalogProductDetail }) {
+    const breadcrumbs: CatalogCategoryBreadcrumb[] = product.category
+        ? [...product.category.breadcrumbs, product.category]
+        : [];
 
     return (
         <div className="catalog-breadcrumbs">
             <Link href="/">Главная</Link>
             <span>/</span>
             <Link href="/catalog">Каталог оборудования</Link>
-            {ancestors.map((item) => (
+            {breadcrumbs.map((item) => (
                 <span key={item.href} className="catalog-breadcrumbs__group">
                     <span>/</span>
-                    <Link href={item.href}>{item.title}</Link>
+                    <Link href={item.href}>{item.name}</Link>
                 </span>
             ))}
             <span>/</span>
@@ -154,16 +225,28 @@ function ProductBreadcrumbs({ product, category }: { product: CatalogProduct; ca
     );
 }
 
-function ProductShowPage({ product, category }: { product: CatalogProduct; category: FlatCatalogCategory }) {
+function ProductShowPage({ product }: { product: CatalogProductDetail }) {
+    const manager = product.manager;
+    const productImages = product.images.length ? product.images : [product.imageUrl];
+    const availability = product.availability?.name;
+    const state = product.state?.name;
+    const region = product.region?.name;
+    const category = product.category?.name;
+
     return (
         <>
             <Header />
             <main>
                 <section className="page-hero">
                     <Container size="xl">
-                        <ProductBreadcrumbs product={product} category={category} />
+                        <ProductBreadcrumbs product={product} />
                         <Title order={1}>{product.title}</Title>
-                        <Text size="lg">{product.summary}</Text>
+                        {product.summary ? (
+                            <div
+                                className="product-show-summary"
+                                dangerouslySetInnerHTML={{ __html: product.summary }}
+                            />
+                        ) : null}
                     </Container>
                 </section>
 
@@ -171,41 +254,36 @@ function ProductShowPage({ product, category }: { product: CatalogProduct; categ
                     <Container size="xl">
                         <div className="product-show-layout">
                             <div className="product-show-main">
-                                <ProductGallery
-                                    title={product.title}
-                                    images={[product.imageUrl, ...product.galleryImages]}
-                                />
+                                <ProductGallery title={product.title} images={productImages} />
 
                                 {product.characteristicBlocks.map((block) => (
                                     <section key={block.title} className="product-info-block">
                                         <Title order={2}>{block.title}</Title>
-                                        <div className="product-info-block__content">
-                                            {block.items.map((item) => (
-                                                <div key={item} className="product-info-row">
-                                                    <IconCheck size={18} />
-                                                    <Text>{item}</Text>
-                                                </div>
-                                            ))}
-                                        </div>
+                                        <div
+                                            className="product-info-block__content"
+                                            dangerouslySetInnerHTML={{ __html: block.contentHtml }}
+                                        />
                                     </section>
                                 ))}
 
-                                <section className="product-info-block">
-                                    <Title order={2}>Теги товара</Title>
-                                    <Group gap="xs">
-                                        {product.tags.map((tag) => (
-                                            <Link key={tag} href={`/catalog?search=${encodeURIComponent(tag)}`} className="product-tag">
-                                                {tag}
-                                            </Link>
-                                        ))}
-                                    </Group>
-                                </section>
+                                {product.tags.length ? (
+                                    <section className="product-info-block">
+                                        <Title order={2}>Теги товара</Title>
+                                        <Group gap="xs">
+                                            {product.tags.map((tag) => (
+                                                <Link key={tag} href={`/catalog?search=${encodeURIComponent(tag)}`} className="product-tag">
+                                                    {tag}
+                                                </Link>
+                                            ))}
+                                        </Group>
+                                    </section>
+                                ) : null}
                             </div>
 
                             <aside className="product-show-aside">
                                 <div className="product-show-panel">
                                     <Stack gap="md">
-                                        <Badge variant="light" color="blue">{product.availability}</Badge>
+                                        {availability ? <Badge variant="light" color="blue">{availability}</Badge> : null}
                                         <div>
                                             <Text c="dimmed" size="sm" fw={700}>Цена</Text>
                                             <div className="product-show-price">{formatCatalogPrice(product.price)}</div>
@@ -213,63 +291,79 @@ function ProductShowPage({ product, category }: { product: CatalogProduct; categ
                                         <Divider />
                                         <div className="product-show-details">
                                             <div className="product-show-detail"><span>Название:</span><b>{product.title}</b></div>
-                                            <div className="product-show-detail"><span>Артикул:</span><b>{product.sku}</b></div>
-                                            <div className="product-show-detail"><span>Состояние:</span><b>{product.condition}</b></div>
-                                            <div className="product-show-detail"><span>Наличие:</span><b>{product.availability}</b></div>
-                                            <div className="product-show-detail"><span>Локация:</span><b>{product.location}</b></div>
-                                            <div className="product-show-detail"><span>Категория:</span><b>{category.title}</b></div>
+                                            <div className="product-show-detail"><span>Артикул:</span><b>{product.sku ?? 'уточняется'}</b></div>
+                                            {state ? <div className="product-show-detail"><span>Состояние:</span><b>{state}</b></div> : null}
+                                            {availability ? <div className="product-show-detail"><span>Наличие:</span><b>{availability}</b></div> : null}
+                                            {region ? <div className="product-show-detail"><span>Локация:</span><b>{region}</b></div> : null}
+                                            {category ? <div className="product-show-detail"><span>Категория:</span><b>{category}</b></div> : null}
                                         </div>
-                                        <Divider />
-                                        <div className="product-manager-card">
-                                            <Text fw={800}>Контакты менеджера</Text>
-                                            <Text c="dimmed" size="sm">{product.manager.name}</Text>
-                                            <Anchor href={phoneHref(product.manager.phone)} className="contact-link">
-                                                <IconPhone size={18} />
-                                                <span>{product.manager.phone}</span>
-                                            </Anchor>
-                                            <Anchor href={emailHref(product.manager.email)} className="contact-link">
-                                                <IconMail size={18} />
-                                                <span>{product.manager.email}</span>
-                                            </Anchor>
-                                            <Group gap="xs" mt="xs">
-                                                <Button
-                                                    component="a"
-                                                    href={product.manager.socialLinks.whatsapp}
-                                                    size="sm"
-                                                    variant="light"
-                                                    leftSection={<IconBrandWhatsapp size={16} />}
-                                                >
-                                                    WA
-                                                </Button>
-                                                <Button
-                                                    component="a"
-                                                    href={product.manager.socialLinks.telegram}
-                                                    size="sm"
-                                                    variant="light"
-                                                    leftSection={<IconBrandTelegram size={16} />}
-                                                >
-                                                    TG
-                                                </Button>
-                                                <Button
-                                                    component="a"
-                                                    href={product.manager.socialLinks.max}
-                                                    size="sm"
-                                                    variant="light"
-                                                    leftSection={<IconMessageCircle size={16} />}
-                                                >
-                                                    MAX
-                                                </Button>
-                                            </Group>
-                                        </div>
-                                        <Button
-                                            component="a"
-                                            href={phoneHref(product.manager.phone)}
-                                            size="lg"
-                                            leftSection={<IconPhone size={19} />}
-                                            className="product-show-call-button"
-                                        >
-                                            Позвонить
-                                        </Button>
+                                        {manager ? (
+                                            <>
+                                                <Divider />
+                                                <div className="product-manager-card">
+                                                    <Text fw={800}>Контакты менеджера</Text>
+                                                    <Text c="dimmed" size="sm">{manager.name}</Text>
+                                                    {manager.phone ? (
+                                                        <Anchor href={phoneHref(manager.phone)} className="contact-link">
+                                                            <IconPhone size={18} />
+                                                            <span>{manager.phone}</span>
+                                                        </Anchor>
+                                                    ) : null}
+                                                    {manager.email ? (
+                                                        <Anchor href={emailHref(manager.email)} className="contact-link">
+                                                            <IconMail size={18} />
+                                                            <span>{manager.email}</span>
+                                                        </Anchor>
+                                                    ) : null}
+                                                    <Group gap="xs" mt="xs">
+                                                        {manager.socialLinks.vk ? (
+                                                            <Button
+                                                                component="a"
+                                                                href={manager.socialLinks.vk}
+                                                                size="sm"
+                                                                variant="light"
+                                                                leftSection={<IconBrandVk size={16} />}
+                                                            >
+                                                                VK
+                                                            </Button>
+                                                        ) : null}
+                                                        {manager.socialLinks.telegram ? (
+                                                            <Button
+                                                                component="a"
+                                                                href={manager.socialLinks.telegram}
+                                                                size="sm"
+                                                                variant="light"
+                                                                leftSection={<IconBrandTelegram size={16} />}
+                                                            >
+                                                                TG
+                                                            </Button>
+                                                        ) : null}
+                                                        {manager.socialLinks.max ? (
+                                                            <Button
+                                                                component="a"
+                                                                href={manager.socialLinks.max}
+                                                                size="sm"
+                                                                variant="light"
+                                                                leftSection={<IconMessageCircle size={16} />}
+                                                            >
+                                                                MAX
+                                                            </Button>
+                                                        ) : null}
+                                                    </Group>
+                                                </div>
+                                                {manager.phone ? (
+                                                    <Button
+                                                        component="a"
+                                                        href={phoneHref(manager.phone)}
+                                                        size="lg"
+                                                        leftSection={<IconPhone size={19} />}
+                                                        className="product-show-call-button"
+                                                    >
+                                                        Позвонить
+                                                    </Button>
+                                                ) : null}
+                                            </>
+                                        ) : null}
                                         <Button
                                             component="a"
                                             href="/contacts"
@@ -294,19 +388,38 @@ function ProductShowPage({ product, category }: { product: CatalogProduct; categ
 
 export default async function CatalogSlugPage({ params, searchParams }: CatalogSlugPageProps) {
     const [{ slug }, resolvedSearchParams] = await Promise.all([params, searchParams]);
-    const resolvedPath = resolveCatalogPath(slug);
+    const routeKey = slug.at(-1) ?? '';
 
-    if (!resolvedPath) {
+    if (isProductRoute(slug)) {
+        const product = await getCatalogProductOrNotFound(routeKey);
+        const currentPathname = getRoutePathname(slug);
+
+        if (currentPathname !== product.canonicalHref) {
+            permanentRedirect(product.canonicalHref);
+        }
+
+        return <ProductShowPage product={product} />;
+    }
+
+    const categoryPath = slug.join('/');
+    const catalogSearchParams = getCatalogSearchParams(resolvedSearchParams, categoryPath);
+    const categoryPage = await getCatalogPageOrNull(catalogSearchParams);
+
+    if (categoryPage !== null) {
+        return <CatalogPageView data={categoryPage} searchParams={catalogSearchParams} />;
+    }
+
+    const product = routeKey === '' ? null : await getCatalogProductOrNull(routeKey);
+
+    if (product === null) {
         notFound();
     }
 
-    if (resolvedPath.type === 'category') {
-        return <CatalogPageView currentCategory={resolvedPath.category} searchParams={resolvedSearchParams} />;
+    const currentPathname = getRoutePathname(slug);
+
+    if (currentPathname !== product.canonicalHref) {
+        permanentRedirect(product.canonicalHref);
     }
 
-    if (!resolvedPath.isCanonical) {
-        permanentRedirect(getCatalogProductHref(resolvedPath.product));
-    }
-
-    return <ProductShowPage product={resolvedPath.product} category={resolvedPath.category} />;
+    return <ProductShowPage product={product} />;
 }

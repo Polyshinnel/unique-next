@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 final class Product extends Model
 {
@@ -22,6 +23,7 @@ final class Product extends Model
         'external_id',
         'name',
         'sku',
+        'slug',
         'title',
         'description',
         'og_image',
@@ -45,6 +47,36 @@ final class Product extends Model
         'show_price' => 'bool',
         'published_at' => 'datetime',
     ];
+
+    protected static function booted(): void
+    {
+        static::creating(function (self $product): void {
+            if (filled($product->slug) || ! filled($product->sku)) {
+                return;
+            }
+
+            $product->slug = self::generateUniqueSlug($product->sku);
+        });
+    }
+
+    private static function generateUniqueSlug(string $sku): string
+    {
+        $baseSlug = Str::slug($sku);
+
+        if ($baseSlug === '') {
+            $baseSlug = Str::lower(trim($sku));
+        }
+
+        $slug = $baseSlug;
+        $suffix = 2;
+
+        while (self::query()->where('slug', $slug)->exists()) {
+            $slug = $baseSlug.'-'.$suffix;
+            $suffix++;
+        }
+
+        return $slug;
+    }
 
     public function category(): BelongsTo
     {

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { getPageSeo, toMetadata } from '@/lib/seo';
+import { canonicalUrl, getPageSeo, toMetadata } from '@/lib/seo';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
 import { phoneHref } from '@/lib/site-content';
@@ -33,6 +33,9 @@ export async function generateMetadata(): Promise<Metadata> {
     return toMetadata(seo, {
         title: 'Выкуп оборудования | ЮНИК С',
         description: 'Выкуп и реализация промышленного оборудования по рыночным ценам с сопровождением сделки по всей России.',
+        alternates: {
+            canonical: canonicalUrl('/services/vykup'),
+        },
     });
 }
 

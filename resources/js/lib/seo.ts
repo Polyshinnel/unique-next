@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 
 import { api } from '@/lib/api';
+import { siteConfig } from '@/lib/site-config';
 
 export interface PageSeo {
     key: string;
@@ -37,6 +38,14 @@ export async function getPageSeo(key: string): Promise<PageSeo | null> {
     }
 }
 
+export function canonicalUrl(path: string): string {
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+        return path;
+    }
+
+    return `${siteConfig.appUrl}/${path.replace(/^\/+/, '')}`;
+}
+
 export function toMetadata(seo: PageSeo | null, fallback: Metadata): Metadata {
     if (!seo) {
         return fallback;
@@ -45,6 +54,7 @@ export function toMetadata(seo: PageSeo | null, fallback: Metadata): Metadata {
     return {
         title: seo.title ?? fallback.title,
         description: seo.description ?? fallback.description,
+        alternates: fallback.alternates,
         openGraph: seo.og_image
             ? { images: [{ url: seo.og_image }] }
             : fallback.openGraph,

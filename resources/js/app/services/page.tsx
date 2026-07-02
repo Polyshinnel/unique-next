@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { getPageSeo, toMetadata } from '@/lib/seo';
+import { canonicalUrl, getPageSeo, toMetadata } from '@/lib/seo';
 import { demoServices, phoneHref } from '@/lib/site-content';
 import { getSiteContacts } from '@/lib/site-contacts';
 import { FeedbackRequestModal } from '@/components/common/FeedbackRequestModal';
@@ -16,6 +16,9 @@ export async function generateMetadata(): Promise<Metadata> {
     return toMetadata(seo, {
         title: 'Услуги | ЮНИК С',
         description: 'Услуги ЮНИК С: продажа, выкуп, поставка, импорт и сопровождение сделок с промышленным оборудованием.',
+        alternates: {
+            canonical: canonicalUrl('/services'),
+        },
     });
 }
 

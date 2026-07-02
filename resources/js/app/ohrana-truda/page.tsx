@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { getPageSeo, toMetadata } from '@/lib/seo';
+import { canonicalUrl, getPageSeo, toMetadata } from '@/lib/seo';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
 import { Button, Container, Stack, Text, Title } from '@mantine/core';
@@ -16,7 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
         title: 'Охрана труда | ЮНИК С',
         description: 'Сводная ведомость результатов проведения специальной оценки условий труда ООО «Юник С».',
         alternates: {
-            canonical: 'https://uniqset.com/ohrana-truda',
+            canonical: canonicalUrl('/ohrana-truda'),
         },
     });
 }

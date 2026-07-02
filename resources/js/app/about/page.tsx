@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { getPageSeo, toMetadata } from '@/lib/seo';
+import { canonicalUrl, getPageSeo, toMetadata } from '@/lib/seo';
 import { AboutPageView } from '@/components/about/AboutPageView';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -8,6 +8,9 @@ export async function generateMetadata(): Promise<Metadata> {
     return toMetadata(seo, {
         title: 'О компании | ЮНИК С',
         description: 'История, география поставок и принципы работы компании ЮНИК С.',
+        alternates: {
+            canonical: canonicalUrl('/about'),
+        },
     });
 }
 

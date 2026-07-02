@@ -42,6 +42,8 @@ services:
       - APP_DEBUG=true
       - DB_HOST=mysql
       - REDIS_HOST=redis
+      - WWWUSER=${UID:-1000}
+      - WWWGROUP=${GID:-1000}
     networks:
       - uniqset2_network
     depends_on:

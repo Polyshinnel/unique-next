@@ -19,7 +19,11 @@ final class Shipment extends Model
         'shipment_date',
         'location',
         'title',
+        'slug',
         'short_description',
+        'description',
+        'seo_title',
+        'seo_description',
         'sort_order',
         'is_active',
     ];

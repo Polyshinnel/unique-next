@@ -1,135 +1,70 @@
+import 'server-only';
+
+import { api } from '@/lib/api';
+
 export type Shipment = {
-    id: string;
+    id: number;
     title: string;
+    slug: string | null;
+    seoTitle: string | null;
+    seoDescription: string | null;
     date: string;
-    location: string;
+    location: string | null;
     image: string;
     summary: string;
     tags: string[];
-    galleryImages?: string[];
-    content?: string[];
+    galleryImages: string[];
+    content: string[];
 };
 
-export const shipments: Shipment[] = [
-    {
-        id: 'shipment-1',
-        title: 'Отгрузка машины для шовной сварки SВКJ SВFN-55 в Республику Беларусь',
-        date: '29.01.2024',
-        location: 'Республика Беларусь, г. Смолевичи',
-        image: '/assets/img/shipments/sbkj-sbfn-55/1.jpeg',
-        summary: 'Экспортная отгрузка машины шовной сварки SВКJ SВFN-55 в Республику Беларусь с онлайн-показом, проверкой комплектности и подготовкой пакета документов.',
-        tags: ['Экспорт', 'Видеоотчет', 'Документы'],
-        galleryImages: [
-            '/assets/img/shipments/sbkj-sbfn-55/1.jpeg',
-            '/assets/img/shipments/sbkj-sbfn-55/2.jpeg',
-            '/assets/img/shipments/sbkj-sbfn-55/3.jpeg',
-            '/assets/img/shipments/sbkj-sbfn-55/4.jpeg',
-            '/assets/img/shipments/sbkj-sbfn-55/5.jpeg',
-            '/assets/img/shipments/sbkj-sbfn-55/6.jpeg',
-        ],
-        content: [
-            '29.01.2024 г. отгрузили машину шовной сварки Китайского производства SВКJ SВFN-55 от крупного промышленного предприятия по ЭКСПОРТНОМУ ДОГОВОРУ в Республику Беларусь.',
-            'SВКJ SВFN-55 – машина для шовной сварки, производитель – Kитай, без проверки в работе, но до консервации в полностью работоспособном состоянии.',
-            'Показ онлайн – показали покупателю по видео-связи, показали со всех сторон, подтвердили комплектность. Далее составили экспортный договор без НДС, подготовили CMR-ки, отгрузочные и отправили попутной машиной на новое место работы в Минскую область, г. Смолевичи.',
-        ],
-    },
-    {
-        id: 'shipment-2',
-        title: 'Отгрузка станка плазменной резки с ЧПУ Hypertherm PowerMax 105',
-        date: '26.09.2023',
-        location: 'г. Обнинск, Калужская область',
-        image: '/assets/img/otgruzki-2.jpg',
-        summary: 'Плазменный станок Hypertherm PowerMax 105 отгружен в Обнинск после согласования условий, договора и логистики.',
-        tags: ['ЧПУ', 'Логистика', 'Подготовка'],
-    },
-    {
-        id: 'shipment-3',
-        title: 'Отгрузка 1531М, токарно-карусельного одностоечного станка',
-        date: '31.08.2023',
-        location: 'г. Пенза',
-        image: '/assets/img/otgruzki-3.jpeg',
-        summary: 'Токарно-карусельный 1531М отправлен в Пензу под восстановление с удаленным согласованием и контролем отгрузки.',
-        tags: ['Тяжелый станок', 'Погрузка', 'Контроль'],
-    },
-    {
-        id: 'shipment-4',
-        title: 'Удаленная отгрузка с полным контролем процесса',
-        date: '15.08.2023',
-        location: 'Отгрузка без присутствия клиента',
-        image: '/assets/img/otgruzki-1.jpeg',
-        summary: 'Если клиент не приезжает, организуем удаленную отгрузку: фото и видео узлов, онлайн-показ и фиксация погрузки.',
-        tags: ['Удаленная сделка', 'Фотофиксация', 'Онлайн-показ'],
-    },
-    {
-        id: 'shipment-5',
-        title: 'Отгрузка листогибочного пресса после сервисной проверки',
-        date: '21.07.2023',
-        location: 'г. Самара',
-        image: '/assets/img/otgruzki-2.jpg',
-        summary: 'Перед отправкой выполнили контрольный запуск, проверили гидравлику и подготовили станок к междугородней перевозке.',
-        tags: ['Проверка', 'Гидравлика', 'Перевозка'],
-    },
-    {
-        id: 'shipment-6',
-        title: 'Поставка фрезерного станка на производственную площадку',
-        date: '03.07.2023',
-        location: 'г. Нижний Новгород',
-        image: '/assets/img/otgruzki-3.jpeg',
-        summary: 'Согласовали окно погрузки, обеспечили строповку и отправили фрезерный станок на новый производственный участок.',
-        tags: ['Фрезерный станок', 'Строповка', 'Склад'],
-    },
-    {
-        id: 'shipment-7',
-        title: 'Отгрузка координатно-расточного станка с расширенным фотоотчетом',
-        date: '28.06.2023',
-        location: 'г. Екатеринбург',
-        image: '/assets/img/otgruzki-1.jpeg',
-        summary: 'Для клиента подготовили расширенный фотоотчет по узлам и комплектности, после чего согласовали отгрузку и транспорт.',
-        tags: ['Фотоотчет', 'Комплектность', 'Согласование'],
-    },
-    {
-        id: 'shipment-8',
-        title: 'Отправка токарного станка после демонтажа и упаковки',
-        date: '14.06.2023',
-        location: 'г. Воронеж',
-        image: '/assets/img/otgruzki-2.jpg',
-        summary: 'Станок демонтировали, упаковали ответственные элементы и передали перевозчику с контрольной фиксацией погрузки.',
-        tags: ['Демонтаж', 'Упаковка', 'Перевозчик'],
-    },
-    {
-        id: 'shipment-9',
-        title: 'Отгрузка шлифовального оборудования с сопровождением менеджера',
-        date: '30.05.2023',
-        location: 'г. Челябинск',
-        image: '/assets/img/otgruzki-3.jpeg',
-        summary: 'Менеджер контролировал маршрут и сроки подачи транспорта, чтобы отгрузка прошла без простоев и задержек.',
-        tags: ['Шлифовка', 'Маршрут', 'Сроки'],
-    },
-    {
-        id: 'shipment-10',
-        title: 'Вывоз пресса с территории склада и доставка клиенту',
-        date: '18.05.2023',
-        location: 'г. Ярославль',
-        image: '/assets/img/otgruzki-1.jpeg',
-        summary: 'Организовали спецтранспорт, погрузку на складе и передачу оборудования клиенту с комплектом закрывающих документов.',
-        tags: ['Пресс', 'Спецтранспорт', 'Закрывающие документы'],
-    },
-    {
-        id: 'shipment-11',
-        title: 'Отгрузка сверлильного станка с онлайн-демонстрацией работы',
-        date: '04.05.2023',
-        location: 'г. Тула',
-        image: '/assets/img/otgruzki-2.jpg',
-        summary: 'Перед покупкой клиент получил онлайн-демонстрацию работы станка, после чего мы организовали адресную отправку.',
-        tags: ['Сверлильный', 'Видеосвязь', 'Адресная доставка'],
-    },
-    {
-        id: 'shipment-12',
-        title: 'Комплексная отгрузка оборудования для нового цеха',
-        date: '19.04.2023',
-        location: 'г. Казань',
-        image: '/assets/img/otgruzki-3.jpeg',
-        summary: 'Собрали несколько позиций в одну логистическую поставку, синхронизировали документы и проконтролировали отправку.',
-        tags: ['Комплексная поставка', 'Несколько позиций', 'Синхронизация'],
-    },
-];
+export type ShipmentsPagination = {
+    currentPage: number;
+    perPage: number;
+    total: number;
+    totalPages: number;
+};
+
+export type ShipmentsPageResponse = {
+    shipments: Shipment[];
+    pagination: ShipmentsPagination;
+};
+
+type ApiPaginatedResponse<T> = {
+    data: T[];
+    meta: {
+        current_page: number;
+        per_page: number;
+        total: number;
+        last_page: number;
+    };
+};
+
+export async function getShipmentsPage(page: number | string = 1): Promise<ShipmentsPageResponse> {
+    const response = await api.server.get<ApiPaginatedResponse<Shipment>>('/shipments', {
+        cache: 'no-store',
+        params: {
+            page,
+            per_page: 8,
+        },
+    });
+
+    return {
+        shipments: response.data,
+        pagination: {
+            currentPage: response.meta.current_page,
+            perPage: response.meta.per_page,
+            total: response.meta.total,
+            totalPages: response.meta.last_page,
+        },
+    };
+}
+
+export function getShipment(id: number | string): Promise<Shipment> {
+    return api.server.get<Shipment>(`/shipments/${id}`, {
+        cache: 'no-store',
+    });
+}
+
+export function getShipmentHref(shipment: Pick<Shipment, 'id' | 'slug'>): string {
+    return `/otgruzki/${shipment.slug ?? shipment.id}`;
+}

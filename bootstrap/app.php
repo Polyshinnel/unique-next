@@ -3,6 +3,7 @@
 use App\Domain\Catalog\Import\Commands\ImportProductsCommand;
 use App\Domain\Catalog\Import\Commands\UpdateExistingProductsCommand;
 use App\Domain\Catalog\Import\Commands\UpdateRevisionProductsCommand;
+use App\Domain\Seo\Commands\GenerateSitemapCommand;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -19,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ImportProductsCommand::class,
         UpdateExistingProductsCommand::class,
         UpdateRevisionProductsCommand::class,
+        GenerateSitemapCommand::class,
     ])
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->statefulApi();

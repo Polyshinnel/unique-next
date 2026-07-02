@@ -8,6 +8,9 @@ import { Header } from '@/components/layout/Header';
 import type { Shipment } from '@/lib/shipments';
 
 export function ShipmentDetailPageView({ shipment }: { shipment: Shipment }) {
+    const summary = shipment.summary.trim();
+    const contentParagraphs = (shipment.content ?? []).filter((paragraph) => paragraph.trim() !== summary);
+
     return (
         <>
             <Header />
@@ -22,7 +25,6 @@ export function ShipmentDetailPageView({ shipment }: { shipment: Shipment }) {
                             <span>{shipment.title}</span>
                         </div>
                         <Title order={1}>{shipment.title}</Title>
-                        <Text size="lg">{shipment.summary}</Text>
                     </Container>
                 </section>
 
@@ -37,7 +39,7 @@ export function ShipmentDetailPageView({ shipment }: { shipment: Shipment }) {
                                     />
                                 ) : (
                                     <div className="shipment-detail__image">
-                                        <ImageView src={shipment.image} alt={shipment.title} width={1440} height={960} />
+                                        <ImageView src={shipment.image} alt={shipment.title} width={1440} height={960} unoptimized />
                                     </div>
                                 )}
                             </div>
@@ -45,15 +47,11 @@ export function ShipmentDetailPageView({ shipment }: { shipment: Shipment }) {
                             <Stack gap="lg" p={{ base: 'lg', md: 'xl' }} className="shipment-detail__content">
                                 <Group gap="sm">
                                     <Badge variant="light" color="blue">{shipment.date}</Badge>
-                                    <Badge variant="light" color="gray">{shipment.location}</Badge>
+                                    {shipment.location ? <Badge variant="light" color="gray">{shipment.location}</Badge> : null}
                                 </Group>
 
-                                <Text size="lg" c="dimmed">
-                                    {shipment.summary}
-                                </Text>
-
                                 <div className="shipment-detail__text">
-                                    {(shipment.content ?? [shipment.summary]).map((paragraph) => (
+                                    {contentParagraphs.map((paragraph) => (
                                         <Text key={paragraph} size="lg">
                                             {paragraph}
                                         </Text>
