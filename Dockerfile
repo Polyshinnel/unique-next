@@ -40,8 +40,8 @@ COPY . .
 RUN composer dump-autoload --optimize \
     && php artisan package:discover --ansi
 
-COPY --from=frontend-builder /app/node_modules ./node_modules
 COPY --from=frontend-builder /app/resources/js/.next ./resources/js/.next
+RUN npm ci
 
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage \
