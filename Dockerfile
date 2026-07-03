@@ -17,7 +17,7 @@ RUN apk add --no-cache \
     oniguruma-dev icu-dev icu-libs \
     freetype-dev libjpeg-turbo-dev \
     nginx supervisor shadow su-exec bash \
-    nodejs
+    nodejs npm
 
 RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
     && pecl install redis \
@@ -37,6 +37,7 @@ COPY composer.json composer.lock ./
 RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-scripts
 
 COPY . .
+RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 RUN composer dump-autoload --optimize \
     && php artisan package:discover --ansi
 

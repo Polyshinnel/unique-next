@@ -1,7 +1,6 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-    output: 'standalone',
     reactStrictMode: true,
     env: {
         NEXT_PUBLIC_YANDEX_MAPS_API_KEY:
