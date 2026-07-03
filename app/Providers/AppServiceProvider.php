@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Horizon\Horizon;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,5 +24,7 @@ class AppServiceProvider extends ServiceProvider
         if ($this->app->isProduction() && str_starts_with((string) config('app.url'), 'https://')) {
             URL::forceScheme('https');
         }
+
+        Horizon::auth(static fn () => true);
     }
 }

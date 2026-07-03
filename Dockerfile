@@ -16,7 +16,7 @@ RUN apk add --no-cache \
     libpng-dev libzip-dev zip unzip \
     oniguruma-dev icu-dev icu-libs \
     freetype-dev libjpeg-turbo-dev \
-    nginx supervisor shadow su-exec bash \
+    nginx supervisor shadow su-exec bash tzdata \
     nodejs npm
 
 RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \

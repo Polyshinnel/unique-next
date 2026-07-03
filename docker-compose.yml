@@ -15,6 +15,9 @@ services:
       - "${APP_HTTP_PORT:-28080}:80"
     environment:
       - APP_DEBUG=true
+      - APP_TIMEZONE=${APP_TIMEZONE:-Europe/Moscow}
+      - APP_SCHEDULE_TIMEZONE=${APP_SCHEDULE_TIMEZONE:-Europe/Moscow}
+      - TZ=${TZ:-Europe/Moscow}
       - BACKEND_URL=http://127.0.0.1
       - NEXT_PUBLIC_API_URL=/api
       - DB_HOST=mysql
@@ -40,6 +43,9 @@ services:
       - ./:/var/www/html
     environment:
       - APP_DEBUG=true
+      - APP_TIMEZONE=${APP_TIMEZONE:-Europe/Moscow}
+      - APP_SCHEDULE_TIMEZONE=${APP_SCHEDULE_TIMEZONE:-Europe/Moscow}
+      - TZ=${TZ:-Europe/Moscow}
       - DB_HOST=mysql
       - REDIS_HOST=redis
       - WWWUSER=${UID:-1000}
@@ -60,6 +66,7 @@ services:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
       MYSQL_PASSWORD: ${DB_PASSWORD:-root}
       MYSQL_USER: ${DB_USERNAME:-uniqset2}
+      TZ: ${TZ:-Europe/Moscow}
     ports:
       - "${MYSQL_HOST_PORT:-23306}:3306"
     volumes:

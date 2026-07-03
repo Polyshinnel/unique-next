@@ -17,6 +17,9 @@ services:
       APP_KEY: ${APP_KEY:-}
       APP_DEBUG: ${APP_DEBUG:-false}
       APP_URL: ${APP_URL:-http://localhost}
+      APP_TIMEZONE: ${APP_TIMEZONE:-Europe/Moscow}
+      APP_SCHEDULE_TIMEZONE: ${APP_SCHEDULE_TIMEZONE:-Europe/Moscow}
+      TZ: ${TZ:-Europe/Moscow}
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost:28080}
       APP_LOCALE: ${APP_LOCALE:-en}
       APP_FALLBACK_LOCALE: ${APP_FALLBACK_LOCALE:-en}
@@ -81,6 +84,9 @@ services:
       APP_KEY: ${APP_KEY:-}
       APP_DEBUG: ${APP_DEBUG:-false}
       APP_URL: ${APP_URL:-http://localhost}
+      APP_TIMEZONE: ${APP_TIMEZONE:-Europe/Moscow}
+      APP_SCHEDULE_TIMEZONE: ${APP_SCHEDULE_TIMEZONE:-Europe/Moscow}
+      TZ: ${TZ:-Europe/Moscow}
       DB_CONNECTION: ${DB_CONNECTION:-mysql}
       DB_HOST: ${DB_HOST:-uniqset2-db}
       DB_PORT: ${DB_PORT:-3306}
@@ -109,6 +115,7 @@ services:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
       MYSQL_PASSWORD: ${DB_PASSWORD:-root}
       MYSQL_USER: ${DB_USERNAME:-uniqset2}
+      TZ: ${TZ:-Europe/Moscow}
     volumes:
       - db_data:/var/lib/mysql
       - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf:ro
