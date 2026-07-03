@@ -103,22 +103,18 @@ class ShipmentForm
                             ->reorderable()
                             ->addActionLabel('Добавить изображение')
                             ->schema([
-                                FileUpload::make('file_path')
-                                    ->label('Изображение')
-                                    ->disk('public')
-                                    ->directory('shipments')
-                                    ->visibility('public')
-                                    ->rules([ImageUpload::rule()])
-                                    ->extraInputAttributes([
-                                        'accept' => ImageUpload::ACCEPT_ATTRIBUTE,
-                                    ])
+                                ImageUpload::webpConvertibleUpload(
+                                    FileUpload::make('file_path')->label('Изображение'),
+                                    disk: 'public',
+                                    directory: 'shipments',
+                                )
                                     ->image()
                                     ->imagePreviewHeight('180')
                                     ->openable()
                                     ->downloadable()
                                     ->required()
                                     ->columnSpanFull()
-                                    ->helperText('Файл будет сохранён в storage/app/public/shipments и доступен по пути /storage/shipments/...'),
+                                    ->helperText('Файл будет сохранён сразу, затем автоматически преобразован в WebP в фоне.'),
                                 Toggle::make('is_main')
                                     ->label('Главное изображение'),
                             ])

@@ -9,14 +9,12 @@ use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 final class ValidImageUpload implements ValidationRule
 {
-    private const ALLOWED_EXTENSIONS = [
-        'jpg',
-        'jpeg',
-        'png',
-        'gif',
-        'bmp',
-        'webp',
-    ];
+    /**
+     * @param  array<int, string>  $allowedExtensions
+     */
+    public function __construct(
+        private readonly array $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'],
+    ) {}
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
@@ -27,8 +25,12 @@ final class ValidImageUpload implements ValidationRule
         }
 
         $extension = strtolower($value->getClientOriginalExtension() ?: (string) $value->guessExtension());
+        $allowedExtensions = array_map(
+            static fn (string $extension): string => strtolower($extension),
+            $this->allowedExtensions,
+        );
 
-        if (! in_array($extension, self::ALLOWED_EXTENSIONS, strict: true)) {
+        if (! in_array($extension, $allowedExtensions, strict: true)) {
             $fail(__('validation.image', ['attribute' => $attribute]));
 
             return;

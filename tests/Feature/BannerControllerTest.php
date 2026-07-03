@@ -29,7 +29,7 @@ final class BannerControllerTest extends TestCase
         ]);
 
         Banner::query()->create([
-            'image' => 'banners/first.jpg',
+            'image' => 'banners/first.webp',
             'title' => 'First banner',
             'text' => 'First text',
             'button_one_text' => 'Open first',
@@ -46,9 +46,10 @@ final class BannerControllerTest extends TestCase
             ->assertOk()
             ->assertJsonCount(2)
             ->assertJsonPath('0.title', 'First banner')
-            ->assertJsonPath('0.image', 'banners/first.jpg')
+            ->assertJsonPath('0.image', 'banners/first.webp')
             ->assertJsonPath('0.button_one_text', 'Open first')
             ->assertJsonPath('0.button_two_url', '/contacts')
-            ->assertJsonPath('1.title', 'Second banner');
+            ->assertJsonPath('1.title', 'Second banner')
+            ->assertJsonPath('1.image', 'banners/second.jpg');
     }
 }

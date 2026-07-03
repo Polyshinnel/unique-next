@@ -5,6 +5,6 @@ export default [
     ...nextVitals,
     ...nextTypescript,
     {
-        ignores: ['resources/js/.next/**'],
+        ignores: ['resources/js/.next/**', 'resources/js/.next-runtime/**'],
     },
 ];

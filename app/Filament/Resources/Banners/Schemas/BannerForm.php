@@ -18,20 +18,17 @@ class BannerForm
                 Section::make('Баннер')
                     ->columns(2)
                     ->schema([
-                        FileUpload::make('image')
-                            ->label('Изображение')
-                            ->disk('public')
-                            ->directory('banners')
-                            ->visibility('public')
-                            ->rules([ImageUpload::rule()])
-                            ->extraInputAttributes([
-                                'accept' => ImageUpload::ACCEPT_ATTRIBUTE,
-                            ])
+                        ImageUpload::webpConvertibleUpload(
+                            FileUpload::make('image')->label('Изображение'),
+                            disk: 'public',
+                            directory: 'banners',
+                        )
+                            ->image()
                             ->imagePreviewHeight('200')
                             ->openable()
                             ->downloadable()
                             ->columnSpanFull()
-                            ->helperText('Файл будет сохранён в storage/app/public/banners и доступен по пути /storage/banners/...'),
+                            ->helperText('Файл будет сохранён сразу, затем автоматически преобразован в WebP в фоне.'),
                         TextInput::make('title')
                             ->label('Заголовок баннера')
                             ->maxLength(255)

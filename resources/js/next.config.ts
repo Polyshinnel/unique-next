@@ -2,6 +2,7 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
     reactStrictMode: true,
+    distDir: '.next-runtime',
     env: {
         NEXT_PUBLIC_YANDEX_MAPS_API_KEY:
             process.env.YANDEX_MAPS_API_KEY || 'ddda0c18-95d3-493d-820b-a7304bc04e5c',

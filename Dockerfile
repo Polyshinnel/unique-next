@@ -7,7 +7,7 @@ RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 
 COPY . .
 RUN npm run build \
-    && mkdir -p /app/resources/js/.next
+    && mkdir -p /app/resources/js/.next-runtime
 
 FROM php:8.4-fpm-alpine AS php-base
 
@@ -15,8 +15,8 @@ RUN apk add --no-cache \
     git curl curl-dev libcurl \
     libpng-dev libzip-dev zip unzip \
     oniguruma-dev icu-dev icu-libs \
-    freetype-dev libjpeg-turbo-dev \
-    nginx supervisor shadow su-exec bash tzdata \
+    freetype-dev libjpeg-turbo-dev libwebp-dev \
+    nginx supervisor shadow su-exec bash tzdata acl \
     nodejs npm
 
 RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
@@ -24,7 +24,7 @@ RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
     && docker-php-ext-enable redis \
     && apk del .build-deps
 
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
     && docker-php-ext-install -j"$(nproc)" \
         pdo_mysql bcmath exif gd intl \
         opcache pcntl zip mbstring
@@ -41,7 +41,7 @@ RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 RUN composer dump-autoload --optimize \
     && php artisan package:discover --ansi
 
-COPY --from=frontend-builder /app/resources/js/.next ./resources/js/.next
+COPY --from=frontend-builder /app/resources/js/.next-runtime ./resources/js/.next-runtime
 
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage \

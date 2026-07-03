@@ -19,6 +19,7 @@
 /public/hot
 /public/storage
 /resources/js/.next
+/resources/js/.next-runtime
 /resources/js/.env.local
 /storage/*.key
 /storage/pail

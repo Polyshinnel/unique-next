@@ -28,6 +28,7 @@ return [
     'waits' => [
         'redis:default' => 60,
         'redis:imports' => 300,
+        'redis:images' => 60,
     ],
 
     'trim' => [
@@ -85,6 +86,19 @@ return [
             'timeout' => 1800,
             'nice' => 5,
         ],
+        'images-supervisor' => [
+            'connection' => 'redis',
+            'queue' => ['images'],
+            'balance' => 'auto',
+            'autoScalingStrategy' => 'time',
+            'maxProcesses' => 1,
+            'maxTime' => 0,
+            'maxJobs' => 0,
+            'memory' => 256,
+            'tries' => 3,
+            'timeout' => 300,
+            'nice' => 0,
+        ],
     ],
 
     'environments' => [
@@ -99,6 +113,11 @@ return [
                 'balanceMaxShift' => 1,
                 'balanceCooldown' => 5,
             ],
+            'images-supervisor' => [
+                'maxProcesses' => 2,
+                'balanceMaxShift' => 1,
+                'balanceCooldown' => 3,
+            ],
         ],
 
         'local' => [
@@ -106,6 +125,9 @@ return [
                 'maxProcesses' => 3,
             ],
             'imports-supervisor' => [
+                'maxProcesses' => 1,
+            ],
+            'images-supervisor' => [
                 'maxProcesses' => 1,
             ],
         ],

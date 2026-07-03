@@ -27,6 +27,17 @@ final class ShipmentImage extends Model
         'is_main' => 'bool',
     ];
 
+    public function setFilePathAttribute(?string $value): void
+    {
+        $this->attributes['file_path'] = $value;
+
+        if (filled($value)) {
+            $this->attributes['file_name'] = (string) Str::of($value)
+                ->afterLast('/')
+                ->toString();
+        }
+    }
+
     public function shipment(): BelongsTo
     {
         return $this->belongsTo(Shipment::class);
@@ -34,14 +45,6 @@ final class ShipmentImage extends Model
 
     protected static function booted(): void
     {
-        static::saving(static function (ShipmentImage $image): void {
-            if ($image->file_path && (blank($image->file_name) || $image->isDirty('file_path'))) {
-                $image->file_name = Str::of($image->file_path)
-                    ->afterLast('/')
-                    ->toString();
-            }
-        });
-
         static::saved(static function (ShipmentImage $image): void {
             if (! $image->is_main || ! $image->shipment_id) {
                 return;

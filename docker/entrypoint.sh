@@ -33,7 +33,13 @@ ensure_laravel_permissions() {
         chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
     fi
 
-    chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+    find /var/www/html/storage /var/www/html/bootstrap/cache -type d -exec chmod 2775 {} \;
+    find /var/www/html/storage /var/www/html/bootstrap/cache -type f -exec chmod 664 {} \;
+
+    if command -v setfacl >/dev/null 2>&1; then
+        setfacl -R -m u:www-data:rwx,g:www-data:rwx /var/www/html/storage /var/www/html/bootstrap/cache
+        setfacl -R -d -m u:www-data:rwx,g:www-data:rwx /var/www/html/storage /var/www/html/bootstrap/cache
+    fi
 }
 
 sync_www_data_ids
