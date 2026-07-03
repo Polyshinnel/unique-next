@@ -17,7 +17,7 @@ RUN apk add --no-cache \
     oniguruma-dev icu-dev icu-libs \
     freetype-dev libjpeg-turbo-dev \
     nginx supervisor shadow su-exec bash \
-    nodejs npm
+    nodejs
 
 RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
     && pecl install redis \
@@ -41,7 +41,6 @@ RUN composer dump-autoload --optimize \
     && php artisan package:discover --ansi
 
 COPY --from=frontend-builder /app/resources/js/.next ./resources/js/.next
-RUN npm ci
 
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage \
