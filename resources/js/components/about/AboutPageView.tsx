@@ -75,7 +75,7 @@ export function AboutPageView() {
                             </Stack>
 
                             <div className="about-company-image">
-                                <Image src="/assets/img/about/main.jpeg" alt="Команда ЮНИК С" />
+                                <Image src="/assets/img/about/main.webp" alt="Команда ЮНИК С" />
                             </div>
                         </div>
                     </Container>
@@ -113,7 +113,7 @@ export function AboutPageView() {
 
                             <div className="about-map-card">
                                 <div className="about-map-card__image">
-                                    <Image src="/assets/img/about/map.jpg" alt="Карта регионов поставок ЮНИК С" />
+                                    <Image src="/assets/img/about/map.webp" alt="Карта регионов поставок ЮНИК С" />
                                 </div>
                                 <Text className="about-map-card__caption">
                                     У нас в офисе висит карта, где мы отмечаем новые города, куда мы отправили оборудование.

@@ -46,7 +46,7 @@ export default function OccupationalSafetyPage() {
                     <Container size="xl">
                         <div className="occupational-safety-card">
                             <img
-                                src="/assets/img/ohrana-truda.png"
+                                src="/assets/img/ohrana-truda.webp"
                                 alt="Сводная ведомость результатов проведения специальной оценки условий труда"
                                 className="occupational-safety-card__image"
                             />

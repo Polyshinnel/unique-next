@@ -9,13 +9,29 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('catalog:import-products')
-    ->daily()
+    ->cron('10 */2 * * *')
     ->withoutOverlapping()
+    ->environments(['production'])
+    ->onOneServer()
+    ->runInBackground();
+
+Schedule::command('catalog:update-existing-products')
+    ->cron('5,35 * * * *')
+    ->withoutOverlapping()
+    ->environments(['production'])
     ->onOneServer()
     ->runInBackground();
 
 Schedule::command('catalog:update-revision-products')
-    ->everyFourHours()
+    ->cron('20 * * * *')
     ->withoutOverlapping()
+    ->environments(['production'])
+    ->onOneServer()
+    ->runInBackground();
+
+Schedule::command('seo:generate-sitemap')
+    ->cron('40 */12 * * *')
+    ->withoutOverlapping()
+    ->environments(['production'])
     ->onOneServer()
     ->runInBackground();

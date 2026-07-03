@@ -382,13 +382,13 @@ img {
 .page-hero.about-hero {
     background:
         linear-gradient(135deg, rgba(8, 27, 51, 0.72), rgba(19, 62, 113, 0.54)),
-        url('/assets/img/about-banner.png') center / cover no-repeat;
+        url('/assets/img/about-banner.webp') center / cover no-repeat;
 }
 
 .page-hero.otgruzki-hero {
     background:
         linear-gradient(135deg, rgba(8, 27, 51, 0.72), rgba(19, 62, 113, 0.54)),
-        url('/assets/img/otgruzki-banner.JPEG') center / cover no-repeat;
+        url('/assets/img/otgruzki-banner.webp') center / cover no-repeat;
 }
 
 .page-hero.privacy-hero {
@@ -1260,7 +1260,7 @@ img {
     position: absolute;
     inset: 0;
     z-index: -2;
-    background: url('/assets/img/catalog-banner.png') center / cover no-repeat;
+    background: url('/assets/img/catalog-banner.webp') center / cover no-repeat;
     opacity: 1;
 }
 
@@ -1285,7 +1285,7 @@ img {
     position: absolute;
     inset: 0;
     z-index: -2;
-    background: url('/assets/img/services-banner.JPEG') center / cover no-repeat;
+    background: url('/assets/img/services-banner.webp') center / cover no-repeat;
 }
 
 .services-hero::after {
@@ -1566,7 +1566,7 @@ img {
     position: absolute;
     inset: 0;
     z-index: -2;
-    background: url('/assets/img/catalog-banner.png') center / cover no-repeat;
+    background: url('/assets/img/catalog-banner.webp') center / cover no-repeat;
     opacity: 1;
 }
 
@@ -1712,7 +1712,9 @@ img {
 }
 
 .instrument-hero::before {
-    background: url('/assets/img/slide-4.jpg') center / cover no-repeat;
+    background:
+        linear-gradient(135deg, rgba(8, 27, 51, 0.76), rgba(19, 62, 113, 0.54)),
+        radial-gradient(circle at top right, rgba(240, 163, 47, 0.2), transparent 30%);
     opacity: 1;
 }
 
@@ -1798,8 +1800,8 @@ img {
     inset: 0;
     z-index: -2;
     background:
-        linear-gradient(90deg, rgba(8, 27, 51, 0.36), rgba(8, 27, 51, 0.14)),
-        url('/assets/img/slide-2.jpg') center 28% / cover no-repeat;
+        linear-gradient(135deg, rgba(8, 27, 51, 0.82), rgba(19, 62, 113, 0.62)),
+        radial-gradient(circle at top right, rgba(240, 163, 47, 0.24), transparent 28%);
     opacity: 0.36;
 }
 
@@ -1983,7 +1985,9 @@ img {
     position: absolute;
     inset: 0;
     z-index: -2;
-    background: url('/assets/img/slide-3.jpg') center / cover no-repeat;
+    background:
+        linear-gradient(135deg, rgba(8, 27, 51, 0.8), rgba(19, 62, 113, 0.58)),
+        radial-gradient(circle at top left, rgba(240, 163, 47, 0.18), transparent 30%);
     opacity: 1;
 }
 
@@ -2076,7 +2080,7 @@ img {
 .why-we-hero {
     background:
         linear-gradient(135deg, rgba(8, 27, 51, 0.72), rgba(19, 62, 113, 0.54)),
-        url('/assets/img/about-banner.png') center / cover no-repeat;
+        url('/assets/img/about-banner.webp') center / cover no-repeat;
 }
 
 .why-we-intro {
@@ -2122,7 +2126,7 @@ img {
     background:
         linear-gradient(135deg, rgba(8, 27, 51, 0.8), rgba(19, 62, 113, 0.68)),
         radial-gradient(circle at top right, rgba(240, 163, 47, 0.24), transparent 28%),
-        url('/assets/img/contact-banner.png') center/cover no-repeat,
+        url('/assets/img/contact-banner.webp') center/cover no-repeat,
         linear-gradient(135deg, rgba(8, 27, 51, 0.92), rgba(19, 62, 113, 0.82));
 }
 

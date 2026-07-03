@@ -37,7 +37,7 @@ export async function generateMetadata(): Promise<Metadata> {
     });
 }
 
-const galleryImages = Array.from({ length: 15 }, (_, index) => `/assets/img/services/instrument-page/${index + 1}.jpg`);
+const galleryImages = Array.from({ length: 15 }, (_, index) => `/assets/img/services/instrument-page/${index + 1}.webp`);
 
 const contactItems: ReadonlyArray<{
     icon: TablerIcon;

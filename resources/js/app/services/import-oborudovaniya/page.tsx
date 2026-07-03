@@ -40,7 +40,7 @@ export async function generateMetadata(): Promise<Metadata> {
     });
 }
 
-const galleryImages = Array.from({ length: 9 }, (_, index) => `/assets/img/services/import-page/gallery/${index + 1}.jpg`);
+const galleryImages = Array.from({ length: 9 }, (_, index) => `/assets/img/services/import-page/gallery/${index + 1}.webp`);
 
 const offerItems = [
     'Поиск и подбор требуемого оборудования под ключ',
@@ -144,7 +144,7 @@ function IntroSection() {
 
                     <div className="import-intro-card__media">
                         <Image
-                            src="/assets/img/services/import-page/import-block.jpeg"
+                            src="/assets/img/services/import-page/import-block.webp"
                             alt="Импорт и поставка промышленного оборудования"
                         />
                     </div>

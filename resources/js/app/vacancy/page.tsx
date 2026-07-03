@@ -112,7 +112,7 @@ export default function VacancyPage() {
                             </Stack>
 
                             <div className="vacancy-intro__image">
-                                <Image src="/assets/img/vacancy-img.jpeg" alt="Вакансии компании ЮНИК С" />
+                                <Image src="/assets/img/vacancy-img.webp" alt="Вакансии компании ЮНИК С" />
                             </div>
                         </div>
                     </Container>

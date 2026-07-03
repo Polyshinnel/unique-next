@@ -41,7 +41,7 @@ export async function Footer() {
             <Container size="xl">
                 <SimpleGrid cols={{ base: 1, sm: 2, lg: 5 }} spacing="xl">
                     <Stack gap="md">
-                        <Image src="/assets/img/unique-logo.png" alt="ЮНИК С" className="footer-logo" />
+                        <Image src="/assets/img/unique-logo.webp" alt="ЮНИК С" className="footer-logo" />
                         <Text c="white" fw={700}>ООО “Юник С”</Text>
                         <Text c="gray.4" size="sm">ИНН: {contacts.inn}</Text>
                         <Text c="gray.4" size="sm">ОГРН: {contacts.ogrn}</Text>

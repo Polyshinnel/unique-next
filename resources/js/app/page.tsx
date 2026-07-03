@@ -76,7 +76,7 @@ function CompanySection() {
                         </SimpleGrid>
                     </Stack>
                     <div className="company-image">
-                        <Image src="/assets/img/main.jpeg" alt="Промышленное оборудование ЮНИК С" />
+                        <Image src="/assets/img/main.webp" alt="Промышленное оборудование ЮНИК С" />
                     </div>
                 </div>
             </Container>

@@ -30,7 +30,7 @@ final class ShipmentResource extends JsonResource
             'seoDescription' => $shipment->seo_description,
             'date' => $shipment->shipment_date?->format('d.m.Y'),
             'location' => $shipment->location,
-            'image' => $this->imageUrl($shipment->mainImage) ?: ($images[0] ?? '/assets/img/otgruzki-banner.JPEG'),
+            'image' => $this->imageUrl($shipment->mainImage) ?: ($images[0] ?? '/assets/img/otgruzki-banner.webp'),
             'summary' => $summary ?: '',
             'tags' => $shipment->tags
                 ->pluck('name')

@@ -107,7 +107,7 @@ function SupplierChoiceSection() {
 
                     <div className="why-we-intro__media">
                         <Image
-                            src="/assets/img/services/import-page/import-block.jpeg"
+                            src="/assets/img/services/import-page/import-block.webp"
                             alt="Промышленное оборудование"
                         />
                     </div>

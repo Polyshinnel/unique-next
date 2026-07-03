@@ -60,7 +60,7 @@ export function HeaderClient({ email, phone }: HeaderClientProps) {
         <header className="site-header">
             <Container size="xl" className="site-header__inner">
                 <Link href="/" className="site-logo" aria-label="ЮНИК С">
-                    <Image src="/assets/img/unique-logo.png" alt="ЮНИК С" />
+                    <Image src="/assets/img/unique-logo.webp" alt="ЮНИК С" />
                 </Link>
 
                 <Box className="site-header__nav">{menu}</Box>
