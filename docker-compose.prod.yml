@@ -12,12 +12,52 @@ services:
     ports:
       - "${APP_HTTP_PORT:-28080}:80"
     environment:
-      RUN_STORAGE_LINK: "true"
-      BACKEND_URL: http://127.0.0.1
-      NEXT_PUBLIC_API_URL: /api
-      REDIS_HOST: uniqset2-redis
-      REDIS_PORT: "6379"
-      REDIS_PASSWORD: ""
+      APP_NAME: ${APP_NAME:-Laravel}
+      APP_ENV: ${APP_ENV:-production}
+      APP_KEY: ${APP_KEY:-}
+      APP_DEBUG: ${APP_DEBUG:-false}
+      APP_URL: ${APP_URL:-http://localhost}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:28080}
+      APP_LOCALE: ${APP_LOCALE:-en}
+      APP_FALLBACK_LOCALE: ${APP_FALLBACK_LOCALE:-en}
+      APP_FAKER_LOCALE: ${APP_FAKER_LOCALE:-en_US}
+      APP_MAINTENANCE_DRIVER: ${APP_MAINTENANCE_DRIVER:-file}
+      LOG_CHANNEL: ${LOG_CHANNEL:-stack}
+      LOG_STACK: ${LOG_STACK:-single}
+      LOG_DEPRECATIONS_CHANNEL: ${LOG_DEPRECATIONS_CHANNEL:-null}
+      LOG_LEVEL: ${LOG_LEVEL:-error}
+      DB_CONNECTION: ${DB_CONNECTION:-mysql}
+      DB_HOST: ${DB_HOST:-uniqset2-db}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_DATABASE: ${DB_DATABASE:-uniqset2}
+      DB_USERNAME: ${DB_USERNAME:-uniqset2}
+      DB_PASSWORD: ${DB_PASSWORD:-root}
+      SESSION_DRIVER: ${SESSION_DRIVER:-redis}
+      SESSION_LIFETIME: ${SESSION_LIFETIME:-120}
+      SESSION_ENCRYPT: ${SESSION_ENCRYPT:-false}
+      SESSION_PATH: ${SESSION_PATH:-/}
+      SESSION_DOMAIN: ${SESSION_DOMAIN:-null}
+      SESSION_SAME_SITE: ${SESSION_SAME_SITE:-lax}
+      SESSION_SECURE_COOKIE: ${SESSION_SECURE_COOKIE:-true}
+      BROADCAST_CONNECTION: ${BROADCAST_CONNECTION:-log}
+      FILESYSTEM_DISK: ${FILESYSTEM_DISK:-local}
+      QUEUE_CONNECTION: ${QUEUE_CONNECTION:-redis}
+      CACHE_STORE: ${CACHE_STORE:-redis}
+      REDIS_CLIENT: ${REDIS_CLIENT:-phpredis}
+      REDIS_HOST: ${REDIS_HOST:-uniqset2-redis}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-null}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      SANCTUM_STATEFUL_DOMAINS: ${SANCTUM_STATEFUL_DOMAINS:-localhost}
+      BACKEND_URL: ${BACKEND_URL:-http://127.0.0.1}
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-/api}
+      HORIZON_BASIC_AUTH_USERNAME: ${HORIZON_BASIC_AUTH_USERNAME:-admin}
+      HORIZON_BASIC_AUTH_PASSWORD: ${HORIZON_BASIC_AUTH_PASSWORD:-change-me}
+      CATALOG_IMPORT_FEED_URL: ${CATALOG_IMPORT_FEED_URL:-https://panel.uniqset.com/storage/exports/advertisements.xml}
+      CATALOG_IMPORT_IMAGE_DISK: ${CATALOG_IMPORT_IMAGE_DISK:-public}
+      CATALOG_IMPORT_HTTP_TIMEOUT: ${CATALOG_IMPORT_HTTP_TIMEOUT:-60}
+      CATALOG_IMPORT_QUEUE: ${CATALOG_IMPORT_QUEUE:-imports}
+      CATALOG_IMPORT_UPDATE_EXISTING: ${CATALOG_IMPORT_UPDATE_EXISTING:-false}
+      RUN_STORAGE_LINK: ${RUN_STORAGE_LINK:-true}
     networks:
       - uniqset2_network
     depends_on:
@@ -36,7 +76,23 @@ services:
     volumes:
       - storage_public_data:/var/www/html/storage/app/public
     environment:
-      REDIS_HOST: uniqset2-redis
+      APP_NAME: ${APP_NAME:-Laravel}
+      APP_ENV: ${APP_ENV:-production}
+      APP_KEY: ${APP_KEY:-}
+      APP_DEBUG: ${APP_DEBUG:-false}
+      APP_URL: ${APP_URL:-http://localhost}
+      DB_CONNECTION: ${DB_CONNECTION:-mysql}
+      DB_HOST: ${DB_HOST:-uniqset2-db}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_DATABASE: ${DB_DATABASE:-uniqset2}
+      DB_USERNAME: ${DB_USERNAME:-uniqset2}
+      DB_PASSWORD: ${DB_PASSWORD:-root}
+      QUEUE_CONNECTION: ${QUEUE_CONNECTION:-redis}
+      CACHE_STORE: ${CACHE_STORE:-redis}
+      REDIS_CLIENT: ${REDIS_CLIENT:-phpredis}
+      REDIS_HOST: ${REDIS_HOST:-uniqset2-redis}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-null}
+      REDIS_PORT: ${REDIS_PORT:-6379}
     networks:
       - uniqset2_network
     depends_on:
@@ -57,7 +113,10 @@ services:
       - db_data:/var/lib/mysql
       - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf:ro
     networks:
-      - uniqset2_network
+      uniqset2_network:
+        aliases:
+          - uniqset2-db
+          - mysql
 
   redis:
     image: redis:7-alpine
@@ -69,6 +128,7 @@ services:
     networks:
       uniqset2_network:
         aliases:
+          - redis
           - uniqset2-redis
 
 volumes:
