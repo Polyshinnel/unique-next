@@ -31,11 +31,14 @@ final class CatalogPageControllerTest extends TestCase
 
     private ProductStatus $saleStatus;
 
+    private ProductStatus $reserveStatus;
+
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->saleStatus = ProductStatus::query()->create(['name' => 'В продаже']);
+        $this->reserveStatus = ProductStatus::query()->create(['name' => 'Резерв']);
     }
 
     public function test_catalog_page_returns_products_filters_and_pagination(): void
@@ -247,17 +250,81 @@ final class CatalogPageControllerTest extends TestCase
             ->assertJsonPath('canonicalHref', '/catalog/tokarnye-stanki/'.$product->id);
     }
 
-    public function test_product_detail_returns_404_for_unpublished_or_not_for_sale_products(): void
+    public function test_product_detail_returns_404_for_unpublished_or_deleted_products(): void
     {
         $hidden = $this->product(['published_at' => null]);
-        $soldStatus = ProductStatus::query()->create(['name' => 'Продан']);
-        $sold = $this->product(['product_status_id' => $soldStatus->id]);
         $deleted = $this->product();
         $deleted->delete();
 
         $this->getJson('/api/catalog/products/'.$hidden->id)->assertNotFound();
-        $this->getJson('/api/catalog/products/'.$sold->id)->assertNotFound();
         $this->getJson('/api/catalog/products/'.$deleted->id)->assertNotFound();
+    }
+
+    public function test_product_detail_returns_sold_product_with_sold_labels_and_reduced_blocks(): void
+    {
+        $category = Category::query()->create(['name' => 'Токарные станки', 'slug' => 'tokarnye-stanki']);
+        $availability = EquipmentAvailability::query()->create(['name' => 'В наличии']);
+        $soldStatus = ProductStatus::query()->create(['name' => 'Продано']);
+        $checkStatus = CheckStatus::query()->create(['name' => 'Проверен']);
+        $dismantleStatus = DismantleStatus::query()->create(['name' => 'Демонтирован']);
+        $shipmentStatus = ShipmentStatus::query()->create(['name' => 'Готов к погрузке']);
+        $product = $this->product([
+            'title' => 'Проданный станок',
+            'category_id' => $category->id,
+            'equipment_availability_id' => $availability->id,
+            'product_status_id' => $soldStatus->id,
+            'price' => 123456,
+            'show_price' => true,
+        ]);
+
+        ProductMainCharacteristic::query()->create([
+            'product_id' => $product->id,
+            'content' => '<p>Основные характеристики</p>',
+        ]);
+        ProductMainInfo::query()->create([
+            'product_id' => $product->id,
+            'content' => '<p>Основная информация</p>',
+        ]);
+        ProductComplectation::query()->create([
+            'product_id' => $product->id,
+            'content' => '<p>Комплектация</p>',
+        ]);
+        ProductTechnicalCharacteristic::query()->create([
+            'product_id' => $product->id,
+            'content' => '<p>Технические характеристики</p>',
+        ]);
+        ProductAdditionalInfo::query()->create([
+            'product_id' => $product->id,
+            'content' => '<p>Дополнительная информация</p>',
+        ]);
+        ProductCheck::query()->create([
+            'product_id' => $product->id,
+            'check_status_id' => $checkStatus->id,
+            'comment' => '<p>Комментарий проверки</p>',
+        ]);
+        ProductDismantling::query()->create([
+            'product_id' => $product->id,
+            'dismantle_status_id' => $dismantleStatus->id,
+            'comment' => '<p>Комментарий демонтажа</p>',
+        ]);
+        ProductLoading::query()->create([
+            'product_id' => $product->id,
+            'shipment_status_id' => $shipmentStatus->id,
+            'comment' => '<p>Комментарий погрузки</p>',
+        ]);
+
+        $this->getJson('/api/catalog/products/'.$product->id)
+            ->assertOk()
+            ->assertJsonPath('price.amount', null)
+            ->assertJsonPath('price.isPublished', false)
+            ->assertJsonPath('price.isReserve', false)
+            ->assertJsonPath('price.isSold', true)
+            ->assertJsonPath('price.label', 'Продано')
+            ->assertJsonPath('availability.name', 'В наличии')
+            ->assertJsonPath('characteristicBlocks.0.title', 'Основные характеристики')
+            ->assertJsonPath('characteristicBlocks.1.title', 'Основная информация')
+            ->assertJsonMissingPath('characteristicBlocks.2.title')
+            ->assertJsonCount(2, 'characteristicBlocks');
     }
 
     public function test_product_detail_hides_unpublished_price_amount(): void
@@ -267,7 +334,27 @@ final class CatalogPageControllerTest extends TestCase
         $this->getJson('/api/catalog/products/'.$product->id)
             ->assertOk()
             ->assertJsonPath('price.amount', null)
-            ->assertJsonPath('price.isPublished', false);
+            ->assertJsonPath('price.isPublished', false)
+            ->assertJsonPath('price.isReserve', false)
+            ->assertJsonPath('price.label', 'По запросу');
+    }
+
+    public function test_product_detail_returns_reserved_product_with_reserve_price_label(): void
+    {
+        $product = $this->product([
+            'title' => 'Станок в резерве',
+            'product_status_id' => $this->reserveStatus->id,
+            'price' => 123456,
+            'show_price' => true,
+        ]);
+
+        $this->getJson('/api/catalog/products/'.$product->id)
+            ->assertOk()
+            ->assertJsonPath('price.amount', null)
+            ->assertJsonPath('price.isPublished', false)
+            ->assertJsonPath('price.isReserve', true)
+            ->assertJsonPath('price.label', 'Резерв')
+            ->assertJsonPath('characteristicBlocks.0.contentHtml', '<p class="product-sale-price"><strong>Цена:</strong> Резерв</p>');
     }
 
     public function test_catalog_page_uses_fixed_pagination_page_from_query(): void
@@ -294,6 +381,7 @@ final class CatalogPageControllerTest extends TestCase
     {
         $oldest = $this->product(['title' => 'Старый публичный']);
         $newest = $this->product(['title' => 'Новый публичный']);
+        $reserved = $this->product(['title' => 'Зарезервированный', 'product_status_id' => $this->reserveStatus->id]);
         $unpublished = $this->product(['title' => 'Черновик', 'published_at' => null]);
         $hiddenStatus = ProductStatus::query()->create(['name' => 'Снят с продажи']);
         $hidden = $this->product(['title' => 'Скрытый статус', 'product_status_id' => $hiddenStatus->id]);
@@ -301,9 +389,12 @@ final class CatalogPageControllerTest extends TestCase
         $response = $this->getJson('/api/catalog/page')
             ->assertOk()
             ->assertJsonPath('sorting.active', 'default')
-            ->assertJsonPath('products.0.id', $newest->id)
-            ->assertJsonPath('products.1.id', $oldest->id)
-            ->assertJsonPath('pagination.total', 2);
+            ->assertJsonPath('products.0.id', $reserved->id)
+            ->assertJsonPath('products.0.price.isReserve', true)
+            ->assertJsonPath('products.0.price.label', 'Резерв')
+            ->assertJsonPath('products.1.id', $newest->id)
+            ->assertJsonPath('products.2.id', $oldest->id)
+            ->assertJsonPath('pagination.total', 3);
 
         self::assertNotContains($unpublished->id, $this->productIds($response->json('products')));
         self::assertNotContains($hidden->id, $this->productIds($response->json('products')));
@@ -311,6 +402,7 @@ final class CatalogPageControllerTest extends TestCase
 
     public function test_catalog_page_sorts_by_price_desc_with_unpriced_products_last(): void
     {
+        $reserved = $this->product(['title' => 'Резерв', 'price' => 500000, 'show_price' => true, 'product_status_id' => $this->reserveStatus->id]);
         $hiddenHighPrice = $this->product(['title' => 'Скрытая цена', 'price' => 999999, 'show_price' => false]);
         $withoutPrice = $this->product(['title' => 'Без цены', 'price' => null, 'show_price' => true]);
         $cheap = $this->product(['title' => 'Дешевый', 'price' => 100, 'show_price' => true]);
@@ -322,11 +414,13 @@ final class CatalogPageControllerTest extends TestCase
             ->assertJsonPath('products.0.id', $expensive->id)
             ->assertJsonPath('products.1.id', $cheap->id)
             ->assertJsonPath('products.2.id', $hiddenHighPrice->id)
-            ->assertJsonPath('products.3.id', $withoutPrice->id);
+            ->assertJsonPath('products.3.id', $reserved->id)
+            ->assertJsonPath('products.4.id', $withoutPrice->id);
     }
 
     public function test_catalog_page_sorts_by_price_asc_with_unpriced_products_last(): void
     {
+        $reserved = $this->product(['title' => 'Резерв', 'price' => 500000, 'show_price' => true, 'product_status_id' => $this->reserveStatus->id]);
         $hiddenHighPrice = $this->product(['title' => 'Скрытая цена', 'price' => 999999, 'show_price' => false]);
         $withoutPrice = $this->product(['title' => 'Без цены', 'price' => null, 'show_price' => true]);
         $cheap = $this->product(['title' => 'Дешевый', 'price' => 100, 'show_price' => true]);
@@ -340,6 +434,7 @@ final class CatalogPageControllerTest extends TestCase
 
         $ids = $this->productIds($response->json('products'));
 
+        self::assertContains($reserved->id, array_slice($ids, 2));
         self::assertContains($hiddenHighPrice->id, array_slice($ids, 2));
         self::assertContains($withoutPrice->id, array_slice($ids, 2));
     }

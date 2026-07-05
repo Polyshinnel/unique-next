@@ -734,6 +734,12 @@ img {
     font-weight: 700;
 }
 
+.product-tag--small {
+    min-height: 24px;
+    padding: 0 8px;
+    font-size: 11px;
+}
+
 .product-card .mantine-Button-root {
     margin-top: auto;
 }
@@ -1098,21 +1104,39 @@ img {
 }
 
 .feedback-modal {
+    max-width: 620px;
     border-radius: 20px;
     overflow: hidden;
 }
 
 .feedback-modal__header {
-    padding: 22px 24px 0;
+    position: relative;
+    min-height: 0;
+    height: 0;
+    padding: 0;
+    margin: 0;
 }
 
 .feedback-modal__body {
-    padding: 12px 24px 24px;
+    padding: 26px 24px 24px;
+}
+
+.feedback-modal__close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    z-index: 1;
 }
 
 .feedback-form__hint {
     line-height: 1.5;
     text-align: center;
+}
+
+.feedback-form__link {
+    color: var(--mantine-primary-color-filled);
+    text-decoration: underline;
+    text-underline-offset: 2px;
 }
 
 .page-hero {
@@ -1713,6 +1737,7 @@ img {
 
 .instrument-hero::before {
     background:
+        url('/assets/img/instrument-banner.webp') center / cover no-repeat,
         linear-gradient(135deg, rgba(8, 27, 51, 0.76), rgba(19, 62, 113, 0.54)),
         radial-gradient(circle at top right, rgba(240, 163, 47, 0.2), transparent 30%);
     opacity: 1;
@@ -1799,10 +1824,17 @@ img {
     position: absolute;
     inset: 0;
     z-index: -2;
+    background: url('/assets/img/vykup-banner.webp') center / cover no-repeat;
+}
+
+.buyout-hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
     background:
         linear-gradient(135deg, rgba(8, 27, 51, 0.82), rgba(19, 62, 113, 0.62)),
         radial-gradient(circle at top right, rgba(240, 163, 47, 0.24), transparent 28%);
-    opacity: 0.36;
 }
 
 .buyout-hero__layout {
@@ -1905,6 +1937,11 @@ img {
     padding: clamp(24px, 4vw, 36px);
 }
 
+.buyout-regions-title {
+    font-size: clamp(1.8rem, 2vw, 2.3rem);
+    line-height: 1.2;
+}
+
 .buyout-note {
     display: grid;
     gap: 14px;
@@ -1986,6 +2023,7 @@ img {
     inset: 0;
     z-index: -2;
     background:
+        url('/assets/img/import-banner.webp') center / cover no-repeat,
         linear-gradient(135deg, rgba(8, 27, 51, 0.8), rgba(19, 62, 113, 0.58)),
         radial-gradient(circle at top left, rgba(240, 163, 47, 0.18), transparent 30%);
     opacity: 1;
@@ -2032,9 +2070,18 @@ img {
         linear-gradient(180deg, #f6f8fb, #eef3f8);
 }
 
-.import-offer-stack {
-    display: grid;
-    gap: clamp(22px, 3vw, 28px);
+.import-offer-layout {
+    align-items: stretch;
+}
+
+.import-offer-card,
+.import-form-card {
+    height: 100%;
+}
+
+.import-offer-card__content {
+    height: 100%;
+    justify-content: space-between;
 }
 
 .import-quote-card {
@@ -2043,12 +2090,8 @@ img {
 }
 
 .import-quote-card p {
-    text-align: left;
-    font-size: clamp(20px, 2.2vw, 28px);
-}
-
-.import-form-card {
-    position: static;
+    text-align: center;
+    font-size: clamp(17px, 1.6vw, 22px);
 }
 
 .import-gallery-caption {
@@ -2706,15 +2749,16 @@ img {
 }
 
 .product-show-contact-button {
-    color: #0f5132;
-    border-color: rgba(25, 135, 84, 0.28);
-    background: rgba(25, 135, 84, 0.12);
+    color: #ffffff;
+    font-weight: 800;
+    border-color: var(--mantine-color-teal-filled);
+    background: var(--mantine-color-teal-filled);
 }
 
 .product-show-contact-button:hover {
     color: #ffffff;
-    border-color: #198754;
-    background: #198754;
+    border-color: var(--mantine-color-teal-filled-hover);
+    background: var(--mantine-color-teal-filled-hover);
 }
 
 .product-show-empty {
@@ -2791,14 +2835,13 @@ img {
 
 @media (min-width: 62.001em) {
     .product-show-contact-button {
-        color: #ffffff;
-        border-color: #198754;
-        background: #198754;
+        border-color: var(--mantine-color-teal-filled);
+        background: var(--mantine-color-teal-filled);
     }
 
     .product-show-contact-button:hover {
-        border-color: #157347;
-        background: #157347;
+        border-color: var(--mantine-color-teal-filled-hover);
+        background: var(--mantine-color-teal-filled-hover);
     }
 }
 
@@ -2961,11 +3004,16 @@ img {
     }
 
     .feedback-modal__header {
-        padding: 18px 18px 0;
+        padding: 0;
     }
 
     .feedback-modal__body {
-        padding: 10px 18px 18px;
+        padding: 24px 18px 18px;
+    }
+
+    .feedback-modal__close {
+        top: 10px;
+        right: 10px;
     }
 
     .product-show-detail {

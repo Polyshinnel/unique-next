@@ -7,6 +7,8 @@ use App\Domain\Catalog\Models\EquipmentAvailability;
 use App\Domain\Catalog\Models\EquipmentState;
 use App\Domain\Catalog\Models\Product;
 use App\Domain\Catalog\Models\ProductImage;
+use App\Domain\Catalog\Models\ProductMainCharacteristic;
+use App\Domain\Catalog\Models\ProductMainInfo;
 use App\Domain\Catalog\Models\ProductStatus;
 use App\Domain\Catalog\Models\ProductTechnicalCharacteristic;
 use App\Domain\Catalog\Models\Region;
@@ -110,9 +112,35 @@ final class CatalogResourcesTest extends TestCase
             'breadcrumbs' => [],
         ], $resource['category']);
         self::assertSame(['id' => $region->id, 'name' => 'Самарская область'], $resource['region']);
-        self::assertSame(['amount' => null, 'isPublished' => false, 'comment' => null], $resource['price']);
+        self::assertSame(['amount' => null, 'isPublished' => false, 'isReserve' => false, 'isSold' => false, 'label' => 'По запросу', 'comment' => null], $resource['price']);
         self::assertSame(['id' => $availability->id, 'name' => 'В наличии', 'color' => '#42a'], $resource['availability']);
         self::assertSame(['id' => $state->id, 'name' => 'Б.У'], $resource['state']);
+    }
+
+    public function test_product_card_resource_marks_reserved_product_price(): void
+    {
+        $category = Category::query()->create(['name' => 'Токарные станки', 'slug' => 'tokarnye-stanki']);
+        $status = ProductStatus::query()->create(['name' => 'Резерв']);
+        $product = Product::query()->create([
+            'name' => 'Станок',
+            'title' => 'Токарный станок 16К20',
+            'category_id' => $category->id,
+            'product_status_id' => $status->id,
+            'price' => 95000,
+            'show_price' => true,
+            'published_at' => now(),
+        ]);
+
+        $product->setRelation('category', $category);
+        $product->setRelation('mainImage', null);
+        $product->setRelation('equipmentAvailability', null);
+        $product->setRelation('equipmentState', null);
+        $product->setRelation('regions', collect());
+        $product->setRelation('productStatus', $status);
+
+        $resource = (new CatalogProductCardResource($product))->resolve();
+
+        self::assertSame(['amount' => null, 'isPublished' => false, 'isReserve' => true, 'isSold' => false, 'label' => 'Резерв', 'comment' => null], $resource['price']);
     }
 
     public function test_product_card_resource_uses_og_image_when_main_image_is_missing(): void
@@ -195,6 +223,85 @@ final class CatalogResourcesTest extends TestCase
         $resource = (new CatalogProductDetailResource($product))->resolve();
 
         self::assertSame('<p>Габариты ДхШхВ<strong>:</strong> 2812х1348х1424</p>', $resource['characteristicBlocks'][0]['contentHtml']);
+    }
+
+    public function test_product_detail_resource_shows_reserve_in_sale_conditions(): void
+    {
+        $category = Category::query()->create(['name' => 'Токарные станки', 'slug' => 'tokarnye-stanki']);
+        $status = ProductStatus::query()->create(['name' => 'Резерв']);
+        $product = Product::query()->create([
+            'name' => 'Станок',
+            'title' => 'Токарный станок',
+            'category_id' => $category->id,
+            'product_status_id' => $status->id,
+            'price' => 150000,
+            'show_price' => true,
+            'published_at' => now(),
+        ]);
+        $product->setRelation('category', $category);
+        $product->setRelation('images', collect());
+        $product->setRelation('mainImage', null);
+        $product->setRelation('equipmentAvailability', null);
+        $product->setRelation('equipmentState', null);
+        $product->setRelation('regions', collect());
+        $product->setRelation('manager', null);
+        $product->setRelation('tags', collect());
+        $product->setRelation('mainCharacteristics', null);
+        $product->setRelation('complectation', null);
+        $product->setRelation('technicalCharacteristics', null);
+        $product->setRelation('mainInfo', null);
+        $product->setRelation('additionalInfo', null);
+        $product->setRelation('productStatus', $status);
+
+        $resource = (new CatalogProductDetailResource($product))->resolve();
+
+        self::assertSame('<p class="product-sale-price"><strong>Цена:</strong> Резерв</p>', $resource['characteristicBlocks'][0]['contentHtml']);
+    }
+
+    public function test_product_detail_resource_shows_sold_and_hides_sale_only_blocks(): void
+    {
+        $category = Category::query()->create(['name' => 'Токарные станки', 'slug' => 'tokarnye-stanki']);
+        $status = ProductStatus::query()->create(['name' => 'Продано']);
+        $product = Product::query()->create([
+            'name' => 'Станок',
+            'title' => 'Проданный токарный станок',
+            'category_id' => $category->id,
+            'product_status_id' => $status->id,
+            'price' => 150000,
+            'show_price' => true,
+            'published_at' => now(),
+        ]);
+        $product->setRelation('category', $category);
+        $product->setRelation('images', collect());
+        $product->setRelation('mainImage', null);
+        $product->setRelation('equipmentAvailability', new EquipmentAvailability([
+            'name' => 'В наличии',
+        ]));
+        $product->setRelation('equipmentState', null);
+        $product->setRelation('regions', collect());
+        $product->setRelation('manager', null);
+        $product->setRelation('tags', collect());
+        $product->setRelation('mainCharacteristics', new ProductMainCharacteristic([
+            'content' => '<p>Основные характеристики</p>',
+        ]));
+        $product->setRelation('complectation', new ProductTechnicalCharacteristic([
+            'content' => '<p>Комплектация</p>',
+        ]));
+        $product->setRelation('technicalCharacteristics', new ProductTechnicalCharacteristic([
+            'content' => '<p>Технические характеристики</p>',
+        ]));
+        $product->setRelation('mainInfo', new ProductMainInfo([
+            'content' => '<p>Основная информация</p>',
+        ]));
+        $product->setRelation('additionalInfo', new ProductTechnicalCharacteristic([
+            'content' => '<p>Дополнительная информация</p>',
+        ]));
+        $product->setRelation('productStatus', $status);
+
+        $resource = (new CatalogProductDetailResource($product))->resolve();
+
+        self::assertSame(['amount' => null, 'isPublished' => false, 'isReserve' => false, 'isSold' => true, 'label' => 'Продано', 'comment' => null], $resource['price']);
+        self::assertSame(['Основные характеристики', 'Основная информация'], array_column($resource['characteristicBlocks'], 'title'));
     }
 
     public function test_product_detail_resource_scrubs_invalid_utf8_characteristic_html(): void

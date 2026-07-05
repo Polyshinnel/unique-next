@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 import { canonicalUrl, getPageSeo, toMetadata } from '@/lib/seo';
 import { Footer } from '@/components/layout/Footer';
@@ -45,10 +46,12 @@ export default function OccupationalSafetyPage() {
                 <section className="content-section">
                     <Container size="xl">
                         <div className="occupational-safety-card">
-                            <img
+                            <Image
                                 src="/assets/img/ohrana-truda.webp"
                                 alt="Сводная ведомость результатов проведения специальной оценки условий труда"
                                 className="occupational-safety-card__image"
+                                width={1600}
+                                height={900}
                             />
                         </div>
 

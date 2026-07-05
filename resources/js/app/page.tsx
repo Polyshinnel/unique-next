@@ -2,24 +2,14 @@ import type { Metadata } from 'next';
 import { getHomeBanners } from '@/lib/banners';
 import { canonicalUrl, getPageSeo, toMetadata } from '@/lib/seo';
 import { getCatalogPage, type CatalogProductCard } from '@/lib/catalog-api';
+import { ProductCollectionSection } from '@/components/catalog/ProductCollectionSection';
 import { demoServices } from '@/lib/site-content';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
-import { ProductCard } from '@/components/catalog/ProductCard';
 import { FeedbackRequestModal } from '@/components/common/FeedbackRequestModal';
 import { ServiceCard } from '@/components/services/ServiceCard';
 import { HeroSlider } from '@/components/home/HeroSlider';
-import {
-    Button,
-    Container,
-    Group,
-    Image,
-    SimpleGrid,
-    Stack,
-    Text,
-    Title,
-} from '@mantine/core';
-import { IconArrowRight } from '@tabler/icons-react';
+import { Container, Group, Image, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 
 export async function generateMetadata(): Promise<Metadata> {
     const seo = await getPageSeo('home');
@@ -85,29 +75,15 @@ function CompanySection() {
 }
 
 function LatestProducts({ products }: { products: CatalogProductCard[] }) {
-    if (products.length === 0) {
-        return null;
-    }
-
     return (
-        <section className="content-section content-section--tight-top latest-products-section">
-            <Container size="xl">
-                <Group justify="space-between" align="end" mb="xl" gap="lg">
-                    <Stack gap={6}>
-                        <Title order={2}>Последние поступления</Title>
-                        <Text c="dimmed">Свежие новинки из нашего каталога.</Text>
-                    </Stack>
-                    <Button component="a" href="/catalog" variant="filled" className="latest-products-section__button" rightSection={<IconArrowRight size={18} />}>
-                        Перейти в каталог
-                    </Button>
-                </Group>
-                <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="lg">
-                    {products.slice(0, 8).map((product) => (
-                        <ProductCard key={product.id} product={product} />
-                    ))}
-                </SimpleGrid>
-            </Container>
-        </section>
+        <ProductCollectionSection
+            title="Последние поступления"
+            description="Свежие новинки из нашего каталога."
+            products={products}
+            href="/catalog"
+            buttonLabel="Перейти в каталог"
+            limit={8}
+        />
     );
 }
 
@@ -209,8 +185,8 @@ export default async function HomePage() {
                                 <Text>Оставьте запрос, и менеджер подберет подходящее оборудование.</Text>
                             </Stack>
                             <FeedbackRequestModal
-                                modalTitle="Оставьте заявку на подбор"
-                                description="Укажите ваши контакты и опишите запрос. Мы подберем подходящую позицию и свяжемся с вами."
+                                modalTitle="Свяжитесь со мной"
+                                description="Оставьте ваши контактные данные и опишите вопрос и мы свяжемся с вами в ближайшее время."
                             />
                         </Group>
                     </Container>

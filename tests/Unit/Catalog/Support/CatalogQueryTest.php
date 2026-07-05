@@ -21,6 +21,8 @@ final class CatalogQueryTest extends TestCase
 
     private ProductStatus $hiddenStatus;
 
+    private ProductStatus $reserveStatus;
+
     private Category $rootCategory;
 
     private Category $childCategory;
@@ -42,6 +44,7 @@ final class CatalogQueryTest extends TestCase
         parent::setUp();
 
         $this->saleStatus = ProductStatus::query()->create(['name' => 'В продаже']);
+        $this->reserveStatus = ProductStatus::query()->create(['name' => 'Резерв']);
         $this->hiddenStatus = ProductStatus::query()->create(['name' => 'Снят с продажи']);
         $this->rootCategory = Category::query()->create(['name' => 'Токарные станки', 'slug' => 'tokarnye-stanki']);
         $this->childCategory = Category::query()->create([
@@ -61,6 +64,7 @@ final class CatalogQueryTest extends TestCase
     {
         $first = $this->product(['title' => 'Первый']);
         $second = $this->product(['title' => 'Второй']);
+        $reserve = $this->product(['title' => 'В резерве', 'product_status_id' => $this->reserveStatus->id]);
         $this->product(['title' => 'Черновик', 'published_at' => null]);
         $this->product(['title' => 'Скрытый статус', 'product_status_id' => $this->hiddenStatus->id]);
         $this->product(['title' => 'Удаленный'])->delete();
@@ -76,7 +80,7 @@ final class CatalogQueryTest extends TestCase
             'regions',
         ], array_keys($query->getEagerLoads()));
 
-        self::assertSame([$second->id, $first->id], $query->pluck('id')->all());
+        self::assertSame([$reserve->id, $second->id, $first->id], $query->pluck('id')->all());
     }
 
     public function test_it_applies_category_region_availability_and_state_filters(): void
@@ -132,6 +136,7 @@ final class CatalogQueryTest extends TestCase
 
     public function test_price_sort_keeps_unpublished_prices_last(): void
     {
+        $reserve = $this->product(['price' => 500000, 'show_price' => true, 'product_status_id' => $this->reserveStatus->id]);
         $hiddenHighPrice = $this->product(['price' => 999999, 'show_price' => false]);
         $withoutPrice = $this->product(['price' => null, 'show_price' => true]);
         $cheap = $this->product(['price' => 100, 'show_price' => true]);
@@ -140,11 +145,11 @@ final class CatalogQueryTest extends TestCase
         $catalog = new CatalogQuery;
 
         self::assertSame(
-            [$expensive->id, $cheap->id, $hiddenHighPrice->id, $withoutPrice->id],
+            [$expensive->id, $cheap->id, $hiddenHighPrice->id, $reserve->id, $withoutPrice->id],
             $catalog->listQuery(filters: ['sort' => CatalogQuery::SORT_PRICE_DESC])->pluck('id')->all(),
         );
         self::assertSame(
-            [$cheap->id, $expensive->id, $withoutPrice->id, $hiddenHighPrice->id],
+            [$cheap->id, $expensive->id, $withoutPrice->id, $reserve->id, $hiddenHighPrice->id],
             $catalog->listQuery(filters: ['sort' => CatalogQuery::SORT_PRICE_ASC])->pluck('id')->all(),
         );
     }

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { SocialProofSection } from '@/components/common/SocialProofSection';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
 import { YandexMap } from '@/components/contacts/YandexMap';
@@ -199,6 +200,8 @@ export function ContactsPageView({ contacts }: ContactsPageViewProps) {
                         </Stack>
                     </Container>
                 </section>
+
+                <SocialProofSection />
             </main>
             <Footer />
         </>

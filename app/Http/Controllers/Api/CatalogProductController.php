@@ -12,7 +12,7 @@ final class CatalogProductController extends Controller
     public function show(string $product, CatalogQuery $catalog): JsonResponse
     {
         $product = $catalog
-            ->baseQuery()
+            ->detailQuery()
             ->with([
                 'category.parent',
                 'images',

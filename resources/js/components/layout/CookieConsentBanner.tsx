@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useSyncExternalStore } from 'react';
 
 import { Anchor, Button, Text } from '@mantine/core';
 
@@ -21,16 +21,18 @@ function persistCookieConsent() {
     document.cookie = `${COOKIE_NAME}=1; max-age=${COOKIE_MAX_AGE_SECONDS}; path=/; samesite=lax`;
 }
 
-export function CookieConsentBanner() {
-    const [isVisible, setIsVisible] = useState(false);
+function subscribeToCookieConsent() {
+    return () => {};
+}
 
-    useEffect(() => {
-        setIsVisible(!hasCookieConsent());
-    }, []);
+export function CookieConsentBanner() {
+    const [isAccepted, setIsAccepted] = useState(false);
+    const needsConsent = useSyncExternalStore(subscribeToCookieConsent, () => !hasCookieConsent(), () => false);
+    const isVisible = needsConsent && !isAccepted;
 
     const handleAccept = () => {
         persistCookieConsent();
-        setIsVisible(false);
+        setIsAccepted(true);
     };
 
     if (!isVisible) {

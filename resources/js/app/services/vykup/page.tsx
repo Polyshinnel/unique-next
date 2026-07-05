@@ -1,21 +1,13 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { EquipmentBuyoutRequestForm } from '@/components/services/EquipmentBuyoutRequestForm';
+import { EquipmentBuyoutRequestModalButton } from '@/components/services/EquipmentBuyoutRequestModalButton';
 import { canonicalUrl, getPageSeo, toMetadata } from '@/lib/seo';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
 import { phoneHref } from '@/lib/site-content';
 import { getSiteContacts, type SiteContacts } from '@/lib/site-contacts';
-import {
-    Button,
-    Container,
-    Group,
-    SimpleGrid,
-    Stack,
-    Text,
-    TextInput,
-    Textarea,
-    Title,
-} from '@mantine/core';
+import { Button, Container, Group, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 import {
     IconCalculator,
     IconChecklist,
@@ -133,9 +125,7 @@ function HeroSection({ contacts }: { contacts: SiteContacts }) {
                         >
                             Позвонить
                         </Button>
-                        <Button component="a" href="#buyout-form" size="lg" variant="white" color="dark">
-                            Оставить заявку
-                        </Button>
+                        <EquipmentBuyoutRequestModalButton size="lg" variant="white" color="dark" />
                     </Group>
                 </Stack>
             </Container>
@@ -178,7 +168,7 @@ function RegionsSection({ contacts }: { contacts: SiteContacts }) {
                 <div className="buyout-regions-layout">
                     <div className="buyout-regions-card">
                         <Stack gap="xl">
-                            <Title order={2}>
+                            <Title order={2} className="buyout-regions-title">
                                 Мы проработаем вопрос реализации ЛЮБОГО промышленного оборудования, находящегося в
                                 следующих регионах:
                             </Title>
@@ -209,32 +199,7 @@ function RegionsSection({ contacts }: { contacts: SiteContacts }) {
                     </div>
 
                     <aside id="buyout-form" className="buyout-form-card">
-                        <Stack gap="md">
-                            <Text className="contact-card__eyebrow">Заявка на оценку</Text>
-                            <Title order={3}>Оставьте данные по оборудованию</Title>
-                            <Text c="dimmed">
-                                Перезвоним, уточним детали и предложим удобный формат: выкуп или реализация по
-                                агентской схеме.
-                            </Text>
-                        </Stack>
-
-                        <Stack gap="sm" mt="xl">
-                            <TextInput label="Ваше имя" placeholder="Как к вам обращаться" />
-                            <TextInput label="Телефон" placeholder="+7 (___) ___-__-__" />
-                            <TextInput label="Регион" placeholder="Город или область" />
-                            <Textarea
-                                label="Что хотите реализовать"
-                                placeholder="Кратко опишите оборудование, количество, состояние"
-                                minRows={5}
-                            />
-                        </Stack>
-
-                        <Button fullWidth size="lg" mt="xl">
-                            Отправить заявку
-                        </Button>
-                        <Text size="sm" c="dimmed" className="buyout-form-card__hint">
-                            Нажимая кнопку, вы соглашаетесь на обработку персональных данных.
-                        </Text>
+                        <EquipmentBuyoutRequestForm />
                     </aside>
                 </div>
             </Container>
@@ -269,7 +234,7 @@ function PartnersSection() {
     );
 }
 
-function SummarySection({ contacts }: { contacts: SiteContacts }) {
+function SummarySection() {
     return (
         <section className="content-section buyout-summary-section">
             <Container size="xl">
@@ -299,14 +264,11 @@ function SummarySection({ contacts }: { contacts: SiteContacts }) {
                         </Text>
 
                         <Group mt="md">
-                            <Button
-                                component="a"
-                                href={phoneHref(contacts.phone)}
+                            <EquipmentBuyoutRequestModalButton
                                 size="lg"
                                 leftSection={<IconPhone size={18} />}
-                            >
-                                Заказать обратный звонок
-                            </Button>
+                                buttonLabel="Заказать обратный звонок"
+                            />
                         </Group>
                     </Stack>
                 </div>
@@ -326,7 +288,7 @@ export default async function EquipmentBuyoutPage() {
                 <ListSection title="Берем на реализацию следующее оборудование:" items={equipmentList} />
                 <RegionsSection contacts={contacts} />
                 <PartnersSection />
-                <SummarySection contacts={contacts} />
+                <SummarySection />
             </main>
             <Footer />
         </>

@@ -90,16 +90,17 @@ final class CatalogProductDetailResource extends JsonResource
      */
     private function characteristicBlocks(Product $product): array
     {
+        $isSold = $this->isSoldProduct($product);
         $blocks = collect([
             ['title' => 'Основные характеристики', 'content' => $product->mainCharacteristics?->content],
             ['title' => 'Основная информация', 'content' => $product->mainInfo?->content],
-            ['title' => 'Комплектация', 'content' => $product->complectation?->content],
-            ['title' => 'Технические характеристики', 'content' => $product->technicalCharacteristics?->content],
-            ['title' => 'Условия продажи', 'content' => $this->saleConditionsHtml($product)],
-            ['title' => 'Проверка', 'content' => $this->statusBlockHtml($product->check?->status?->name, $product->check?->comment)],
-            ['title' => 'Демонтаж', 'content' => $this->statusBlockHtml($product->dismantling?->status?->name, $product->dismantling?->comment)],
-            ['title' => 'Погрузка', 'content' => $this->statusBlockHtml($product->loading?->status?->name, $product->loading?->comment)],
-            ['title' => 'Дополнительная информация', 'content' => $product->additionalInfo?->content],
+            ['title' => 'Комплектация', 'content' => $isSold ? null : $product->complectation?->content],
+            ['title' => 'Технические характеристики', 'content' => $isSold ? null : $product->technicalCharacteristics?->content],
+            ['title' => 'Условия продажи', 'content' => $isSold ? null : $this->saleConditionsHtml($product)],
+            ['title' => 'Проверка', 'content' => $isSold ? null : $this->statusBlockHtml($product->check?->status?->name, $product->check?->comment)],
+            ['title' => 'Демонтаж', 'content' => $isSold ? null : $this->statusBlockHtml($product->dismantling?->status?->name, $product->dismantling?->comment)],
+            ['title' => 'Погрузка', 'content' => $isSold ? null : $this->statusBlockHtml($product->loading?->status?->name, $product->loading?->comment)],
+            ['title' => 'Дополнительная информация', 'content' => $isSold ? null : $product->additionalInfo?->content],
         ]);
 
         return $blocks
@@ -114,9 +115,7 @@ final class CatalogProductDetailResource extends JsonResource
 
     private function saleConditionsHtml(Product $product): string
     {
-        $price = (bool) $product->show_price && $product->price !== null
-            ? number_format((float) $product->price, 0, '.', ' ').' ₽'
-            : 'По запросу';
+        $price = $this->salePriceLabel($product);
         $comment = $this->utf8($product->price_comment);
 
         return collect([
@@ -167,6 +166,28 @@ final class CatalogProductDetailResource extends JsonResource
         }
 
         return mb_scrub($value, 'UTF-8');
+    }
+
+    private function salePriceLabel(Product $product): string
+    {
+        if ($this->isSoldProduct($product)) {
+            return 'Продано';
+        }
+
+        if ($product->productStatus?->name === 'Резерв') {
+            return 'Резерв';
+        }
+
+        if ((bool) $product->show_price && $product->price !== null) {
+            return number_format((float) $product->price, 0, '.', ' ').' ₽';
+        }
+
+        return 'По запросу';
+    }
+
+    private function isSoldProduct(Product $product): bool
+    {
+        return ! in_array($product->productStatus?->name, ['В продаже', 'Резерв'], true);
     }
 
     private function imageUrl(?ProductImage $image): string

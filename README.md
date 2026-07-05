@@ -101,6 +101,27 @@ curl http://localhost:28080/api/health
 docker compose exec app php artisan tinker --execute="Cache::put('test', 'ok', 60); echo Cache::get('test');"
 ```
 
+## Ручной запуск Next.js в dev режиме
+
+По умолчанию локальный контейнер `app` поднимает Next.js в production-режиме через `supervisor`. Если нужно вручную включить hot reload и обычный `next dev`, остановите процесс `next` в supervisor и запустите dev server отдельно:
+
+```bash
+docker compose up -d
+docker compose exec app supervisorctl stop next
+docker compose exec app npm run dev -- --hostname 0.0.0.0 --port 3000
+```
+
+После этого приложение остается доступным по `http://localhost:28080`, потому что nginx в контейнере продолжает проксировать запросы на порт `3000`.
+
+Если фронтенд нужно поднять с хоста, а не внутри контейнера:
+
+```bash
+npm install
+npm run dev -- --hostname 0.0.0.0 --port 3000
+```
+
+В этом режиме Next.js будет доступен напрямую на `http://localhost:3000`. Его имеет смысл использовать, только если Laravel API и инфраструктура уже подняты отдельно.
+
 ## Импорт товаров и заполнение данных
 
 ### Импорт и обновление товаров

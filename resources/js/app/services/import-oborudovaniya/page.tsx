@@ -4,20 +4,11 @@ import { canonicalUrl, getPageSeo, toMetadata } from '@/lib/seo';
 import { ProductGallery } from '@/components/catalog/ProductGallery';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
+import { EquipmentImportRequestForm } from '@/components/services/EquipmentImportRequestForm';
+import { EquipmentImportRequestModalButton } from '@/components/services/EquipmentImportRequestModalButton';
 import { emailHref, phoneHref } from '@/lib/site-content';
 import { getSiteContacts, type SiteContacts } from '@/lib/site-contacts';
-import {
-    Button,
-    Container,
-    Group,
-    Image,
-    SimpleGrid,
-    Stack,
-    Text,
-    TextInput,
-    Textarea,
-    Title,
-} from '@mantine/core';
+import { Button, Container, Group, Image, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 import {
     IconBuildingWarehouse,
     IconChecklist,
@@ -102,16 +93,13 @@ function HeroSection({ contacts }: { contacts: SiteContacts }) {
                         >
                             Позвонить
                         </Button>
-                        <Button
-                            component="a"
-                            href={`mailto:${contacts.email}?subject=%D0%98%D0%BC%D0%BF%D0%BE%D1%80%D1%82%20%D0%BE%D0%B1%D0%BE%D1%80%D1%83%D0%B4%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F`}
+                        <EquipmentImportRequestModalButton
+                            buttonLabel="Отправить запрос"
                             size="lg"
                             variant="white"
                             color="dark"
                             leftSection={<IconMail size={18} />}
-                        >
-                            Отправить запрос
-                        </Button>
+                        />
                     </Group>
                 </Stack>
             </Container>
@@ -158,9 +146,9 @@ function OfferSection({ contacts }: { contacts: SiteContacts }) {
     return (
         <section className="content-section import-offer-section">
             <Container size="xl">
-                <div className="import-offer-stack">
-                    <div className="buyout-regions-card">
-                        <Stack gap="xl">
+                <div className="buyout-regions-layout import-offer-layout">
+                    <div className="buyout-regions-card import-offer-card">
+                        <Stack gap="xl" className="import-offer-card__content">
                             <Title order={2}>Мы предлагаем</Title>
                             <SimpleGrid cols={{ base: 1, md: 1 }} spacing="md">
                                 {offerItems.map((item) => (
@@ -181,34 +169,11 @@ function OfferSection({ contacts }: { contacts: SiteContacts }) {
                         </Stack>
                     </div>
 
-                    <section id="import-form" className="buyout-form-card import-form-card">
-                        <Stack gap="md">
-                            <Text className="contact-card__eyebrow">Заявка на импорт</Text>
-                            <Title order={3}>Оставьте заявку</Title>
-                            <Text c="dimmed">
-                                Напишите, какое оборудование нужно привезти, и мы свяжемся с вами для уточнения
-                                деталей по поставке.
-                            </Text>
-                        </Stack>
-
-                        <Stack gap="sm" mt="xl">
-                            <TextInput label="Имя" placeholder="Как к вам обращаться" />
-                            <TextInput label="Email" placeholder="example@mail.ru" type="email" />
-                            <TextInput label="Телефон" placeholder="+7 (___) ___-__-__" />
-                            <Textarea
-                                label="Сообщение"
-                                placeholder="Опишите оборудование, страну поставки, сроки или дополнительные пожелания"
-                                minRows={5}
-                            />
-                        </Stack>
-
-                        <Button fullWidth size="lg" mt="xl">
-                            Отправить заявку
-                        </Button>
-                        <Text size="sm" c="dimmed" className="buyout-form-card__hint">
-                            Также можно написать на {contacts.email} или позвонить по номеру {contacts.phone}.
-                        </Text>
-                    </section>
+                    <aside id="import-form" className="buyout-form-card import-form-card">
+                        <EquipmentImportRequestForm
+                            hint={`Также можно написать на ${contacts.email} или позвонить по номеру ${contacts.phone}.`}
+                        />
+                    </aside>
                 </div>
             </Container>
         </section>

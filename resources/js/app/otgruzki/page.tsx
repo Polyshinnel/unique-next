@@ -1,12 +1,12 @@
 import type { Metadata } from 'next';
 import ImageView from 'next/image';
 import Link from 'next/link';
+import { SocialProofSection } from '@/components/common/SocialProofSection';
 import { canonicalUrl, getPageSeo, toMetadata } from '@/lib/seo';
 import { Pagination } from '@/components/common/Pagination';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
 import {
-    Badge,
     Button,
     Container,
     Group,
@@ -23,7 +23,6 @@ import {
     IconChevronRight,
     IconChevronsLeft,
     IconChevronsRight,
-    IconExternalLink,
     IconMessageCircle,
     IconShieldCheck,
     IconTruckDelivery,
@@ -53,29 +52,6 @@ const remoteSupportSteps = [
 const vkHref = 'https://vk.com/uniqset';
 const telegramHref = 'https://telegram.me/uniqset_gen';
 
-const followCards = [
-    {
-        badge: 'ВКонтакте',
-        badgeColor: 'orange',
-        title: 'Наша официальная группа во ВКонтакте',
-        description: 'Публикуем новые поступления, свежие кейсы по отгрузкам и показываем оборудование в работе.',
-        href: 'https://vk.com/uniqset',
-        action: 'Перейти во ВКонтакте',
-        qrSrc: '/assets/img/qr-vk-uniqset.svg',
-        qrAlt: 'QR-код для перехода в группу ЮНИК С во ВКонтакте',
-    },
-    {
-        badge: 'Авито',
-        badgeColor: 'blue',
-        title: 'Профиль компании и отзывы на Авито',
-        description: 'Смотрите актуальные объявления, переходите к отзывам и оценивайте наш профиль перед обращением.',
-        href: 'https://www.avito.ru/brands/i182086396',
-        action: 'Открыть Авито',
-        qrSrc: '/assets/img/qr-avito-uniqset.svg',
-        qrAlt: 'QR-код для перехода в профиль ЮНИК С на Авито',
-    },
-] as const;
-
 function shortText(text: string, maxLength = 150) {
     if (text.length <= maxLength) {
         return text;
@@ -103,6 +79,10 @@ function getRequestedPage(pageParam: string | string[] | undefined) {
 
 function getShipmentsPageHref(page: number) {
     return page === 1 ? '/otgruzki' : `/otgruzki?page=${page}`;
+}
+
+function getShipmentCardTags(tags: string[]) {
+    return tags.slice(0, 3);
 }
 
 function ShipmentsSection({
@@ -142,8 +122,8 @@ function ShipmentsSection({
                                 <Text>{shortText(shipment.summary)}</Text>
 
                                 <Group gap="xs">
-                                    {shipment.tags.map((tag) => (
-                                        <span key={tag} className="product-tag">{tag}</span>
+                                    {getShipmentCardTags(shipment.tags).map((tag) => (
+                                        <span key={tag} className="product-tag product-tag--small">{tag}</span>
                                     ))}
                                 </Group>
 
@@ -181,66 +161,7 @@ function ShipmentsSection({
 }
 
 function FollowSection() {
-    return (
-        <section className="content-section">
-            <Container size="xl">
-                <Stack gap="xl">
-                    <Stack gap={6}>
-                        <Title order={2}>Где можно посмотреть нас ближе</Title>
-                        <Text c="dimmed" maw={760}>
-                            Переходите в наши публичные каналы, чтобы увидеть новые предложения, отзывы и реальные кейсы.
-                        </Text>
-                    </Stack>
-
-                    <div className="otgruzki-follow-summary">
-                        <Badge variant="filled" color="orange" size="lg">97%</Badge>
-                        <Text size="lg">
-                            <strong>97% клиентов довольны нашей работой</strong> и возвращаются к нам за следующими
-                            сделками или рекомендуют нас коллегам.
-                        </Text>
-                    </div>
-
-                    <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="lg">
-                        {followCards.map((card) => (
-                            <article key={card.title} className="otgruzki-follow-card">
-                                <div className="otgruzki-follow-card__content">
-                                    <div className="otgruzki-follow-card__body">
-                                        <Badge variant="light" color={card.badgeColor}>{card.badge}</Badge>
-                                        <Title order={3}>{card.title}</Title>
-                                        <Text c="dimmed">{card.description}</Text>
-                                        <Button
-                                            component="a"
-                                            href={card.href}
-                                            target="_blank"
-                                            rel="noreferrer"
-                                            rightSection={<IconExternalLink size={17} />}
-                                        >
-                                            {card.action}
-                                        </Button>
-                                    </div>
-
-                                    <div className="otgruzki-follow-card__qr">
-                                        <div className="otgruzki-follow-card__qr-frame">
-                                            <ImageView
-                                                src={card.qrSrc}
-                                                alt={card.qrAlt}
-                                                width={220}
-                                                height={220}
-                                                unoptimized
-                                            />
-                                        </div>
-                                        <Text size="sm" c="dimmed" ta="center">
-                                            Сканируйте QR-код, чтобы открыть страницу сразу на телефоне.
-                                        </Text>
-                                    </div>
-                                </div>
-                            </article>
-                        ))}
-                    </SimpleGrid>
-                </Stack>
-            </Container>
-        </section>
-    );
+    return <SocialProofSection className="content-section" />;
 }
 
 function RemoteShipmentSection() {

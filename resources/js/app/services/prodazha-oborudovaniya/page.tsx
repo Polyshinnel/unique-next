@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import ImageView from 'next/image';
+import { SocialProofSection } from '@/components/common/SocialProofSection';
+import { FeedbackRequestModal } from '@/components/common/FeedbackRequestModal';
 import { canonicalUrl, getPageSeo, toMetadata } from '@/lib/seo';
 import { getCatalogPage, type CatalogProductCard } from '@/lib/catalog-api';
 import { Footer } from '@/components/layout/Footer';
@@ -8,7 +9,6 @@ import { Header } from '@/components/layout/Header';
 import { ProductCard } from '@/components/catalog/ProductCard';
 import { SummarySection } from './components/SummarySection';
 import {
-    Badge,
     Button,
     Container,
     Group,
@@ -21,7 +21,6 @@ import {
     IconArrowRight,
     IconBrandTelegram,
     IconExternalLink,
-    IconFileDescription,
     IconMessageCircle,
     IconPhotoScan,
     IconReceiptTax,
@@ -74,29 +73,6 @@ const alreadyDoneList = [
     'Проработали сопутствующие вопросы, касающиеся демонтажа и погрузки',
     'Зачастую, уже выкупили ту или иную единицу оборудования',
 ];
-
-const socialCards = [
-    {
-        badge: 'ВКонтакте',
-        badgeColor: 'orange',
-        title: 'Наша официальная группа во ВКонтакте',
-        description: 'Публикуем новые поступления, свежие кейсы по отгрузкам и показываем оборудование в работе.',
-        href: 'https://vk.com/uniqset',
-        action: 'Перейти во ВКонтакте',
-        qrSrc: '/assets/img/qr-vk-uniqset.svg',
-        qrAlt: 'QR-код для перехода в группу ЮНИК С во ВКонтакте',
-    },
-    {
-        badge: 'Авито',
-        badgeColor: 'blue',
-        title: 'Профиль компании и отзывы на Авито',
-        description: 'Смотрите актуальные объявления, переходите к отзывам и оценивайте наш профиль перед обращением.',
-        href: 'https://www.avito.ru/brands/i182086396',
-        action: 'Открыть Авито',
-        qrSrc: '/assets/img/qr-avito-uniqset.svg',
-        qrAlt: 'QR-код для перехода в профиль ЮНИК С на Авито',
-    },
-] as const;
 
 const remotePurchaseSupport = [
     'Дополнительные фото и видео конкретных узлов по запросу',
@@ -224,66 +200,7 @@ function AdvantagesSection() {
 }
 
 function SocialSection() {
-    return (
-        <section className="content-section content-section--white">
-            <Container size="xl">
-                <Stack gap="xl">
-                    <Stack gap={6}>
-                        <Title order={2}>Где можно посмотреть нас ближе</Title>
-                        <Text c="dimmed" maw={760}>
-                            Переходите в наши публичные каналы, чтобы увидеть новые предложения, отзывы и реальные кейсы.
-                        </Text>
-                    </Stack>
-
-                    <div className="otgruzki-follow-summary">
-                        <Badge variant="filled" color="orange" size="lg">97%</Badge>
-                        <Text size="lg">
-                            <strong>97% клиентов довольны нашей работой</strong> и возвращаются к нам за следующими
-                            сделками или рекомендуют нас коллегам.
-                        </Text>
-                    </div>
-
-                    <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="lg">
-                        {socialCards.map((card) => (
-                            <article key={card.title} className="otgruzki-follow-card">
-                                <div className="otgruzki-follow-card__content">
-                                    <div className="otgruzki-follow-card__body">
-                                        <Badge variant="light" color={card.badgeColor}>{card.badge}</Badge>
-                                        <Title order={3}>{card.title}</Title>
-                                        <Text c="dimmed">{card.description}</Text>
-                                        <Button
-                                            component="a"
-                                            href={card.href}
-                                            target="_blank"
-                                            rel="noreferrer"
-                                            rightSection={<IconExternalLink size={17} />}
-                                        >
-                                            {card.action}
-                                        </Button>
-                                    </div>
-
-                                    <div className="otgruzki-follow-card__qr">
-                                        <div className="otgruzki-follow-card__qr-frame">
-                                            <ImageView
-                                                src={card.qrSrc}
-                                                alt={card.qrAlt}
-                                                width={220}
-                                                height={220}
-                                                unoptimized
-                                            />
-                                        </div>
-                                        <Text size="sm" c="dimmed" ta="center">
-                                            Сканируйте QR-код, чтобы открыть страницу сразу на телефоне.
-                                        </Text>
-                                    </div>
-                                </div>
-                            </article>
-                        ))}
-                    </SimpleGrid>
-                </Stack>
-            </Container>
-        </section>
-    );
+    return <SocialProofSection />;
 }
 
 function RemotePurchaseSection() {
@@ -319,14 +236,14 @@ function RemotePurchaseSection() {
                             </Text>
                         </Stack>
 
-                        <SimpleGrid cols={{ base: 1, md: 3 }} spacing="md">
+                        <Stack gap="md">
                             {deliverySupport.map((item) => (
                                 <div key={item} className="sales-list-item sales-list-item--surface">
                                     <span className="sales-list-item__dot" />
                                     <Text>{item}</Text>
                                 </div>
                             ))}
-                        </SimpleGrid>
+                        </Stack>
 
                         <Stack gap="sm">
                             <Text className="sales-section-kicker">Мы продаем оборудование по всей территории Российской федерации.</Text>
@@ -343,21 +260,21 @@ function RemotePurchaseSection() {
                         <Group gap="md">
                             <Button
                                 component="a"
-                                href="https://www.avito.ru/brands/i182086396"
-                                target="_blank"
-                                rel="noreferrer"
+                                href="/catalog"
+                                size="md"
                                 rightSection={<IconExternalLink size={17} />}
                             >
-                                Авито-магазин
+                                Каталог
                             </Button>
-                            <Button
-                                component="a"
-                                href="/contacts"
-                                variant="outline"
-                                rightSection={<IconFileDescription size={17} />}
-                            >
-                                Связаться с менеджером
-                            </Button>
+                            <FeedbackRequestModal
+                                buttonLabel="Связаться с менеджером"
+                                size="md"
+                                buttonVariant="outline"
+                                buttonRightSection={<IconMessageCircle size={17} />}
+                                buttonLeftSection={null}
+                                modalTitle="Связаться с менеджером"
+                                description="Оставьте ваши контактные данные и коротко опишите вопрос. Менеджер свяжется с вами в ближайшее время."
+                            />
                         </Group>
                     </Stack>
                 </div>

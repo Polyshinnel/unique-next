@@ -8,6 +8,14 @@ use Illuminate\Database\Eloquent\Builder;
 
 final class CatalogQuery
 {
+    /**
+     * @var list<string>
+     */
+    private const PUBLIC_PRODUCT_STATUSES = [
+        'В продаже',
+        'Резерв',
+    ];
+
     public const FILTER_CATEGORY = 'category';
 
     public const FILTER_REGION = 'region';
@@ -45,12 +53,20 @@ final class CatalogQuery
      */
     public function baseQuery(): Builder
     {
-        return Product::query()
-            ->whereNotNull('products.published_at')
+        return $this->detailQuery()
             ->whereHas(
                 'productStatus',
-                fn (Builder $query): Builder => $query->where('name', 'В продаже'),
+                fn (Builder $query): Builder => $query->whereIn('name', self::PUBLIC_PRODUCT_STATUSES),
             );
+    }
+
+    /**
+     * @return Builder<Product>
+     */
+    public function detailQuery(): Builder
+    {
+        return Product::query()
+            ->whereNotNull('products.published_at');
     }
 
     /**
@@ -153,7 +169,10 @@ final class CatalogQuery
     private function applyPriceSort(Builder $query, string $direction): Builder
     {
         return $query
-            ->orderByRaw('case when products.show_price = 1 and products.price is not null then 0 else 1 end asc')
+            ->orderByRaw(
+                'case when products.show_price = 1 and products.price is not null and exists (select 1 from product_statuses where product_statuses.id = products.product_status_id and product_statuses.name <> ?) then 0 else 1 end asc',
+                ['Резерв'],
+            )
             ->orderBy('products.price', $direction)
             ->orderByDesc('products.id');
     }

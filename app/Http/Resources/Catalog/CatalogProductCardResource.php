@@ -105,13 +105,35 @@ final class CatalogProductCardResource extends JsonResource
      */
     private function price(Product $product): array
     {
-        $isPublished = (bool) $product->show_price;
+        $isSold = ! in_array($product->productStatus?->name, ['В продаже', 'Резерв'], true);
+        $isReserve = $product->productStatus?->name === 'Резерв';
+        $isPublished = (bool) $product->show_price && ! $isReserve && ! $isSold;
 
         return [
             'amount' => $isPublished && $product->price !== null ? (string) $product->price : null,
             'isPublished' => $isPublished,
+            'isReserve' => $isReserve,
+            'isSold' => $isSold,
+            'label' => $this->priceLabel($product, $isSold, $isReserve, $isPublished),
             'comment' => $product->price_comment,
         ];
+    }
+
+    private function priceLabel(Product $product, bool $isSold, bool $isReserve, bool $isPublished): string
+    {
+        if ($isSold) {
+            return 'Продано';
+        }
+
+        if ($isReserve) {
+            return 'Резерв';
+        }
+
+        if ($isPublished && $product->price !== null) {
+            return number_format((float) $product->price, 0, '.', ' ').' ₽';
+        }
+
+        return 'По запросу';
     }
 
     /**

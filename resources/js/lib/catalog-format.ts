@@ -1,10 +1,25 @@
 export type CatalogPrice = {
     amount: number | string | null;
     isPublished: boolean;
+    isReserve?: boolean;
+    isSold?: boolean;
+    label?: string | null;
     comment?: string | null;
 };
 
 export function formatCatalogPrice(price: CatalogPrice | null | undefined): string {
+    if (price?.isSold) {
+        return 'Продано';
+    }
+
+    if (price?.label) {
+        return price.label;
+    }
+
+    if (price?.isReserve) {
+        return 'Резерв';
+    }
+
     if (!price?.isPublished || price.amount === null) {
         return 'По запросу';
     }
