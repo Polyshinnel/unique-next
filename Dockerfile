@@ -19,9 +19,20 @@ RUN apk add --no-cache \
     nginx supervisor shadow su-exec bash tzdata acl \
     nodejs npm
 
+# PECL's package index is occasionally unavailable (and has returned an empty
+# release list in production builds).  Build a pinned phpredis release directly
+# from its upstream source instead of depending on that index.
+ARG PHPREDIS_VERSION=6.1.0
 RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
-    && pecl install redis \
+    && curl -fsSL "https://github.com/phpredis/phpredis/archive/refs/tags/${PHPREDIS_VERSION}.tar.gz" -o /tmp/phpredis.tar.gz \
+    && tar -xzf /tmp/phpredis.tar.gz -C /tmp \
+    && cd "/tmp/phpredis-${PHPREDIS_VERSION}" \
+    && phpize \
+    && ./configure \
+    && make -j"$(nproc)" \
+    && make install \
     && docker-php-ext-enable redis \
+    && rm -rf /tmp/phpredis.tar.gz "/tmp/phpredis-${PHPREDIS_VERSION}" \
     && apk del .build-deps
 
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
