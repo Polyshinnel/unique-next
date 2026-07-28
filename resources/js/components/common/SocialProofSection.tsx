@@ -46,10 +46,10 @@ const socialCards = [
         badgeColor: 'dark',
         title: 'Мессенджер MAX',
         description: 'Открывайте MAX по QR-коду, если вам удобнее этот канал связи.',
-        href: 'https://max.ru',
+        href: 'https://max.ru/id4027139409_biz',
         action: 'Открыть MAX',
         qrSrc: '/assets/img/qr-max-uniqset.svg',
-        qrAlt: 'QR-код для перехода на сайт MAX',
+        qrAlt: 'QR-код для перехода в MAX ЮНИК С',
     },
 ] as const;
 

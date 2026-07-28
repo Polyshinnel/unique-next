@@ -11,6 +11,48 @@ export interface PageSeo {
     og_image: string | null;
 }
 
+const defaultOgImage = '/assets/img/og-image-home.png';
+
+function metadataTitleToString(title: Metadata['title']): string | undefined {
+    if (typeof title === 'string') {
+        return title;
+    }
+
+    if (title && typeof title === 'object') {
+        return 'absolute' in title ? title.absolute : title.default;
+    }
+
+    return undefined;
+}
+
+export function withSocialMetadata(metadata: Metadata): Metadata {
+    const title = metadataTitleToString(metadata.title);
+    const description = metadata.description ?? undefined;
+    const canonicalValue = metadata.alternates?.canonical;
+    const canonical = canonicalValue && typeof canonicalValue === 'object' && !(canonicalValue instanceof URL)
+        ? canonicalValue.url
+        : canonicalValue ?? undefined;
+
+    return {
+        ...metadata,
+        openGraph: {
+            type: 'website',
+            locale: 'ru_RU',
+            siteName: 'ЮНИК С',
+            title,
+            description,
+            url: canonical,
+            images: [{ url: defaultOgImage }],
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title,
+            description,
+            images: [defaultOgImage],
+        },
+    };
+}
+
 function normalizeOgImagePath(path: string | null): string | null {
     if (!path) {
         return null;
@@ -48,15 +90,12 @@ export function canonicalUrl(path: string): string {
 
 export function toMetadata(seo: PageSeo | null, fallback: Metadata): Metadata {
     if (!seo) {
-        return fallback;
+        return withSocialMetadata(fallback);
     }
 
-    return {
+    return withSocialMetadata({
         title: seo.title ?? fallback.title,
         description: seo.description ?? fallback.description,
         alternates: fallback.alternates,
-        openGraph: seo.og_image
-            ? { images: [{ url: seo.og_image }] }
-            : fallback.openGraph,
-    };
+    });
 }

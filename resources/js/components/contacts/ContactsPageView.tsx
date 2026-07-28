@@ -103,7 +103,7 @@ export function ContactsPageView({ contacts }: ContactsPageViewProps) {
                                             component="a"
                                             href={href}
                                             className="contact-card__link"
-                                            color="green"
+                                            color="teal"
                                             variant="filled"
                                         >
                                             {action}
@@ -161,7 +161,7 @@ export function ContactsPageView({ contacts }: ContactsPageViewProps) {
                                                 component="a"
                                                 href={phoneHref(contacts.phone)}
                                                 className="contacts-note__button"
-                                                color="green"
+                                                color="teal"
                                                 leftSection={<IconPhone size={18} />}
                                             >
                                                 Свяжитесь со мной

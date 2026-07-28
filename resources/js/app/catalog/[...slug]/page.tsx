@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound, permanentRedirect } from 'next/navigation';
-import { canonicalUrl } from '@/lib/seo';
+import { canonicalUrl, withSocialMetadata } from '@/lib/seo';
 import { CatalogPageView } from '@/components/catalog/CatalogPageView';
 import { ProductCollectionSection } from '@/components/catalog/ProductCollectionSection';
 import { FeedbackRequestModal } from '@/components/common/FeedbackRequestModal';
@@ -131,7 +131,7 @@ async function getCatalogProductOrNull(id: string): Promise<CatalogProductDetail
 async function getRelatedProducts(product: CatalogProductDetail): Promise<CatalogProductCard[]> {
     const firstTag = product.tags[0]?.trim();
 
-    if (!firstTag || product.price.isSold !== true) {
+    if (!firstTag) {
         return [];
     }
 
@@ -167,43 +167,46 @@ export async function generateMetadata({ params }: CatalogSlugPageProps): Promis
         if (isProductRoute(slug)) {
             const product = await getCatalogProduct(routeKey);
 
-            return {
+            return withSocialMetadata({
                 title: `${product.title} | ЮНИК С`,
                 description: htmlToPlainText(product.summary ?? product.description) ?? categoryDescriptionFallback,
                 alternates: {
                     canonical: canonicalUrl(product.canonicalHref),
                 },
-            };
+            });
         }
 
         const data = await getCatalogPage({ category_path: slug.join('/') });
         const category = data.category;
 
-        return {
+        return withSocialMetadata({
             title: category?.title || category?.name || 'Каталог оборудования',
             description: category?.description || categoryDescriptionFallback,
             alternates: {
                 canonical: canonicalUrl(category?.href ?? getRoutePathname(slug)),
             },
-        };
+        });
     } catch (error) {
         if (isApiNotFoundError(error)) {
             const product = routeKey === '' ? null : await getCatalogProductOrNull(routeKey);
 
             if (product !== null) {
-                return {
+                return withSocialMetadata({
                     title: `${product.title} | ЮНИК С`,
                     description: htmlToPlainText(product.summary ?? product.description) ?? categoryDescriptionFallback,
                     alternates: {
                         canonical: canonicalUrl(product.canonicalHref),
                     },
-                };
+                });
             }
 
-            return {
+            return withSocialMetadata({
                 title: 'Страница не найдена | ЮНИК С',
                 description: 'Запрошенная страница каталога не найдена.',
-            };
+                alternates: {
+                    canonical: canonicalUrl(getRoutePathname(slug)),
+                },
+            });
         }
 
         throw error;
@@ -306,6 +309,19 @@ function ProductShowPage({
                                             ))}
                                         </Group>
                                     </section>
+                                ) : null}
+
+                                {!isSold && relatedProducts.length > 0 ? (
+                                    <ProductCollectionSection
+                                        title="Может быть вас заинтересует"
+                                        description={`Подобрали похожие товары по тегу "${product.tags[0]}".`}
+                                        products={relatedProducts}
+                                        href={`/catalog?search=${encodeURIComponent(product.tags[0] ?? '')}`}
+                                        buttonLabel="Смотреть все"
+                                        limit={6}
+                                        withContainer={false}
+                                        columns={{ base: 1, sm: 2, lg: 3 }}
+                                    />
                                 ) : null}
                             </div>
 

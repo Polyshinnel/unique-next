@@ -3,10 +3,11 @@ import type { ReactNode } from 'react';
 
 import { CookieConsentBanner } from '@/components/layout/CookieConsentBanner';
 import { siteConfig } from '@/lib/site-config';
+import { withSocialMetadata } from '@/lib/seo';
 import { Providers } from './providers';
 import './globals.css';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocialMetadata({
     metadataBase: new URL(siteConfig.appUrl),
     title: 'ЮНИК С - каталог промышленного оборудования',
     description: 'Продажа, подбор и сопровождение сделок с промышленным оборудованием.',
@@ -15,7 +16,7 @@ export const metadata: Metadata = {
         shortcut: '/favicon.png',
         apple: '/favicon.png',
     },
-};
+});
 
 type RootLayoutProps = {
     children: ReactNode;

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ShipmentDetailPageView } from '@/components/shipments/ShipmentDetailPageView';
-import { canonicalUrl } from '@/lib/seo';
+import { canonicalUrl, withSocialMetadata } from '@/lib/seo';
 import { getShipment, getShipmentHref } from '@/lib/shipments';
 
 type ShipmentPageProps = {
@@ -15,19 +15,22 @@ export async function generateMetadata({ params }: ShipmentPageProps): Promise<M
     const shipment = await getShipment(id).catch(() => null);
 
     if (!shipment) {
-        return {
+        return withSocialMetadata({
             title: 'Отгрузка не найдена | ЮНИК С',
             description: 'Запрошенная страница отгрузки не найдена.',
-        };
+            alternates: {
+                canonical: canonicalUrl(`/otgruzki/${id}`),
+            },
+        });
     }
 
-    return {
+    return withSocialMetadata({
         title: `${shipment.seoTitle ?? shipment.title} | ЮНИК С`,
         description: shipment.seoDescription ?? shipment.summary,
         alternates: {
             canonical: canonicalUrl(getShipmentHref(shipment)),
         },
-    };
+    });
 }
 
 export default async function ShipmentPage({ params }: ShipmentPageProps) {
