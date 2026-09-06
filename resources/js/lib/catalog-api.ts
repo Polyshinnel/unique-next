@@ -76,6 +76,7 @@ export type CatalogProductReference = {
 };
 
 export type CatalogProductCategory = CatalogProductReference & {
+    title: string;
     slug: string;
     path: string[];
     pathString: string;
