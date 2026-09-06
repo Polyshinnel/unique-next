@@ -3,15 +3,19 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { ActionIcon, Image } from '@mantine/core';
 import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
+import { Navigation } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
 import { Fancybox } from '@fancyapps/ui/dist/fancybox/';
 import '@fancyapps/ui/dist/fancybox/fancybox.css';
 
 type ProductGalleryProps = {
     title: string;
     images: string[];
+    mobileSlider?: boolean;
 };
 
-export function ProductGallery({ title, images }: ProductGalleryProps) {
+export function ProductGallery({ title, images, mobileSlider = false }: ProductGalleryProps) {
     const normalizedImages = useMemo(() => Array.from(new Set(images.filter(Boolean))), [images]);
     const [activeIndex, setActiveIndex] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
@@ -121,52 +125,85 @@ export function ProductGallery({ title, images }: ProductGalleryProps) {
     };
 
     return (
-        <div ref={galleryRef} className="product-show-gallery">
-            <div className="product-show-gallery__main">
-                {normalizedImages.map((image, index) => (
-                    <a
-                        key={image}
-                        href={image}
-                        data-fancybox={galleryId}
-                        data-caption={`${title}: фото ${index + 1}`}
-                        className={`product-show-gallery__main-link${index === safeActiveIndex ? ' product-show-gallery__main-link--active' : ''}`}
-                        aria-label={`Открыть фото товара ${title}`}
-                        tabIndex={index === safeActiveIndex ? 0 : -1}
-                    >
-                        <Image src={image} alt={title} />
-                    </a>
-                ))}
-            </div>
-
-            <div className="product-show-gallery__carousel">
-                <div className="product-show-gallery__nav">
-                    <ActionIcon variant="default" size="lg" radius="xl" onClick={() => goToThumb(-1)} aria-label="Предыдущее фото" disabled={safeActiveIndex === 0}>
-                        <IconChevronLeft size={18} />
-                    </ActionIcon>
+        <div ref={galleryRef} className={`product-show-gallery${mobileSlider ? ' product-show-gallery--mobile-slider' : ''}`}>
+            <div className="product-show-gallery__desktop">
+                <div className="product-show-gallery__main">
+                    {normalizedImages.map((image, index) => (
+                        <a
+                            key={image}
+                            href={image}
+                            data-fancybox={galleryId}
+                            data-caption={`${title}: фото ${index + 1}`}
+                            className={`product-show-gallery__main-link${index === safeActiveIndex ? ' product-show-gallery__main-link--active' : ''}`}
+                            aria-label={`Открыть фото товара ${title}`}
+                            tabIndex={index === safeActiveIndex ? 0 : -1}
+                        >
+                            <Image src={image} alt={title} />
+                        </a>
+                    ))}
                 </div>
 
-                <div
-                    className={`product-show-gallery__thumbs-viewport${isDragging ? ' is-dragging' : ''}`}
-                    onPointerDown={handlePointerDown}
-                    onPointerMove={handlePointerMove}
-                    onPointerUp={handlePointerUp}
-                    onPointerCancel={finishDragging}
-                >
-                    <div className="product-show-gallery__thumbs">
-                        {normalizedImages.map((image, index) => (
-                            <button key={`${image}-${index}`} type="button" className={`product-show-gallery__thumb ${index === safeActiveIndex ? 'product-show-gallery__thumb--active' : ''}`} onClick={() => handleThumbClick(index)} aria-label={`Показать фото ${index + 1}`} aria-pressed={index === safeActiveIndex}>
-                                <Image src={image} alt={`${title}: фото ${index + 1}`} />
-                            </button>
-                        ))}
+                <div className="product-show-gallery__carousel">
+                    <div className="product-show-gallery__nav">
+                        <ActionIcon variant="default" size="lg" radius="xl" onClick={() => goToThumb(-1)} aria-label="Предыдущее фото" disabled={safeActiveIndex === 0}>
+                            <IconChevronLeft size={18} />
+                        </ActionIcon>
+                    </div>
+
+                    <div
+                        className={`product-show-gallery__thumbs-viewport${isDragging ? ' is-dragging' : ''}`}
+                        onPointerDown={handlePointerDown}
+                        onPointerMove={handlePointerMove}
+                        onPointerUp={handlePointerUp}
+                        onPointerCancel={finishDragging}
+                    >
+                        <div className="product-show-gallery__thumbs">
+                            {normalizedImages.map((image, index) => (
+                                <button key={`${image}-${index}`} type="button" className={`product-show-gallery__thumb ${index === safeActiveIndex ? 'product-show-gallery__thumb--active' : ''}`} onClick={() => handleThumbClick(index)} aria-label={`Показать фото ${index + 1}`} aria-pressed={index === safeActiveIndex}>
+                                    <Image src={image} alt={`${title}: фото ${index + 1}`} />
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="product-show-gallery__nav">
+                        <ActionIcon variant="default" size="lg" radius="xl" onClick={() => goToThumb(1)} aria-label="Следующее фото" disabled={safeActiveIndex === normalizedImages.length - 1}>
+                            <IconChevronRight size={18} />
+                        </ActionIcon>
                     </div>
                 </div>
-
-                <div className="product-show-gallery__nav">
-                    <ActionIcon variant="default" size="lg" radius="xl" onClick={() => goToThumb(1)} aria-label="Следующее фото" disabled={safeActiveIndex === normalizedImages.length - 1}>
-                        <IconChevronRight size={18} />
-                    </ActionIcon>
-                </div>
             </div>
+
+            {mobileSlider ? (
+                <div className="product-show-gallery__mobile">
+                    <button type="button" className="product-show-gallery__mobile-arrow product-show-gallery__mobile-prev" aria-label="Предыдущее фото">
+                        <IconChevronLeft size={20} />
+                    </button>
+                    <Swiper
+                        className="product-show-gallery__mobile-swiper"
+                        modules={[Navigation]}
+                        slidesPerView={1}
+                        loop
+                        navigation={{ nextEl: '.product-show-gallery__mobile-next', prevEl: '.product-show-gallery__mobile-prev' }}
+                    >
+                        {normalizedImages.map((image, index) => (
+                            <SwiperSlide key={`${image}-mobile-${index}`}>
+                                <a
+                                    href={image}
+                                    data-fancybox={galleryId}
+                                    data-caption={`${title}: фото ${index + 1}`}
+                                    aria-label={`Открыть фото товара ${title}`}
+                                >
+                                    <Image src={image} alt={`${title}: фото ${index + 1}`} />
+                                </a>
+                            </SwiperSlide>
+                        ))}
+                    </Swiper>
+                    <button type="button" className="product-show-gallery__mobile-arrow product-show-gallery__mobile-next" aria-label="Следующее фото">
+                        <IconChevronRight size={20} />
+                    </button>
+                </div>
+            ) : null}
         </div>
     );
 }

@@ -20,7 +20,7 @@ const suppliers = [
 
 export function SuppliersSection() {
     return (
-        <section className="instrument-card">
+        <section className="instrument-card instrument-suppliers-card">
             <Stack gap="xl">
                 <div className="instrument-section-header">
                     <span className="sales-search-card__icon">

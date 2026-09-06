@@ -8,6 +8,7 @@ import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
 import { PageStructuredData } from '@/components/seo/OrganizationJsonLd';
 import { ProductCard } from '@/components/catalog/ProductCard';
+import { MobileProductSlider } from '@/components/catalog/MobileProductSlider';
 import { SummarySection } from './components/SummarySection';
 import {
     Button,
@@ -145,11 +146,14 @@ function LatestProductsSection({ products }: { products: CatalogProductCard[] })
                         Перейти в каталог
                     </Button>
                 </Group>
-                <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="lg">
+                <SimpleGrid className="latest-products-section__grid" cols={{ base: 1, sm: 2, lg: 4 }} spacing="lg">
                     {products.slice(0, 4).map((product) => (
                         <ProductCard key={product.id} product={product} />
                     ))}
                 </SimpleGrid>
+                <div className="latest-products-section__mobile-slider">
+                    <MobileProductSlider products={products.slice(0, 4)} />
+                </div>
             </Container>
         </section>
     );
@@ -159,7 +163,7 @@ function SloganSection() {
     return (
         <section className="content-section content-section--tight-top sales-quote-section">
             <Container size="xl">
-                <blockquote className="sales-quote-card">
+                <blockquote className="sales-quote-card sales-company-quote">
                     <p>
                         ООО «Юник С» – торгующая компания, мы занимаемся реализацией б.у. оборудования от
                         производственных предприятий на договорных условиях
@@ -172,7 +176,7 @@ function SloganSection() {
 
 function AdvantagesSection() {
     return (
-        <section className="content-section content-section--white">
+        <section className="content-section content-section--white sales-advantages-section">
             <Container size="xl">
                 <Stack gap="xl">
                     <Stack gap={6}>
@@ -206,11 +210,11 @@ function SocialSection() {
 
 function RemotePurchaseSection() {
     return (
-        <section className="content-section">
+        <section className="content-section sales-remote-section">
             <Container size="xl">
                 <div className="sales-remote-card">
                     <Stack gap="xl">
-                        <Stack gap="xl">
+                        <Stack className="sales-remote-card__intro" gap="xl">
                             <Title order={2} mb="md">
                                 Наши клиенты часто покупают оборудование удалено, после предоставленной нашими
                                 специалистами информации, например:
@@ -246,7 +250,7 @@ function RemotePurchaseSection() {
                             ))}
                         </Stack>
 
-                        <Stack gap="sm">
+                        <Stack className="sales-remote-card__territory" gap="sm">
                             <Text className="sales-section-kicker">Мы продаем оборудование по всей территории Российской федерации.</Text>
                             <Text c="dimmed" size="lg">
                                 Подпишитесь на наш авито-магазин, чтобы всегда быть в курсе новых поступлений.

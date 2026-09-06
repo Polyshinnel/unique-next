@@ -76,7 +76,7 @@ export function FeedbackRequestModal({
                     <Stack gap="md">
                         <Stack gap="xs">
                             <Title order={3}>{modalTitle}</Title>
-                            <Text c="dimmed">{description}</Text>
+                            <Text c="dimmed" className="feedback-form__description">{description}</Text>
                         </Stack>
 
                         <TextInput label="ФИО" placeholder="Как к вам обращаться" withAsterisk />

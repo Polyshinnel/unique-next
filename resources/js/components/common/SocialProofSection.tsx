@@ -57,7 +57,7 @@ type SocialProofSectionProps = {
     className?: string;
 };
 
-export function SocialProofSection({ className = 'content-section content-section--white' }: SocialProofSectionProps) {
+export function SocialProofSection({ className = 'content-section content-section--white social-proof-section' }: SocialProofSectionProps) {
     return (
         <section className={className}>
             <Container size="xl">

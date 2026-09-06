@@ -15,7 +15,7 @@ const toolCategories = [
 
 export function ToolCategoriesSection() {
     return (
-        <section className="instrument-card sales-intro-card">
+        <section className="instrument-card sales-intro-card instrument-tool-categories-card">
             <Stack gap="md">
                 <Group gap="sm" align="center">
                     <span className="sales-search-card__icon">

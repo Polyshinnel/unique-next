@@ -1,4 +1,5 @@
 import { ProductCard } from '@/components/catalog/ProductCard';
+import { MobileProductSlider } from '@/components/catalog/MobileProductSlider';
 import type { CatalogProductCard } from '@/lib/catalog-api';
 import { Button, Container, Group, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 import { IconArrowRight } from '@tabler/icons-react';
@@ -11,6 +12,7 @@ type ProductCollectionSectionProps = {
     buttonLabel: string;
     limit?: number;
     withContainer?: boolean;
+    mobileSlider?: boolean;
     columns?: {
         base?: number;
         sm?: number;
@@ -27,6 +29,7 @@ export function ProductCollectionSection({
     buttonLabel,
     limit = 4,
     withContainer = true,
+    mobileSlider = false,
     columns = { base: 1, sm: 2, lg: 4 },
 }: ProductCollectionSectionProps) {
     if (products.length === 0) {
@@ -44,11 +47,16 @@ export function ProductCollectionSection({
                     {buttonLabel}
                 </Button>
             </Group>
-            <SimpleGrid cols={columns} spacing="lg">
+            <SimpleGrid className={mobileSlider ? 'latest-products-section__grid' : undefined} cols={columns} spacing="lg">
                 {products.slice(0, limit).map((product) => (
                     <ProductCard key={product.id} product={product} />
                 ))}
             </SimpleGrid>
+            {mobileSlider ? (
+                <div className="latest-products-section__mobile-slider">
+                    <MobileProductSlider products={products.slice(0, limit)} />
+                </div>
+            ) : null}
         </>
     );
 

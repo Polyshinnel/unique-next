@@ -142,7 +142,7 @@ function ListSection({
     items: readonly string[];
 }) {
     return (
-        <section className="content-section content-section--white">
+        <section className="content-section content-section--white buyout-equipment-section">
             <Container size="xl">
                 <Stack gap="xl">
                     <Title order={2} maw={980}>

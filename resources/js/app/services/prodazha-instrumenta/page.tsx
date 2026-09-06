@@ -114,6 +114,7 @@ export default function ToolSalesPage() {
                             <ProductGallery
                                 title="Продажа инструмента"
                                 images={galleryImages}
+                                mobileSlider
                             />
 
                             <section className="sales-quote-section content-section--tight-top">
@@ -127,7 +128,7 @@ export default function ToolSalesPage() {
 
                             <SuppliersSection />
 
-                            <section className="instrument-card">
+                            <section className="instrument-card instrument-shipping-card">
                                 <Stack gap="lg">
                                     <Title order={2}>Отгрузка и условия поставки</Title>
                                     <div className="instrument-side-note">
@@ -162,7 +163,7 @@ export default function ToolSalesPage() {
                                 </Stack>
                             </section>
 
-                            <section className="instrument-card">
+                            <section className="instrument-card instrument-contact-card">
                                 <Stack gap="lg">
                                     <Title order={2}>Пишите, звоните, задавайте вопросы</Title>
                                     <Stack gap="sm">

@@ -186,9 +186,9 @@ function GallerySection() {
         <section className="content-section content-section--white">
             <Container size="xl">
                 <div className="instrument-layout">
-                    <section className="instrument-card">
+                    <section className="instrument-card import-gallery-card">
                         <Stack gap="xl">
-                            <ProductGallery title="Импорт оборудования" images={galleryImages} />
+                            <ProductGallery title="Импорт оборудования" images={galleryImages} mobileSlider />
                             <Text className="import-gallery-caption">
                                 Фотографии самого первого токарного станка с ЧПУ NILES-SIMMONS N10, привезенного из
                                 Германии в 2019 году для клиента в г. Тимашевск.

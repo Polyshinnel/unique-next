@@ -8,6 +8,7 @@ import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
 import { FeedbackRequestModal } from '@/components/common/FeedbackRequestModal';
 import { ServiceCard } from '@/components/services/ServiceCard';
+import { MobileServiceSlider } from '@/components/services/MobileServiceSlider';
 import { HeroSlider } from '@/components/home/HeroSlider';
 import { PageStructuredData } from '@/components/seo/OrganizationJsonLd';
 import { Container, Group, Image, SimpleGrid, Stack, Text, Title } from '@mantine/core';
@@ -84,6 +85,7 @@ function LatestProducts({ products }: { products: CatalogProductCard[] }) {
             href="/catalog"
             buttonLabel="Перейти в каталог"
             limit={8}
+            mobileSlider
         />
     );
 }
@@ -98,11 +100,14 @@ function ServicesSection() {
                         <Text c="dimmed">Основные направления работы с оборудованием и сделками.</Text>
                     </Stack>
                 </Group>
-                <SimpleGrid cols={{ base: 1, sm: 2, xl: 4 }} spacing="lg">
+                <SimpleGrid className="services-section__grid" cols={{ base: 1, sm: 2, xl: 4 }} spacing="lg">
                     {demoServices.map((service) => (
                         <ServiceCard key={service.id} service={service} />
                     ))}
                 </SimpleGrid>
+                <div className="services-section__mobile-slider">
+                    <MobileServiceSlider services={demoServices} />
+                </div>
             </Container>
         </section>
     );
@@ -110,7 +115,7 @@ function ServicesSection() {
 
 function BusinessEquipmentSection() {
     return (
-        <section className="content-section content-section--white content-section--tight-top">
+        <section className="content-section content-section--white content-section--tight-top business-equipment-section">
             <Container size="xl">
                 <Stack gap="lg">
                     <Title order={2}>Промышленное оборудование и спецтехника для бизнеса</Title>
@@ -181,12 +186,13 @@ export default async function HomePage() {
                 <BusinessEquipmentSection />
                 <section className="search-band">
                     <Container size="xl">
-                        <Group justify="space-between" gap="lg">
-                            <Stack gap={4}>
+                        <Group className="search-band__inner" justify="space-between" gap="lg">
+                            <Stack className="search-band__content" gap={4}>
                                 <Title order={2}>Нужна конкретная позиция?</Title>
                                 <Text>Оставьте запрос, и менеджер подберет подходящее оборудование.</Text>
                             </Stack>
                             <FeedbackRequestModal
+                                buttonClassName="search-band__button"
                                 modalTitle="Свяжитесь со мной"
                                 description="Оставьте ваши контактные данные и опишите вопрос и мы свяжемся с вами в ближайшее время."
                             />

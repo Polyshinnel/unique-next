@@ -114,7 +114,7 @@ export async function Footer() {
                             информация может быть изменена в любое время без предварительного уведомления.
                         </Text>
                     </Stack>
-                    <Stack gap={8} align="flex-end">
+                    <Stack gap={8} align="flex-end" className="footer-request-block">
                         <Group gap="xs" className="footer-request">
                             <TextInput placeholder="Ваш телефон" aria-label="Телефон для обратного звонка" />
                             <Button>Позвоните мне</Button>
