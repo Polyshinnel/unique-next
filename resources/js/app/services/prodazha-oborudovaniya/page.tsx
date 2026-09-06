@@ -6,6 +6,7 @@ import { canonicalUrl, getPageSeo, toMetadata } from '@/lib/seo';
 import { getCatalogPage, type CatalogProductCard } from '@/lib/catalog-api';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
+import { PageStructuredData } from '@/components/seo/OrganizationJsonLd';
 import { ProductCard } from '@/components/catalog/ProductCard';
 import { SummarySection } from './components/SummarySection';
 import {
@@ -288,6 +289,7 @@ export default async function ProductSaleServicePage() {
 
     return (
         <>
+            <PageStructuredData service seoKey="equipment_sale" path="/services/prodazha-oborudovaniya" fallbackTitle="Продажа оборудования | ЮНИК С" fallbackDescription="Продажа б/у промышленного оборудования по всей России с понятным состоянием, сопровождением сделки и логистики." />
             <Header />
             <main>
                 <HeroSection />

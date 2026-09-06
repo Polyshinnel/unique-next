@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { canonicalUrl, getPageSeo, toMetadata } from '@/lib/seo';
+import { PageStructuredData } from '@/components/seo/OrganizationJsonLd';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
 import { getSiteContacts, type SiteContacts } from '@/lib/site-contacts';
@@ -246,6 +247,7 @@ export default async function WhyWePage() {
 
     return (
         <>
+            <PageStructuredData seoKey="why_we" path="/why-we" fallbackTitle="Почему мы | ЮНИК С" fallbackDescription="Почему клиенты выбирают ЮНИК С при покупке б/у промышленного оборудования." />
             <Header />
             <main>
                 <HeroSection />

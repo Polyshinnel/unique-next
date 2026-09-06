@@ -8,6 +8,7 @@ import { EquipmentImportRequestForm } from '@/components/services/EquipmentImpor
 import { EquipmentImportRequestModalButton } from '@/components/services/EquipmentImportRequestModalButton';
 import { emailHref, phoneHref } from '@/lib/site-content';
 import { getSiteContacts, type SiteContacts } from '@/lib/site-contacts';
+import { PageStructuredData } from '@/components/seo/OrganizationJsonLd';
 import { Button, Container, Group, Image, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 import {
     IconBuildingWarehouse,
@@ -264,6 +265,7 @@ export default async function EquipmentImportPage() {
 
     return (
         <>
+            <PageStructuredData service seoKey="equipment_import" path="/services/import-oborudovaniya" fallbackTitle="Импорт оборудования | ЮНИК С" fallbackDescription="Ввоз, растаможка и поставка промышленного оборудования из стран ЕС и Азии с сопровождением под ключ." />
             <Header />
             <main>
                 <HeroSection contacts={contacts} />

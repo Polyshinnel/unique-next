@@ -3,6 +3,7 @@ import ImageView from 'next/image';
 import Link from 'next/link';
 import { SocialProofSection } from '@/components/common/SocialProofSection';
 import { canonicalUrl, getPageSeo, toMetadata } from '@/lib/seo';
+import { PageStructuredData } from '@/components/seo/OrganizationJsonLd';
 import { Pagination } from '@/components/common/Pagination';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
@@ -211,6 +212,7 @@ export default async function OtgruzkiPage({ searchParams }: OtgruzkiPageProps) 
 
     return (
         <>
+            <PageStructuredData seoKey="shipments" path="/otgruzki" pageType="CollectionPage" fallbackTitle="Отгрузки оборудования | ЮНИК С" fallbackDescription="Кейсы и отгрузки промышленного оборудования ЮНИК С с описанием этапов сделки и логистики." />
             <Header />
             <main>
                 <section className="page-hero otgruzki-hero">

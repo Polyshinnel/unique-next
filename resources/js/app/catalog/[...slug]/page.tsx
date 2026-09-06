@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { canonicalUrl, withSocialMetadata } from '@/lib/seo';
 import { CatalogPageView } from '@/components/catalog/CatalogPageView';
+import { PageStructuredData } from '@/components/seo/OrganizationJsonLd';
 import { ProductCollectionSection } from '@/components/catalog/ProductCollectionSection';
 import { FeedbackRequestModal } from '@/components/common/FeedbackRequestModal';
 import { ProductGallery } from '@/components/catalog/ProductGallery';
@@ -11,6 +12,7 @@ import { Header } from '@/components/layout/Header';
 import {
     getCatalogPage,
     getCatalogProduct,
+    catalogPathWithParams,
     type CatalogCategoryBreadcrumb,
     type CatalogProductCard,
     type CatalogPageResponse,
@@ -254,6 +256,23 @@ function ProductShowPage({
 
     return (
         <>
+            <PageStructuredData
+                path={product.canonicalHref}
+                fallbackTitle={`${product.title} | ЮНИК С`}
+                fallbackDescription={htmlToPlainText(product.summary ?? product.description) ?? categoryDescriptionFallback}
+                breadcrumbItems={product.category ? [...product.category.breadcrumbs, product.category] : []}
+                product={{
+                    name: product.title,
+                    description: htmlToPlainText(product.description ?? product.summary) ?? product.title,
+                    sku: product.sku,
+                    category: product.category?.title ?? product.category?.name,
+                    images: product.images.length ? product.images : [product.imageUrl],
+                    price: product.price.amount,
+                    isPublished: product.price.isPublished,
+                    isReserve: product.price.isReserve,
+                    isSold: product.price.isSold,
+                }}
+            />
             <Header />
             <main>
                 <section className="page-hero">
@@ -452,7 +471,10 @@ export default async function CatalogSlugPage({ params, searchParams }: CatalogS
     const categoryPage = await getCatalogPageOrNull(catalogSearchParams);
 
     if (categoryPage !== null) {
-        return <CatalogPageView data={categoryPage} searchParams={catalogSearchParams} />;
+        const category = categoryPage.category;
+        const schemaPath = catalogPathWithParams(category?.href ?? getRoutePathname(slug), catalogSearchParams);
+
+        return <><PageStructuredData path={schemaPath} pageType="CollectionPage" fallbackTitle={category?.title || category?.name || 'Каталог оборудования'} fallbackDescription={category?.description || categoryDescriptionFallback} breadcrumbItems={category ? [...category.breadcrumbs, category] : []} itemList={{ path: schemaPath, products: categoryPage.products }} /><CatalogPageView data={categoryPage} searchParams={catalogSearchParams} /></>;
     }
 
     const product = routeKey === '' ? null : await getCatalogProductOrNull(routeKey);

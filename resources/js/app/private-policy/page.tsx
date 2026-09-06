@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { canonicalUrl, getPageSeo, toMetadata } from '@/lib/seo';
+import { PageStructuredData } from '@/components/seo/OrganizationJsonLd';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
 import { Anchor, Container, Stack, Text, Title } from '@mantine/core';
@@ -111,6 +112,7 @@ const crossBorderRules = [
 export default function PrivatePolicyPage() {
     return (
         <>
+            <PageStructuredData seoKey="privacy_policy" path="/private-policy" fallbackTitle="Политика конфиденциальности | ЮНИК С" fallbackDescription="Политика в отношении обработки персональных данных ООО «Юник С»." />
             <Header />
             <main>
                 <section className="page-hero privacy-hero">

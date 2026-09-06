@@ -70,6 +70,7 @@ final class CatalogProductCardResource extends JsonResource
         return [
             'id' => (int) $categoryData['id'],
             'name' => $categoryData['name'],
+            'title' => $categoryData['title'] ?? $categoryData['name'],
             'slug' => $categoryData['slug'],
             'path' => $categoryData['path'],
             'pathString' => $categoryData['pathString'],

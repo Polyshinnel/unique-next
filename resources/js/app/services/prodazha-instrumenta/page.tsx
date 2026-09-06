@@ -4,6 +4,7 @@ import { canonicalUrl, getPageSeo, toMetadata } from '@/lib/seo';
 import { ProductGallery } from '@/components/catalog/ProductGallery';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
+import { PageStructuredData } from '@/components/seo/OrganizationJsonLd';
 import { ToolCategoriesSection } from './components/ToolCategoriesSection';
 import { SuppliersSection } from './components/SuppliersSection';
 import {
@@ -66,6 +67,7 @@ const telegramHref = 'https://telegram.me/uniqset_gen';
 export default function ToolSalesPage() {
     return (
         <>
+            <PageStructuredData service seoKey="tools_sale" path="/services/prodazha-instrumenta" fallbackTitle="Продажа инструмента | ЮНИК С" fallbackDescription="Инструмент от компании Коникс: поставка со склада в Йошкар-Оле, консультации, прайс и отправка по России." />
             <Header />
             <main>
                 <section className="page-hero catalog-hero instrument-hero">

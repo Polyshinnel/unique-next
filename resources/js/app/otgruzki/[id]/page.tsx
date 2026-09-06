@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { ShipmentDetailPageView } from '@/components/shipments/ShipmentDetailPageView';
 import { canonicalUrl, withSocialMetadata } from '@/lib/seo';
 import { getShipment, getShipmentHref } from '@/lib/shipments';
+import { PageStructuredData } from '@/components/seo/OrganizationJsonLd';
 
 type ShipmentPageProps = {
     params: Promise<{
@@ -41,5 +42,15 @@ export default async function ShipmentPage({ params }: ShipmentPageProps) {
         notFound();
     }
 
-    return <ShipmentDetailPageView shipment={shipment} />;
+    const title = `${shipment.seoTitle ?? shipment.title} | ЮНИК С`;
+    const description = shipment.seoDescription ?? shipment.summary;
+    const publishedAt = shipment.date.split('.').reverse().join('-');
+
+    return <><PageStructuredData path={getShipmentHref(shipment)} fallbackTitle={title} fallbackDescription={description} article={{
+        headline: shipment.title,
+        description: shipment.summary,
+        image: canonicalUrl(shipment.image),
+        datePublished: publishedAt,
+        dateModified: shipment.updatedAt ?? publishedAt,
+    }} /><ShipmentDetailPageView shipment={shipment} /></>;
 }

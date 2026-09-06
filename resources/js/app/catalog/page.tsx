@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import { canonicalUrl, getPageSeo, toMetadata } from '@/lib/seo';
 import { CatalogPageView } from '@/components/catalog/CatalogPageView';
-import { getCatalogPage, type CatalogSearchParams, type CatalogSortValue } from '@/lib/catalog-api';
+import { catalogPathWithParams, getCatalogPage, type CatalogSearchParams, type CatalogSortValue } from '@/lib/catalog-api';
+import { PageStructuredData } from '@/components/seo/OrganizationJsonLd';
 
 export async function generateMetadata(): Promise<Metadata> {
     const seo = await getPageSeo('catalog');
@@ -56,5 +57,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
     const catalogSearchParams = getCatalogSearchParams(params);
     const data = await getCatalogPage(catalogSearchParams);
 
-    return <CatalogPageView data={data} searchParams={catalogSearchParams} />;
+    const schemaPath = catalogPathWithParams('/catalog', catalogSearchParams);
+
+    return <><PageStructuredData seoKey="catalog" path={schemaPath} pageType="CollectionPage" fallbackTitle="Каталог оборудования | ЮНИК С" fallbackDescription="Каталог промышленного оборудования, станков, спецтехники и инструмента с карточками товаров и контактами менеджера." itemList={{ path: schemaPath, products: data.products }} /><CatalogPageView data={data} searchParams={catalogSearchParams} /></>;
 }

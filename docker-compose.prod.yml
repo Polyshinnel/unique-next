@@ -4,6 +4,8 @@ services:
       context: .
       dockerfile: Dockerfile
       network: host
+      args:
+        APP_URL: ${APP_URL:-http://localhost:28080}
     container_name: uniqset2_app
     restart: unless-stopped
     working_dir: /var/www/html
@@ -72,6 +74,8 @@ services:
       context: .
       dockerfile: Dockerfile
       network: host
+      args:
+        APP_URL: ${APP_URL:-http://localhost:28080}
     container_name: uniqset2_scheduler
     restart: unless-stopped
     working_dir: /var/www/html

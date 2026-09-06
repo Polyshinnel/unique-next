@@ -7,6 +7,7 @@ import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
 import { phoneHref } from '@/lib/site-content';
 import { getSiteContacts, type SiteContacts } from '@/lib/site-contacts';
+import { PageStructuredData } from '@/components/seo/OrganizationJsonLd';
 import { Button, Container, Group, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 import {
     IconCalculator,
@@ -282,6 +283,7 @@ export default async function EquipmentBuyoutPage() {
 
     return (
         <>
+            <PageStructuredData service seoKey="equipment_buyout" path="/services/vykup" fallbackTitle="Выкуп оборудования | ЮНИК С" fallbackDescription="Выкуп и реализация промышленного оборудования по рыночным ценам с сопровождением сделки по всей России." />
             <Header />
             <main>
                 <HeroSection contacts={contacts} />

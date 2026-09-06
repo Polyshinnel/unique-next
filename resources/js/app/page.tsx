@@ -9,6 +9,7 @@ import { Header } from '@/components/layout/Header';
 import { FeedbackRequestModal } from '@/components/common/FeedbackRequestModal';
 import { ServiceCard } from '@/components/services/ServiceCard';
 import { HeroSlider } from '@/components/home/HeroSlider';
+import { PageStructuredData } from '@/components/seo/OrganizationJsonLd';
 import { Container, Group, Image, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -170,6 +171,7 @@ export default async function HomePage() {
 
     return (
         <>
+            <PageStructuredData seoKey="home" path="/" fallbackTitle="ЮНИК С - промышленное оборудование и станки" fallbackDescription="Продажа, выкуп, подбор и поставка промышленного оборудования, станков и инструмента по России." />
             <Header />
             <main>
                 <HeroSlider slides={banners} />

@@ -9,6 +9,7 @@ export type Shipment = {
     seoTitle: string | null;
     seoDescription: string | null;
     date: string;
+    updatedAt: string | null;
     location: string | null;
     image: string;
     summary: string;

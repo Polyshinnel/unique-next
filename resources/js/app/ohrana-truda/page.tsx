@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { canonicalUrl, getPageSeo, toMetadata } from '@/lib/seo';
+import { PageStructuredData } from '@/components/seo/OrganizationJsonLd';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
 import { Button, Container, Stack, Text, Title } from '@mantine/core';
@@ -25,6 +26,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default function OccupationalSafetyPage() {
     return (
         <>
+            <PageStructuredData seoKey="labor_safety" path="/ohrana-truda" fallbackTitle="Охрана труда | ЮНИК С" fallbackDescription="Сводная ведомость результатов проведения специальной оценки условий труда ООО «Юник С»." />
             <Header />
             <main>
                 <section className="page-hero privacy-hero">

@@ -264,6 +264,7 @@ final class CategoryTreeBuilder
         return [
             'id' => (int) $category->getKey(),
             'name' => $category->name,
+            'title' => $category->title ?: $category->name,
             'slug' => $category->slug,
             'path' => $metadata['path'],
             'pathString' => $metadata['pathString'],

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { canonicalUrl, getPageSeo, toMetadata } from '@/lib/seo';
 import { AboutPageView } from '@/components/about/AboutPageView';
+import { PageStructuredData } from '@/components/seo/OrganizationJsonLd';
 
 export async function generateMetadata(): Promise<Metadata> {
     const seo = await getPageSeo('company');
@@ -15,5 +16,5 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function AboutPage() {
-    return <AboutPageView />;
+    return <><PageStructuredData seoKey="company" path="/about" fallbackTitle="О компании | ЮНИК С" fallbackDescription="История, география поставок и принципы работы компании ЮНИК С." /><AboutPageView /></>;
 }

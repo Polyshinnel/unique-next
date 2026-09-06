@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { canonicalUrl, getPageSeo, toMetadata } from '@/lib/seo';
+import { PageStructuredData } from '@/components/seo/OrganizationJsonLd';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
 import { Anchor, Container, Image, SimpleGrid, Stack, Text, Title } from '@mantine/core';
@@ -78,6 +79,7 @@ function BulletList({ items }: { items: readonly string[] }) {
 export default function VacancyPage() {
     return (
         <>
+            <PageStructuredData seoKey="vacancy" path="/vacancy" fallbackTitle="Вакансии | ЮНИК С" fallbackDescription="Актуальные вакансии компании ЮНИК С и условия сотрудничества для региональных представителей." />
             <Header />
             <main>
                 <section className="page-hero about-hero">

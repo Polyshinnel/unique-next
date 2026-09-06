@@ -15,6 +15,22 @@ export type CatalogSearchParams = {
     category_path?: string | null;
 };
 
+export function catalogPathWithParams(baseHref: string, params?: CatalogSearchParams): string {
+    const searchParams = new URLSearchParams();
+
+    Object.entries(params ?? {}).forEach(([key, value]) => {
+        if (key === 'category_path') return;
+
+        if (value !== null && value !== undefined && value !== '') {
+            searchParams.set(key, String(value));
+        }
+    });
+
+    const query = searchParams.toString();
+
+    return query ? `${baseHref}?${query}` : baseHref;
+}
+
 export type CatalogPagination = {
     currentPage: number;
     perPage: number;
@@ -25,6 +41,7 @@ export type CatalogPagination = {
 export type CatalogCategoryBreadcrumb = {
     id: number;
     name: string;
+    title?: string;
     slug: string;
     path: string[];
     pathString: string;

@@ -29,6 +29,7 @@ final class ShipmentResource extends JsonResource
             'seoTitle' => $shipment->seo_title,
             'seoDescription' => $shipment->seo_description,
             'date' => $shipment->shipment_date?->format('d.m.Y'),
+            'updatedAt' => $shipment->updated_at?->toAtomString(),
             'location' => $shipment->location,
             'image' => $this->imageUrl($shipment->mainImage) ?: ($images[0] ?? '/assets/img/otgruzki-banner.webp'),
             'summary' => $summary ?: '',

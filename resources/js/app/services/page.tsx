@@ -9,6 +9,7 @@ import { Header } from '@/components/layout/Header';
 import { ServiceCard } from '@/components/services/ServiceCard';
 import { Button, Container, Group, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 import { IconPhone } from '@tabler/icons-react';
+import { PageStructuredData } from '@/components/seo/OrganizationJsonLd';
 
 export async function generateMetadata(): Promise<Metadata> {
     const seo = await getPageSeo('services');
@@ -47,6 +48,7 @@ export default async function ServicesPage() {
 
     return (
         <>
+            <PageStructuredData seoKey="services" path="/services" pageType="CollectionPage" fallbackTitle="Услуги | ЮНИК С" fallbackDescription="Услуги ЮНИК С: продажа, выкуп, поставка, импорт и сопровождение сделок с промышленным оборудованием." />
             <Header />
             <main>
                 <section className="page-hero services-hero">
