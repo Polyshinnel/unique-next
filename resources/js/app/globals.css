@@ -1310,19 +1310,10 @@ img {
 }
 
 .catalog-hero {
-    display: grid;
-    align-items: center;
     position: relative;
     overflow: hidden;
     isolation: isolate;
-    min-height: calc(100dvh - 83px);
-    height: calc(100dvh - 83px);
-    padding: 32px 0 48px;
-}
-
-.catalog-hero p {
-    font-size: 16px;
-    line-height: 1.45;
+    min-height: clamp(420px, 42vw, 520px);
 }
 
 .catalog-hero::before {
@@ -2965,8 +2956,11 @@ img {
     }
 
     .catalog-hero {
+        display: grid;
+        align-items: center;
         min-height: calc(100dvh - 73px);
         height: calc(100dvh - 73px);
+        padding: 32px 0 48px;
     }
 
     .catalog-hero p {
