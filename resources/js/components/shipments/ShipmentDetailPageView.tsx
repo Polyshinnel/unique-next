@@ -15,14 +15,19 @@ export function ShipmentDetailPageView({ shipment }: { shipment: Shipment }) {
         <>
             <Header />
             <main>
-                <section className="page-hero">
+                <section className="page-hero shipment-detail-hero">
                     <Container size="xl">
-                        <div className="catalog-breadcrumbs">
+                        <div className="catalog-breadcrumbs shipment-detail-breadcrumbs--desktop">
                             <Link href="/">Главная</Link>
                             <span>/</span>
                             <Link href="/otgruzki">Отгрузки</Link>
                             <span>/</span>
                             <span>{shipment.title}</span>
+                        </div>
+                        <div className="catalog-breadcrumbs shipment-detail-breadcrumbs--mobile">
+                            <Link href="/">Главная</Link>
+                            <span>/</span>
+                            <Link href="/otgruzki">Отгрузки</Link>
                         </div>
                         <Title order={1}>{shipment.title}</Title>
                     </Container>
@@ -31,11 +36,12 @@ export function ShipmentDetailPageView({ shipment }: { shipment: Shipment }) {
                 <section className="content-section content-section--white">
                     <Container size="xl">
                         <article className="shipment-detail">
-                            <div className="shipment-detail__media">
+                            <div className={`shipment-detail__media${shipment.galleryImages?.length ? ' shipment-detail__media--gallery' : ''}`}>
                                 {shipment.galleryImages?.length ? (
                                     <ProductGallery
                                         title={shipment.title}
                                         images={shipment.galleryImages}
+                                        mobileSlider
                                     />
                                 ) : (
                                     <div className="shipment-detail__image">

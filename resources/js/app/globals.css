@@ -424,6 +424,10 @@ img {
         url('/assets/img/otgruzki-banner.webp') center / cover no-repeat;
 }
 
+.shipment-detail-breadcrumbs--mobile {
+    display: none;
+}
+
 .page-hero.privacy-hero {
     background:
         linear-gradient(135deg, rgba(8, 27, 51, 0.92), rgba(19, 62, 113, 0.78)),
@@ -2903,6 +2907,63 @@ img {
         align-items: center;
     }
 
+    .page-hero.otgruzki-hero {
+        display: grid;
+        min-height: calc(100dvh - 73px);
+        height: calc(100dvh - 73px);
+        padding: 32px 0 48px;
+        align-items: center;
+    }
+
+    .page-hero.about-hero {
+        display: grid;
+        min-height: calc(100dvh - 73px);
+        height: calc(100dvh - 73px);
+        padding: 32px 0 48px;
+        align-items: center;
+    }
+
+    .contacts-hero {
+        display: grid;
+        min-height: calc(100dvh - 73px);
+        height: calc(100dvh - 73px);
+        padding: 32px 0 48px;
+        align-items: center;
+    }
+
+    .contacts-hero p {
+        font-size: 14px;
+        line-height: 1.4;
+    }
+
+    .contacts-hero .mantine-Button-root {
+        min-height: 44px;
+        height: 44px;
+        font-size: 14px;
+    }
+
+    .about-hero p {
+        font-size: 14px;
+        line-height: 1.4;
+    }
+
+    .about-hero .mantine-Button-root {
+        min-height: 44px;
+        height: 44px;
+        font-size: 14px;
+    }
+
+    .otgruzki-hero p {
+        font-size: 14px;
+        line-height: 1.4;
+    }
+
+    .otgruzki-hero .mantine-Button-root {
+        min-height: 44px;
+        height: 44px;
+        font-size: 14px;
+    }
+
     .catalog-hero {
         min-height: calc(100dvh - 73px);
         height: calc(100dvh - 73px);
@@ -2943,6 +3004,34 @@ img {
 
     .product-show-hero .product-show-summary {
         display: none;
+    }
+
+    .shipment-detail-hero {
+        padding: 24px 0 28px;
+        color: var(--app-ink);
+        background: #f3f6f9;
+    }
+
+    .shipment-detail-breadcrumbs--desktop {
+        display: none;
+    }
+
+    .shipment-detail-breadcrumbs--mobile {
+        display: flex;
+        margin-bottom: 14px;
+        color: var(--app-muted);
+        font-size: 13px;
+    }
+
+    .shipment-detail-breadcrumbs--mobile a {
+        color: var(--app-blue-dark);
+    }
+
+    .shipment-detail-hero h1 {
+        margin-top: 0;
+        color: var(--app-blue-dark);
+        font-size: 28px;
+        line-height: 1.12;
     }
 
     .content-section.product-show-section {
@@ -3655,6 +3744,17 @@ img {
         padding: 18px;
         border-right: 0;
         border-bottom: 1px solid var(--app-border);
+    }
+
+    .shipment-detail__media--gallery {
+        padding: 0;
+        border-bottom: 0;
+        background: transparent;
+    }
+
+    .shipment-detail__text p {
+        font-size: 14px;
+        line-height: 1.5;
     }
 
     .product-show-gallery__thumbs {
