@@ -237,6 +237,18 @@ function ProductBreadcrumbs({ product }: { product: CatalogProductDetail }) {
     );
 }
 
+function ProductMobileBreadcrumbs({ product }: { product: CatalogProductDetail }) {
+    return (
+        <div className="catalog-breadcrumbs product-show-breadcrumbs--mobile">
+            <Link href="/">Главная</Link>
+            <span>/</span>
+            <span>...</span>
+            <span>/</span>
+            {product.category ? <Link href={product.category.href}>{product.category.name}</Link> : <span>Каталог оборудования</span>}
+        </div>
+    );
+}
+
 function ProductShowPage({
     product,
     relatedProducts,
@@ -275,9 +287,10 @@ function ProductShowPage({
             />
             <Header />
             <main>
-                <section className="page-hero">
+                <section className="page-hero product-show-hero">
                     <Container size="xl">
                         <ProductBreadcrumbs product={product} />
+                        <ProductMobileBreadcrumbs product={product} />
                         <Title order={1}>{product.title}</Title>
                         {product.summary ? (
                             <div
@@ -292,7 +305,7 @@ function ProductShowPage({
                     <Container size="xl">
                         <div className="product-show-layout">
                             <div className="product-show-main">
-                                <ProductGallery title={product.title} images={productImages} />
+                                <ProductGallery title={product.title} images={productImages} mobileSlider />
 
                                 {isSold && relatedProducts.length > 0 ? (
                                     <ProductCollectionSection
@@ -303,6 +316,7 @@ function ProductShowPage({
                                         buttonLabel="Смотреть все"
                                         limit={6}
                                         withContainer={false}
+                                        mobileSlider
                                         columns={{ base: 1, sm: 2, lg: 3 }}
                                     />
                                 ) : null}
@@ -339,6 +353,7 @@ function ProductShowPage({
                                         buttonLabel="Смотреть все"
                                         limit={6}
                                         withContainer={false}
+                                        mobileSlider
                                         columns={{ base: 1, sm: 2, lg: 3 }}
                                     />
                                 ) : null}

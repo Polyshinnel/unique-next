@@ -28,6 +28,7 @@ import {
     IconSearch,
 } from '@tabler/icons-react';
 import { ProductCard } from './ProductCard';
+import { CatalogMobileFilters } from './CatalogMobileFilters';
 
 type CatalogPageViewProps = {
     data: CatalogPageResponse;
@@ -396,9 +397,14 @@ export async function CatalogPageView({ data, searchParams }: CatalogPageViewPro
                 <section className="content-section catalog-section">
                     <Container size="xl">
                         <div className="catalog-layout">
-                            <CatalogFilters baseHref={baseHref} data={data} searchParams={searchParams} />
+                            <div className="catalog-desktop-filters">
+                                <CatalogFilters baseHref={baseHref} data={data} searchParams={searchParams} />
+                            </div>
                             <div className="catalog-main">
                                 <Title order={2} className="visually-hidden">Результаты каталога</Title>
+                                <CatalogMobileFilters>
+                                    <CatalogFilters baseHref={baseHref} data={data} searchParams={searchParams} />
+                                </CatalogMobileFilters>
                                 <CatalogSorting baseHref={baseHref} data={data} searchParams={searchParams} />
                                 <Text size="sm" c="dimmed" mb="lg">
                                     Найдено {data.pagination.total} объявлений
