@@ -28,6 +28,9 @@ function metadataTitleToString(title: Metadata['title']): string | undefined {
 export function withSocialMetadata(metadata: Metadata): Metadata {
     const title = metadataTitleToString(metadata.title);
     const description = metadata.description ?? undefined;
+    const images = metadata.openGraph?.images
+        ? (Array.isArray(metadata.openGraph.images) ? metadata.openGraph.images : [metadata.openGraph.images])
+        : [{ url: defaultOgImage }];
     const canonicalValue = metadata.alternates?.canonical;
     const canonical = canonicalValue && typeof canonicalValue === 'object' && !(canonicalValue instanceof URL)
         ? canonicalValue.url
@@ -36,19 +39,26 @@ export function withSocialMetadata(metadata: Metadata): Metadata {
     return {
         ...metadata,
         openGraph: {
+            ...metadata.openGraph,
             type: 'website',
             locale: 'ru_RU',
             siteName: 'ЮНИК С',
             title,
             description,
             url: canonical,
-            images: [{ url: defaultOgImage }],
+            images,
         },
         twitter: {
             card: 'summary_large_image',
             title,
             description,
-            images: [defaultOgImage],
+            images: images.map((image) => {
+                if (typeof image === 'string') {
+                    return image;
+                }
+
+                return image instanceof URL ? image.toString() : image.url;
+            }),
         },
     };
 }

@@ -11,6 +11,7 @@ import { ServiceCard } from '@/components/services/ServiceCard';
 import { MobileServiceSlider } from '@/components/services/MobileServiceSlider';
 import { HeroSlider } from '@/components/home/HeroSlider';
 import { PageStructuredData } from '@/components/seo/OrganizationJsonLd';
+import { SocialChannelsSection } from '@/components/common/SocialChannelsSection';
 import { Container, Group, Image, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -182,6 +183,7 @@ export default async function HomePage() {
                 <HeroSlider slides={banners} />
                 <CompanySection />
                 <LatestProducts products={catalogPage.products} />
+                <SocialChannelsSection />
                 <ServicesSection />
                 <BusinessEquipmentSection />
                 <section className="search-band">

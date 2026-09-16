@@ -67,7 +67,7 @@ function buildBreadcrumbs(
     return items;
 }
 
-function organizationNode(contacts: SiteContacts) {
+function organizationNode(contacts: SiteContacts, locationId: string) {
     const sameAs = [contacts.telegram, contacts.vk]
         .map(nonEmpty)
         .filter((value): value is string => Boolean(value) && value !== '#');
@@ -82,6 +82,23 @@ function organizationNode(contacts: SiteContacts) {
         taxID: nonEmpty(contacts.inn),
         identifier: nonEmpty(contacts.ogrn),
         sameAs: sameAs.length > 0 ? sameAs : undefined,
+        telephone: nonEmpty(contacts.phone),
+        email: nonEmpty(contacts.email),
+        location: { '@id': locationId },
+        address: {
+            '@type': 'PostalAddress',
+            streetAddress: nonEmpty(formatOfficeAddress(contacts)),
+        },
+    };
+}
+
+function localBusinessNode(contacts: SiteContacts, locationId: string) {
+    return {
+        '@type': 'LocalBusiness',
+        '@id': locationId,
+        name: 'Юник С',
+        parentOrganization: { '@id': `${siteConfig.appUrl}/#organization` },
+        url: siteConfig.appUrl,
         telephone: nonEmpty(contacts.phone),
         email: nonEmpty(contacts.email),
         address: {
@@ -240,7 +257,9 @@ export async function PageStructuredData({
     const itemListId = `${url}#itemlist`;
     const productId = `${url}#product`;
     const organizationId = `${siteConfig.appUrl}/#organization`;
-    const organization = organizationNode(contacts);
+    const locationId = `${siteConfig.appUrl}/#location`;
+    const organization = organizationNode(contacts, locationId);
+    const localBusiness = localBusinessNode(contacts, locationId);
     const website = {
         '@type': 'WebSite',
         '@id': `${siteConfig.appUrl}/#website`,
@@ -258,6 +277,7 @@ export async function PageStructuredData({
                     '@context': 'https://schema.org',
                     '@graph': [
                         organization,
+                        localBusiness,
                         ...(isHomePage ? [website] : []),
                         {
                             '@type': pageType,

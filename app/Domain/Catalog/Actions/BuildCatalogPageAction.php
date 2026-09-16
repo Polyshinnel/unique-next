@@ -18,7 +18,7 @@ final class BuildCatalogPageAction
     ) {}
 
     /**
-     * @param  array{page: int, region: int|null, availability: int|null, state: int|null, sort: string, search: string|null, category_path: string|null}  $input
+     * @param  array{page: int, region: int|null, availability: int|null, state: int|null, sort: string, search: string|null, category_path: string|null, exact_category?: bool, exclude_product_id?: int|null}  $input
      * @return array<string, mixed>
      */
     public function execute(array $input): array
@@ -30,6 +30,8 @@ final class BuildCatalogPageAction
             'state' => $input['state'] ?? null,
             'search' => $input['search'] ?? null,
             'sort' => $input['sort'] ?? CatalogQuery::SORT_DEFAULT,
+            'exact_category' => $input['exact_category'] ?? false,
+            'exclude_product_id' => $input['exclude_product_id'] ?? null,
         ];
 
         return [

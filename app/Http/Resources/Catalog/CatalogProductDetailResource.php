@@ -119,8 +119,8 @@ final class CatalogProductDetailResource extends JsonResource
         $comment = $this->utf8($product->price_comment);
 
         return collect([
-            '<p class="product-sale-price"><strong>Цена:</strong> '.e($price).'</p>',
-            $this->labeledHtml('Комментарий', $comment),
+            '<p class="product-sale-price">'.e($price).'</p>',
+            $this->labeledHtml('Комментарий', $comment, 'product-sale-comment'),
         ])->filter()->implode('');
     }
 
@@ -139,17 +139,23 @@ final class CatalogProductDetailResource extends JsonResource
         ])->filter()->implode('');
     }
 
-    private function labeledHtml(string $label, ?string $content): ?string
+    private function labeledHtml(string $label, ?string $content, ?string $class = null): ?string
     {
         if (! filled($content)) {
             return null;
         }
 
+        $classAttribute = $class === null ? '' : ' class="'.e($class).'"';
+
         if (preg_match('/<\s*(p|div|ul|ol|table|blockquote|h[1-6])\b/i', $content) === 1) {
-            return '<div><strong>'.e($label).':</strong></div>'.$content;
+            if ($class !== null) {
+                return '<div'.$classAttribute.'><strong>'.e($label).':</strong>'.$content.'</div>';
+            }
+
+            return '<div'.$classAttribute.'><strong>'.e($label).':</strong></div>'.$content;
         }
 
-        return '<p><strong>'.e($label).':</strong> '.$content.'</p>';
+        return '<p'.$classAttribute.'><strong>'.e($label).':</strong> '.$content.'</p>';
     }
 
     private function utf8(?string $value): ?string

@@ -6,6 +6,7 @@ import { CatalogPageView } from '@/components/catalog/CatalogPageView';
 import { PageStructuredData } from '@/components/seo/OrganizationJsonLd';
 import { ProductCollectionSection } from '@/components/catalog/ProductCollectionSection';
 import { FeedbackRequestModal } from '@/components/common/FeedbackRequestModal';
+import { SocialChannelsSection } from '@/components/common/SocialChannelsSection';
 import { ProductGallery } from '@/components/catalog/ProductGallery';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
@@ -131,19 +132,19 @@ async function getCatalogProductOrNull(id: string): Promise<CatalogProductDetail
 }
 
 async function getRelatedProducts(product: CatalogProductDetail): Promise<CatalogProductCard[]> {
-    const firstTag = product.tags[0]?.trim();
+    const categoryPath = product.category?.pathString?.trim();
 
-    if (!firstTag) {
+    if (!categoryPath) {
         return [];
     }
 
     const related = await getCatalogPage({
-        search: firstTag,
+        category_path: categoryPath,
+        exact_category: 1,
+        exclude_product_id: product.id,
     });
 
-    return related.products
-        .filter((item) => item.id !== product.id)
-        .slice(0, 6);
+    return related.products.slice(0, 6);
 }
 
 function getRoutePathname(slug: string[]): string {
@@ -161,6 +162,27 @@ function htmlToPlainText(value: string | null): string | null {
         .trim() || null;
 }
 
+function productMetaDescription(product: CatalogProductDetail): string {
+    const mainInfo = product.characteristicBlocks.find((block) => block.title === 'Основная информация');
+
+    return htmlToPlainText(mainInfo?.contentHtml ?? null)
+        ?? htmlToPlainText(product.summary ?? product.description)
+        ?? categoryDescriptionFallback;
+}
+
+function productMetadata(product: CatalogProductDetail): Metadata {
+    return withSocialMetadata({
+        title: `${product.title} | ЮНИК С`,
+        description: productMetaDescription(product),
+        openGraph: {
+            images: [{ url: product.imageUrl }],
+        },
+        alternates: {
+            canonical: canonicalUrl(product.canonicalHref),
+        },
+    });
+}
+
 export async function generateMetadata({ params }: CatalogSlugPageProps): Promise<Metadata> {
     const { slug } = await params;
     const routeKey = slug.at(-1) ?? '';
@@ -169,13 +191,7 @@ export async function generateMetadata({ params }: CatalogSlugPageProps): Promis
         if (isProductRoute(slug)) {
             const product = await getCatalogProduct(routeKey);
 
-            return withSocialMetadata({
-                title: `${product.title} | ЮНИК С`,
-                description: htmlToPlainText(product.summary ?? product.description) ?? categoryDescriptionFallback,
-                alternates: {
-                    canonical: canonicalUrl(product.canonicalHref),
-                },
-            });
+            return productMetadata(product);
         }
 
         const data = await getCatalogPage({ category_path: slug.join('/') });
@@ -193,13 +209,7 @@ export async function generateMetadata({ params }: CatalogSlugPageProps): Promis
             const product = routeKey === '' ? null : await getCatalogProductOrNull(routeKey);
 
             if (product !== null) {
-                return withSocialMetadata({
-                    title: `${product.title} | ЮНИК С`,
-                    description: htmlToPlainText(product.summary ?? product.description) ?? categoryDescriptionFallback,
-                    alternates: {
-                        canonical: canonicalUrl(product.canonicalHref),
-                    },
-                });
+                return productMetadata(product);
             }
 
             return withSocialMetadata({
@@ -308,17 +318,20 @@ function ProductShowPage({
                                 <ProductGallery title={product.title} images={productImages} mobileSlider />
 
                                 {isSold && relatedProducts.length > 0 ? (
-                                    <ProductCollectionSection
-                                        title="Может быть вас заинтересует"
-                                        description={`Подобрали похожие товары по тегу "${product.tags[0]}".`}
-                                        products={relatedProducts}
-                                        href={`/catalog?search=${encodeURIComponent(product.tags[0] ?? '')}`}
-                                        buttonLabel="Смотреть все"
-                                        limit={6}
-                                        withContainer={false}
-                                        mobileSlider
-                                        columns={{ base: 1, sm: 2, lg: 3 }}
-                                    />
+                                    <>
+                                        <SocialChannelsSection productPage />
+                                        <ProductCollectionSection
+                                            title="Может быть вас заинтересует"
+                                            description={`Другие товары из категории "${product.category?.name ?? ''}".`}
+                                            products={relatedProducts}
+                                            href={product.category?.href ?? '/catalog'}
+                                            buttonLabel="Смотреть все"
+                                            limit={6}
+                                            withContainer={false}
+                                            mobileSlider
+                                            columns={{ base: 1, sm: 2, lg: 3 }}
+                                        />
+                                    </>
                                 ) : null}
 
                                 {product.characteristicBlocks.map((block) => (
@@ -345,17 +358,20 @@ function ProductShowPage({
                                 ) : null}
 
                                 {!isSold && relatedProducts.length > 0 ? (
-                                    <ProductCollectionSection
-                                        title="Может быть вас заинтересует"
-                                        description={`Подобрали похожие товары по тегу "${product.tags[0]}".`}
-                                        products={relatedProducts}
-                                        href={`/catalog?search=${encodeURIComponent(product.tags[0] ?? '')}`}
-                                        buttonLabel="Смотреть все"
-                                        limit={6}
-                                        withContainer={false}
-                                        mobileSlider
-                                        columns={{ base: 1, sm: 2, lg: 3 }}
-                                    />
+                                    <>
+                                        <SocialChannelsSection productPage />
+                                        <ProductCollectionSection
+                                            title="Может быть вас заинтересует"
+                                            description={`Другие товары из категории "${product.category?.name ?? ''}".`}
+                                            products={relatedProducts}
+                                            href={product.category?.href ?? '/catalog'}
+                                            buttonLabel="Смотреть все"
+                                            limit={6}
+                                            withContainer={false}
+                                            mobileSlider
+                                            columns={{ base: 1, sm: 2, lg: 3 }}
+                                        />
+                                    </>
                                 ) : null}
                             </div>
 

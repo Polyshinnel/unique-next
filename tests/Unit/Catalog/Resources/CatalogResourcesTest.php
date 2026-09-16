@@ -255,7 +255,7 @@ final class CatalogResourcesTest extends TestCase
 
         $resource = (new CatalogProductDetailResource($product))->resolve();
 
-        self::assertSame('<p class="product-sale-price"><strong>Цена:</strong> Резерв</p>', $resource['characteristicBlocks'][0]['contentHtml']);
+        self::assertSame('<p class="product-sale-price">Резерв</p>', $resource['characteristicBlocks'][0]['contentHtml']);
     }
 
     public function test_product_detail_resource_shows_sold_and_hides_sale_only_blocks(): void

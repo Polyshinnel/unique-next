@@ -23,19 +23,29 @@ export function ProductCard({ product }: { product: CatalogProductCard }) {
                     {product.category ? <Text c="dimmed" size="sm">{product.category.name}</Text> : null}
                     {product.region ? <Text c="dimmed" size="sm">{product.region.name}</Text> : null}
                 </Stack>
-                <Group gap="xs" mt="sm">
-                    {product.state ? <span className="product-tag">{product.state.name}</span> : null}
-                    {product.availability ? <span className="product-tag">{product.availability.name}</span> : null}
-                </Group>
-                <span className="product-card__price">{formatCatalogPrice(product.price)}</span>
-                <Button
-                    component="a"
-                    href={product.href}
-                    className="product-card__more"
-                    rightSection={<IconArrowRight size={17} />}
-                >
-                    Подробнее
-                </Button>
+                <div className="product-card__footer">
+                    <Group gap="xs">
+                        {product.state ? (
+                            <span className={`product-tag${product.state.name === 'Б.У' ? ' product-tag--used' : ''}`}>
+                                {product.state.name}
+                            </span>
+                        ) : null}
+                        {product.availability ? (
+                            <span className={`product-tag${product.availability.name === 'В наличии' ? ' product-tag--available' : ''}`}>
+                                {product.availability.name}
+                            </span>
+                        ) : null}
+                    </Group>
+                    <span className="product-card__price">{formatCatalogPrice(product.price)}</span>
+                    <Button
+                        component="a"
+                        href={product.href}
+                        className="product-card__more"
+                        rightSection={<IconArrowRight size={17} />}
+                    >
+                        Подробнее
+                    </Button>
+                </div>
             </div>
         </article>
     );

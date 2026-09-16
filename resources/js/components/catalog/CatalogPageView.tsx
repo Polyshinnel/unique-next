@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { CatalogCategoryTree } from '@/components/catalog/CatalogCategoryTree';
 import { FeedbackRequestModal } from '@/components/common/FeedbackRequestModal';
+import { SocialChannelsSection } from '@/components/common/SocialChannelsSection';
 import { Pagination } from '@/components/common/Pagination';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
@@ -437,6 +438,7 @@ export async function CatalogPageView({ data, searchParams }: CatalogPageViewPro
                         </div>
                     </Container>
                 </section>
+                <SocialChannelsSection />
                 <section className="search-band">
                     <Container size="xl">
                         <Group justify="space-between" gap="lg">

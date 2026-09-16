@@ -24,6 +24,8 @@ final class CatalogPageRequest extends FormRequest
             'sort' => ['nullable', 'string', 'in:default,price_desc,price_asc'],
             'search' => ['nullable', 'string', 'max:100'],
             'category_path' => ['nullable', 'string', 'max:500'],
+            'exact_category' => ['nullable', 'boolean'],
+            'exclude_product_id' => ['nullable', 'integer', 'min:1'],
         ];
     }
 
@@ -35,7 +37,9 @@ final class CatalogPageRequest extends FormRequest
      *     state: int|null,
      *     sort: string,
      *     search: string|null,
-     *     category_path: string|null
+     *     category_path: string|null,
+     *     exact_category: bool,
+     *     exclude_product_id: int|null
      * }
      */
     public function normalized(): array
@@ -50,6 +54,8 @@ final class CatalogPageRequest extends FormRequest
             'sort' => $validated['sort'],
             'search' => $validated['search'] ?? null,
             'category_path' => $validated['category_path'] ?? null,
+            'exact_category' => (bool) ($validated['exact_category'] ?? false),
+            'exclude_product_id' => $this->nullableInt($validated['exclude_product_id'] ?? null),
         ];
     }
 
@@ -63,6 +69,8 @@ final class CatalogPageRequest extends FormRequest
             'sort' => $this->normalizeSort($this->input('sort')),
             'search' => $this->normalizeSearch($this->input('search')),
             'category_path' => $this->normalizeCategoryPath($this->input('category_path')),
+            'exact_category' => $this->emptyStringToNull($this->input('exact_category')),
+            'exclude_product_id' => $this->emptyStringToNull($this->input('exclude_product_id')),
         ]);
     }
 

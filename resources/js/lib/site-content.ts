@@ -21,9 +21,9 @@ export const siteContacts = {
         latitude: 54.505882234159415,
     },
     socialLinks: {
-        max: '#',
+        max: 'https://max.ru/u/f9LHodD0cOIo9EF4dyFLsLTpWWuc1m9Gprh6sJZhyD3Bu0dKezDRd_uEBqA',
         vk: '#',
-        telegram: '#',
+        telegram: 'https://t.me/uniqset_catalog',
     },
 };
 

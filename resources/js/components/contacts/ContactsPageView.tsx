@@ -17,7 +17,9 @@ import {
 } from '@mantine/core';
 import {
     IconClockHour4,
+    IconBrandTelegram,
     IconMail,
+    IconMessageCircle,
     IconMapPin,
     IconPhone,
     IconRoute,
@@ -31,7 +33,7 @@ export function ContactsPageView({ contacts }: ContactsPageViewProps) {
     const mapLink = getOfficeMapLink(contacts);
     const contactCards = [
         {
-            title: 'Телефон',
+            title: 'Телефон и Email',
             value: contacts.phone,
             description: 'Свяжитесь с нами для консультации, подбора оборудования и обсуждения сделки.',
             href: phoneHref(contacts.phone),
@@ -39,12 +41,13 @@ export function ContactsPageView({ contacts }: ContactsPageViewProps) {
             icon: IconPhone,
         },
         {
-            title: 'Email',
-            value: contacts.email,
-            description: 'Отправьте запрос на подбор, коммерческое предложение или документы по сделке.',
-            href: emailHref(contacts.email),
-            action: 'Написать',
-            icon: IconMail,
+            title: 'Мессенджеры',
+            value: '',
+            description: 'Выберите удобный мессенджер — ответим на вопросы и поможем с подбором оборудования.',
+            href: '',
+            action: '',
+            icon: IconMessageCircle,
+            isMessenger: true,
         },
         {
             title: 'Адрес офиса',
@@ -72,12 +75,34 @@ export function ContactsPageView({ contacts }: ContactsPageViewProps) {
                             Поможем с подбором, покупкой, реализацией и поставкой промышленного оборудования.
                             Свяжитесь с нами удобным способом или приезжайте в офис в Калуге.
                         </Text>
-                        <Group mt="xl" gap="sm">
+                        <Group mt="xl" gap="sm" wrap="wrap">
                             <Button component="a" href={phoneHref(contacts.phone)} size="lg" leftSection={<IconPhone size={18} />}>
                                 Позвонить
                             </Button>
                             <Button component="a" href={emailHref(contacts.email)} size="lg" variant="white" leftSection={<IconMail size={18} />}>
                                 Написать на email
+                            </Button>
+                            <Button
+                                component="a"
+                                href="https://max.ru/u/f9LHodD0cOIo9EF4dyFLsLTpWWuc1m9Gprh6sJZhyD3Bu0dKezDRd_uEBqA"
+                                target="_blank"
+                                rel="noreferrer"
+                                size="lg"
+                                className="contacts-hero__max-button"
+                                leftSection={<IconMessageCircle size={18} />}
+                            >
+                                Написать в MAX
+                            </Button>
+                            <Button
+                                component="a"
+                                href="https://t.me/uniqset_catalog"
+                                target="_blank"
+                                rel="noreferrer"
+                                size="lg"
+                                className="contacts-hero__telegram-button"
+                                leftSection={<IconBrandTelegram size={18} />}
+                            >
+                                Написать в Telegram
                             </Button>
                         </Group>
                     </Container>
@@ -88,7 +113,7 @@ export function ContactsPageView({ contacts }: ContactsPageViewProps) {
                         <Stack gap="xl">
                             <Title order={2} className="visually-hidden">Контактная информация</Title>
                             <SimpleGrid cols={{ base: 1, md: 3 }} spacing="lg">
-                                {contactCards.map(({ title, value, description, href, action, icon: Icon }) => (
+                                {contactCards.map(({ title, value, description, href, action, icon: Icon, isMessenger }) => (
                                     <article key={title} className="contact-card">
                                         <span className="contact-card__icon">
                                             <Icon size={22} />
@@ -96,18 +121,54 @@ export function ContactsPageView({ contacts }: ContactsPageViewProps) {
                                         <Stack gap="sm" className="contact-card__content">
                                             <Title order={3} className="visually-hidden">{title}</Title>
                                             <Text className="contact-card__eyebrow" aria-hidden="true">{title}</Text>
-                                            <Text className="contact-card__value">{value}</Text>
-                                            <Text c="dimmed">{description}</Text>
+                                            {isMessenger ? (
+                                                <Stack gap="sm" className="contact-card__messenger-actions">
+                                                    <Text className="contact-card__value">MAX и Telegram</Text>
+                                                    <Text c="dimmed">{description}</Text>
+                                                    <Button
+                                                        component="a"
+                                                        href="https://t.me/uniqset_catalog"
+                                                        target="_blank"
+                                                        rel="noreferrer"
+                                                        className="contact-card__messenger-button contact-card__messenger-button--telegram"
+                                                        leftSection={<IconBrandTelegram size={18} />}
+                                                    >
+                                                        Написать в Telegram
+                                                    </Button>
+                                                    <Button
+                                                        component="a"
+                                                        href="https://max.ru/u/f9LHodD0cOIo9EF4dyFLsLTpWWuc1m9Gprh6sJZhyD3Bu0dKezDRd_uEBqA"
+                                                        target="_blank"
+                                                        rel="noreferrer"
+                                                        className="contact-card__messenger-button contact-card__messenger-button--max"
+                                                        leftSection={<IconMessageCircle size={18} />}
+                                                    >
+                                                        Написать в MAX
+                                                    </Button>
+                                                </Stack>
+                                            ) : (
+                                                <>
+                                                    <Text className="contact-card__value">{value}</Text>
+                                                    {title === 'Телефон и Email' && (
+                                                        <Text component="a" href={emailHref(contacts.email)} className="contact-card__secondary-value">
+                                                            {contacts.email}
+                                                        </Text>
+                                                    )}
+                                                    <Text c="dimmed">{description}</Text>
+                                                </>
+                                            )}
                                         </Stack>
-                                        <Button
-                                            component="a"
-                                            href={href}
-                                            className="contact-card__link"
-                                            color="teal"
-                                            variant="filled"
-                                        >
-                                            {action}
-                                        </Button>
+                                        {!isMessenger && (
+                                            <Button
+                                                component="a"
+                                                href={href}
+                                                className="contact-card__link"
+                                                color="teal"
+                                                variant="filled"
+                                            >
+                                                {action}
+                                            </Button>
+                                        )}
                                     </article>
                                 ))}
                             </SimpleGrid>
@@ -152,10 +213,9 @@ export function ContactsPageView({ contacts }: ContactsPageViewProps) {
                                         </div>
 
                                         <div className="contacts-note">
-                                            <Title order={4}>Поможем быстро сориентироваться</Title>
+                                            <Title order={4}>Форма обратной связи</Title>
                                             <Text c="dimmed">
-                                                Если вам удобнее начать с короткого звонка или письма, мы уточним задачу
-                                                и подскажем дальнейший формат работы без лишних шагов.
+                                                Опишите коротко свой запрос, вопрос или предложение и мы ответим вам в ближайшее время
                                             </Text>
                                             <Button
                                                 component="a"

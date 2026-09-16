@@ -207,7 +207,7 @@ final class CatalogPageControllerTest extends TestCase
             ->assertJsonPath('characteristicBlocks.2.title', 'Комплектация')
             ->assertJsonPath('characteristicBlocks.3.title', 'Технические характеристики')
             ->assertJsonPath('characteristicBlocks.4.title', 'Условия продажи')
-            ->assertJsonPath('characteristicBlocks.4.contentHtml', '<p class="product-sale-price"><strong>Цена:</strong> 95 000 ₽</p>')
+            ->assertJsonPath('characteristicBlocks.4.contentHtml', '<p class="product-sale-price">95 000 ₽</p>')
             ->assertJsonPath('characteristicBlocks.5.title', 'Проверка')
             ->assertJsonPath('characteristicBlocks.5.contentHtml', '<p><strong>Статус:</strong> Проверен</p><div><strong>Комментарий:</strong></div><p>Комментарий проверки</p>')
             ->assertJsonPath('characteristicBlocks.6.title', 'Демонтаж')
@@ -354,7 +354,7 @@ final class CatalogPageControllerTest extends TestCase
             ->assertJsonPath('price.isPublished', false)
             ->assertJsonPath('price.isReserve', true)
             ->assertJsonPath('price.label', 'Резерв')
-            ->assertJsonPath('characteristicBlocks.0.contentHtml', '<p class="product-sale-price"><strong>Цена:</strong> Резерв</p>');
+            ->assertJsonPath('characteristicBlocks.0.contentHtml', '<p class="product-sale-price">Резерв</p>');
     }
 
     public function test_catalog_page_uses_fixed_pagination_page_from_query(): void
@@ -524,6 +524,33 @@ final class CatalogPageControllerTest extends TestCase
             ->assertJsonPath('products.0.id', $matching->id)
             ->assertJsonCount(1, 'products')
             ->assertJsonPath('pagination.total', 1);
+    }
+
+    public function test_catalog_page_can_filter_only_exact_category_and_exclude_product(): void
+    {
+        $root = Category::query()->create(['name' => 'Сверлильные станки', 'slug' => 'sverlilnye-stanki']);
+        $category = Category::query()->create([
+            'name' => 'Вертикально сверлильные',
+            'slug' => 'vertikalno-sverlilnye',
+            'parent_id' => $root->id,
+        ]);
+        $child = Category::query()->create([
+            'name' => 'Настольные сверлильные',
+            'slug' => 'nastolnye-sverlilnye',
+            'parent_id' => $category->id,
+        ]);
+        $current = $this->product(['category_id' => $category->id]);
+        $sameCategory = $this->product(['category_id' => $category->id]);
+        $childProduct = $this->product(['category_id' => $child->id]);
+        $otherCategory = $this->product(['category_id' => $root->id]);
+
+        $response = $this->getJson('/api/catalog/page?category_path=sverlilnye-stanki/vertikalno-sverlilnye&exact_category=1&exclude_product_id='.$current->id)
+            ->assertOk()
+            ->assertJsonCount(1, 'products')
+            ->assertJsonPath('products.0.id', $sameCategory->id);
+
+        self::assertNotContains($childProduct->id, $this->productIds($response->json('products')));
+        self::assertNotContains($otherCategory->id, $this->productIds($response->json('products')));
     }
 
     public function test_catalog_page_filter_counters_ignore_active_region_and_roll_up_category_descendants(): void

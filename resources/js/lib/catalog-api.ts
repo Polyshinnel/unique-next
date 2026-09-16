@@ -13,6 +13,8 @@ export type CatalogSearchParams = {
     sort?: CatalogSortValue | null;
     search?: string | null;
     category_path?: string | null;
+    exact_category?: boolean | null;
+    exclude_product_id?: number | string | null;
 };
 
 export function catalogPathWithParams(baseHref: string, params?: CatalogSearchParams): string {

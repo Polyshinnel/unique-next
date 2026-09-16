@@ -70,7 +70,7 @@ final class CatalogQuery
     }
 
     /**
-     * @param  array{region?: int|null, availability?: int|null, state?: int|null, search?: string|null, sort?: string|null}  $filters
+     * @param  array{region?: int|null, availability?: int|null, state?: int|null, search?: string|null, sort?: string|null, exact_category?: bool, exclude_product_id?: int|null}  $filters
      * @param  string|list<string>|null  $except
      * @return Builder<Product>
      */
@@ -83,7 +83,7 @@ final class CatalogQuery
     }
 
     /**
-     * @param  array{region?: int|null, availability?: int|null, state?: int|null, search?: string|null}  $filters
+     * @param  array{region?: int|null, availability?: int|null, state?: int|null, search?: string|null, exact_category?: bool, exclude_product_id?: int|null}  $filters
      * @param  string|list<string>|null  $except
      * @return Builder<Product>
      */
@@ -103,7 +103,15 @@ final class CatalogQuery
         $except = $this->normalizeExcept($except);
 
         if ($category !== null && ! in_array(self::FILTER_CATEGORY, $except, true)) {
-            $query->whereIn('products.category_id', $this->categories->descendantIds($category));
+            if (($filters['exact_category'] ?? false) === true) {
+                $query->where('products.category_id', $category->getKey());
+            } else {
+                $query->whereIn('products.category_id', $this->categories->descendantIds($category));
+            }
+        }
+
+        if (($filters['exclude_product_id'] ?? null) !== null) {
+            $query->whereKeyNot((int) $filters['exclude_product_id']);
         }
 
         if (($filters['region'] ?? null) !== null && ! in_array(self::FILTER_REGION, $except, true)) {

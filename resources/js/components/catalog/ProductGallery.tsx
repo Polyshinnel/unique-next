@@ -20,6 +20,7 @@ export function ProductGallery({ title, images, mobileSlider = false }: ProductG
     const [activeIndex, setActiveIndex] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
     const galleryRef = useRef<HTMLDivElement | null>(null);
+    const thumbsViewportRef = useRef<HTMLDivElement | null>(null);
     const galleryId = useId();
     const dragStateRef = useRef({
         isDragging: false,
@@ -97,11 +98,19 @@ export function ProductGallery({ title, images, mobileSlider = false }: ProductG
         setIsDragging(false);
     };
 
+    const safeActiveIndex = Math.min(activeIndex, Math.max(normalizedImages.length - 1, 0));
+
+    useEffect(() => {
+        const activeThumb = thumbsViewportRef.current?.querySelector<HTMLButtonElement>(
+            `button:nth-child(${safeActiveIndex + 1})`,
+        );
+
+        activeThumb?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+    }, [safeActiveIndex]);
+
     if (normalizedImages.length === 0) {
         return null;
     }
-
-    const safeActiveIndex = Math.min(activeIndex, normalizedImages.length - 1);
 
     const goToThumb = (direction: 1 | -1) => {
         setActiveIndex((currentIndex) => Math.min(
@@ -151,6 +160,7 @@ export function ProductGallery({ title, images, mobileSlider = false }: ProductG
                     </div>
 
                     <div
+                        ref={thumbsViewportRef}
                         className={`product-show-gallery__thumbs-viewport${isDragging ? ' is-dragging' : ''}`}
                         onPointerDown={handlePointerDown}
                         onPointerMove={handlePointerMove}
