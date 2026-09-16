@@ -91,7 +91,10 @@ export async function apiRequest<T>(
     if (params) {
         Object.entries(params).forEach(([key, value]) => {
             if (value != null) {
-                url.searchParams.append(key, String(value));
+                url.searchParams.append(
+                    key,
+                    typeof value === 'boolean' ? (value ? '1' : '0') : String(value),
+                );
             }
         });
     }
