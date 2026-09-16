@@ -140,7 +140,7 @@ async function getRelatedProducts(product: CatalogProductDetail): Promise<Catalo
 
     const related = await getCatalogPage({
         category_path: categoryPath,
-        exact_category: 1,
+        exact_category: true,
         exclude_product_id: product.id,
     });
 

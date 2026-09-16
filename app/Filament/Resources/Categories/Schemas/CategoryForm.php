@@ -6,8 +6,8 @@ use App\Domain\Catalog\Models\Category;
 use App\Filament\Support\ImageUpload;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
@@ -45,6 +45,12 @@ class CategoryForm
                                 }
                             )
                             ->getOptionLabelFromRecordUsing(static fn (Category $record): string => $record->name),
+                        TextInput::make('sort_order')
+                            ->label('Порядок сортировки')
+                            ->numeric()
+                            ->minValue(0)
+                            ->nullable()
+                            ->helperText('Для корневых категорий: 0 — выше всех, пустое значение — после отсортированных.'),
                     ]),
                 Section::make('SEO')
                     ->schema([

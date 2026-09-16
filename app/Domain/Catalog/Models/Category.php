@@ -18,10 +18,18 @@ final class Category extends Model
         'name',
         'slug',
         'parent_id',
+        'sort_order',
         'title',
         'description',
         'og_image',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'sort_order' => 'integer',
+        ];
+    }
 
     public function parent(): BelongsTo
     {

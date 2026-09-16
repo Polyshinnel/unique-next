@@ -27,6 +27,10 @@ class CategoriesTable
                     ->placeholder('Не указана')
                     ->sortable()
                     ->searchable(),
+                TextColumn::make('sort_order')
+                    ->label('Порядок сортировки')
+                    ->placeholder('Не указан')
+                    ->sortable(),
                 TextColumn::make('title')
                     ->label('Title')
                     ->limit(40)

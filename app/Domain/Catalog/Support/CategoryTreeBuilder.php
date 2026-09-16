@@ -219,6 +219,21 @@ final class CategoryTreeBuilder
 
         return $this->categories
             ?->filter(fn (Category $category): bool => $category->parent_id === null || ! isset($this->categoriesById[(int) $category->parent_id]))
+            ->sort(function (Category $left, Category $right): int {
+                if ($left->sort_order === null && $right->sort_order !== null) {
+                    return 1;
+                }
+
+                if ($left->sort_order !== null && $right->sort_order === null) {
+                    return -1;
+                }
+
+                if ($left->sort_order !== $right->sort_order) {
+                    return ($left->sort_order ?? 0) <=> ($right->sort_order ?? 0);
+                }
+
+                return [$left->name, $left->getKey()] <=> [$right->name, $right->getKey()];
+            })
             ->values()
             ->all() ?? [];
     }

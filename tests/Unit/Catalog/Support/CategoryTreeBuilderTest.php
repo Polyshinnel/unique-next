@@ -92,6 +92,35 @@ final class CategoryTreeBuilderTest extends TestCase
         self::assertTrue($child->is($builder->resolvePath('/root/child/')));
     }
 
+    public function test_it_sorts_root_categories_by_sort_order_and_keeps_unsorted_categories_last(): void
+    {
+        $unsorted = Category::query()->create([
+            'name' => 'Альфа',
+            'slug' => 'alpha',
+        ]);
+        $second = Category::query()->create([
+            'name' => 'Бета',
+            'slug' => 'beta',
+            'sort_order' => 1,
+        ]);
+        $first = Category::query()->create([
+            'name' => 'Гамма',
+            'slug' => 'gamma',
+            'sort_order' => 0,
+        ]);
+        $child = Category::query()->create([
+            'name' => 'Дочерняя',
+            'slug' => 'child',
+            'parent_id' => $unsorted->id,
+            'sort_order' => 0,
+        ]);
+
+        $tree = (new CategoryTreeBuilder)->tree();
+
+        self::assertSame([$first->id, $second->id, $unsorted->id], array_column($tree, 'id'));
+        self::assertSame($child->id, $tree[2]['children'][0]['id']);
+    }
+
     public function test_descendant_ids_include_current_category_and_all_nested_children(): void
     {
         $root = Category::query()->create([
