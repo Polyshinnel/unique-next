@@ -27,6 +27,7 @@ final class CatalogPageResource extends JsonResource
         return [
             'category' => $category === null ? null : (new CatalogCategoryResource($category, $this->categories))->resolve($request),
             'filters' => [
+                'priceRange' => $this->resource['price_range'] ?? ['min' => null, 'max' => null],
                 'regions' => $this->filterOptions($this->resource['filters']['regions'] ?? [], $request),
                 'categories' => $this->filterOptions($this->resource['filters']['categories'] ?? [], $request),
                 'availabilities' => $this->filterOptions($this->resource['filters']['availabilities'] ?? [], $request),

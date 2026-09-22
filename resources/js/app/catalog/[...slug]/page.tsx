@@ -50,6 +50,8 @@ type CatalogRouteSearchParams = {
     state?: string | string[];
     sort?: string | string[];
     search?: string | string[];
+    price_from?: string | string[];
+    price_to?: string | string[];
 };
 
 type CatalogSlugPageProps = {
@@ -84,6 +86,8 @@ function getCatalogSearchParams(params: CatalogRouteSearchParams | undefined, ca
         state: getSearchParamValue(params?.state),
         sort,
         search: getSearchParamValue(params?.search),
+        price_from: getSearchParamValue(params?.price_from),
+        price_to: getSearchParamValue(params?.price_to),
     };
 }
 
@@ -319,7 +323,6 @@ function ProductShowPage({
 
                                 {isSold && relatedProducts.length > 0 ? (
                                     <>
-                                        <SocialChannelsSection productPage />
                                         <ProductCollectionSection
                                             title="Может быть вас заинтересует"
                                             description={`Другие товары из категории "${product.category?.name ?? ''}".`}
@@ -331,6 +334,7 @@ function ProductShowPage({
                                             mobileSlider
                                             columns={{ base: 1, sm: 2, lg: 3 }}
                                         />
+                                        <SocialChannelsSection productPage />
                                     </>
                                 ) : null}
 
@@ -359,7 +363,6 @@ function ProductShowPage({
 
                                 {!isSold && relatedProducts.length > 0 ? (
                                     <>
-                                        <SocialChannelsSection productPage />
                                         <ProductCollectionSection
                                             title="Может быть вас заинтересует"
                                             description={`Другие товары из категории "${product.category?.name ?? ''}".`}
@@ -371,6 +374,7 @@ function ProductShowPage({
                                             mobileSlider
                                             columns={{ base: 1, sm: 2, lg: 3 }}
                                         />
+                                        <SocialChannelsSection productPage />
                                     </>
                                 ) : null}
                             </div>

@@ -59,6 +59,7 @@ export function FeedbackRequestModal({
                 centered
                 radius="lg"
                 size="md"
+                zIndex={10000}
                 classNames={{
                     content: 'feedback-modal',
                     header: 'feedback-modal__header',

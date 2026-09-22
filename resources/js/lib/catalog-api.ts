@@ -12,6 +12,8 @@ export type CatalogSearchParams = {
     state?: number | string | null;
     sort?: CatalogSortValue | null;
     search?: string | null;
+    price_from?: number | string | null;
+    price_to?: number | string | null;
     category_path?: string | null;
     exact_category?: boolean | null;
     exclude_product_id?: number | string | null;
@@ -132,6 +134,7 @@ export type CatalogProductDetail = CatalogProductCard & {
 export type CatalogPageResponse = {
     category: CatalogCategoryNode | null;
     filters: {
+        priceRange: { min: number | null; max: number | null };
         regions: CatalogFilterOption[];
         categories: CatalogFilterOption[];
         availabilities: CatalogFilterOption[];

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { SocialProofSection } from '@/components/common/SocialProofSection';
+import { SocialChannelsSection } from '@/components/common/SocialChannelsSection';
 import { FeedbackRequestModal } from '@/components/common/FeedbackRequestModal';
 import { canonicalUrl, getPageSeo, toMetadata } from '@/lib/seo';
 import { getCatalogPage, type CatalogProductCard } from '@/lib/catalog-api';
@@ -295,9 +296,10 @@ export default async function ProductSaleServicePage() {
         <>
             <PageStructuredData service seoKey="equipment_sale" path="/services/prodazha-oborudovaniya" fallbackTitle="Продажа оборудования | ЮНИК С" fallbackDescription="Продажа б/у промышленного оборудования по всей России с понятным состоянием, сопровождением сделки и логистики." />
             <Header />
-            <main>
+            <main className="sales-page">
                 <HeroSection />
                 <LatestProductsSection products={catalogPage.products} />
+                <SocialChannelsSection />
                 <AdvantagesSection />
                 <SloganSection />
                 <SummarySection items={alreadyDoneList} />

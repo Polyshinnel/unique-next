@@ -18,7 +18,7 @@ final class BuildCatalogPageAction
     ) {}
 
     /**
-     * @param  array{page: int, region: int|null, availability: int|null, state: int|null, sort: string, search: string|null, category_path: string|null, exact_category?: bool, exclude_product_id?: int|null}  $input
+     * @param  array{page: int, region: int|null, availability: int|null, state: int|null, sort: string, search: string|null, price_from?: float|null, price_to?: float|null, category_path: string|null, exact_category?: bool, exclude_product_id?: int|null}  $input
      * @return array<string, mixed>
      */
     public function execute(array $input): array
@@ -29,13 +29,23 @@ final class BuildCatalogPageAction
             'availability' => $input['availability'] ?? null,
             'state' => $input['state'] ?? null,
             'search' => $input['search'] ?? null,
+            'price_from' => $input['price_from'] ?? null,
+            'price_to' => $input['price_to'] ?? null,
             'sort' => $input['sort'] ?? CatalogQuery::SORT_DEFAULT,
             'exact_category' => $input['exact_category'] ?? false,
             'exclude_product_id' => $input['exclude_product_id'] ?? null,
         ];
+        $priceRangeQuery = $this->catalog->filteredQuery($category)
+            ->where('products.show_price', true)
+            ->whereNotNull('products.price');
+        $priceRange = [
+            'min' => $this->wholePrice($priceRangeQuery->clone()->min('products.price')),
+            'max' => $this->wholePrice($priceRangeQuery->clone()->max('products.price')),
+        ];
 
         return [
             'category' => $category,
+            'price_range' => $priceRange,
             'filters' => $this->filters->execute($category, $filters),
             'sorting' => ['active' => $filters['sort']],
             'products' => $this->catalog
@@ -57,5 +67,10 @@ final class BuildCatalogPageAction
         }
 
         return $category;
+    }
+
+    private function wholePrice(mixed $price): ?int
+    {
+        return $price === null ? null : (int) $price;
     }
 }

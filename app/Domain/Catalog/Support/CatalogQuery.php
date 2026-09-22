@@ -70,7 +70,7 @@ final class CatalogQuery
     }
 
     /**
-     * @param  array{region?: int|null, availability?: int|null, state?: int|null, search?: string|null, sort?: string|null, exact_category?: bool, exclude_product_id?: int|null}  $filters
+     * @param  array{region?: int|null, availability?: int|null, state?: int|null, search?: string|null, price_from?: float|null, price_to?: float|null, sort?: string|null, exact_category?: bool, exclude_product_id?: int|null}  $filters
      * @param  string|list<string>|null  $except
      * @return Builder<Product>
      */
@@ -83,7 +83,7 @@ final class CatalogQuery
     }
 
     /**
-     * @param  array{region?: int|null, availability?: int|null, state?: int|null, search?: string|null, exact_category?: bool, exclude_product_id?: int|null}  $filters
+     * @param  array{region?: int|null, availability?: int|null, state?: int|null, search?: string|null, price_from?: float|null, price_to?: float|null, exact_category?: bool, exclude_product_id?: int|null}  $filters
      * @param  string|list<string>|null  $except
      * @return Builder<Product>
      */
@@ -133,6 +133,14 @@ final class CatalogQuery
 
         if (($filters['search'] ?? null) !== null && ! in_array(self::FILTER_SEARCH, $except, true)) {
             $this->applySearch($query, (string) $filters['search']);
+        }
+
+        if (($filters['price_from'] ?? null) !== null) {
+            $query->where('products.price', '>=', $filters['price_from'])->where('products.show_price', true);
+        }
+
+        if (($filters['price_to'] ?? null) !== null) {
+            $query->where('products.price', '<=', $filters['price_to'])->where('products.show_price', true);
         }
 
         return $query;

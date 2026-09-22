@@ -33,7 +33,7 @@ function ServicesSection() {
                         <Text c="dimmed">Основные направления работы с оборудованием и сделками.</Text>
                     </Stack>
                 </Group>
-                <SimpleGrid cols={{ base: 1, sm: 2, xl: 4 }} spacing="lg">
+                <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="lg">
                     {demoServices.map((service) => (
                         <ServiceCard key={service.id} service={service} />
                     ))}

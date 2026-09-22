@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { CatalogCategoryTree } from '@/components/catalog/CatalogCategoryTree';
 import { FeedbackRequestModal } from '@/components/common/FeedbackRequestModal';
@@ -7,7 +8,6 @@ import { Pagination } from '@/components/common/Pagination';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
 import type { CatalogCategoryBreadcrumb, CatalogFilterOption, CatalogPageResponse, CatalogSearchParams } from '@/lib/catalog-api';
-import { getSiteContacts } from '@/lib/site-contacts';
 import {
     Badge,
     Button,
@@ -20,12 +20,10 @@ import {
     Title,
 } from '@mantine/core';
 import {
-    IconBrandTelegram,
     IconChevronLeft,
     IconChevronRight,
     IconChevronsLeft,
     IconChevronsRight,
-    IconMessageCircle,
     IconSearch,
 } from '@tabler/icons-react';
 import { ProductCard } from './ProductCard';
@@ -82,7 +80,7 @@ function getCatalogHref(
     changes: Partial<CatalogSearchParams> = {},
 ) {
     const params = new URLSearchParams();
-    const keys: CatalogParamKey[] = ['page', 'region', 'availability', 'state', 'sort', 'search'];
+    const keys: CatalogParamKey[] = ['page', 'region', 'availability', 'state', 'sort', 'search', 'price_from', 'price_to'];
 
     keys.forEach((key) => {
         setCatalogParam(params, key, Object.prototype.hasOwnProperty.call(changes, key) ? changes[key] : searchParams?.[key]);
@@ -209,6 +207,16 @@ function CatalogFilters({
                         defaultValue={getParamValue(searchParams?.search)}
                     />
                     <Button type="submit" className="catalog-search-form__button">Найти</Button>
+                </form>
+            </FilterCard>
+            <FilterCard title="Цена, ₽">
+                <form action={baseHref} method="get" className="catalog-search-form">
+                    <HiddenCatalogInputs searchParams={searchParams} />
+                    <div className="catalog-price-filter__inputs">
+                        <TextInput className="catalog-search-form__input" type="number" min="0" step="any" name="price_from" placeholder={`От ${data.filters.priceRange.min ?? ''}`} aria-label="Цена от" defaultValue={getParamValue(searchParams?.price_from)} />
+                        <TextInput className="catalog-search-form__input" type="number" min="0" step="any" name="price_to" placeholder={`До ${data.filters.priceRange.max ?? ''}`} aria-label="Цена до" defaultValue={getParamValue(searchParams?.price_to)} />
+                    </div>
+                    <Button type="submit" className="catalog-search-form__button">Применить</Button>
                 </form>
             </FilterCard>
             <FilterCard title="По региону">
@@ -354,7 +362,6 @@ function CatalogSorting({
 }
 
 export async function CatalogPageView({ data, searchParams }: CatalogPageViewProps) {
-    const contacts = await getSiteContacts();
     const baseHref = data.category?.href ?? '/catalog';
     const title = data.category ? (data.category.title || data.category.name) : catalogTitleFallback;
     const description = data.category?.description ?? catalogDescriptionFallback;
@@ -365,34 +372,32 @@ export async function CatalogPageView({ data, searchParams }: CatalogPageViewPro
             <Header />
             <main>
                 <section className="page-hero catalog-hero">
-                    <Container size="xl">
-                        <CatalogBreadcrumbs data={data} />
-                        <Title order={1}>{title}</Title>
-                        <Stack gap="xs" align="flex-start">
-                            <Text size="lg">{description}</Text>
-                            <Group gap="md" wrap="wrap" mt="sm">
-                                <Button
-                                    component="a"
-                                    href="https://telegram.me/uniqset_gen"
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    leftSection={<IconBrandTelegram size={18} />}
-                                >
-                                    Telegram
-                                </Button>
-                                <Button
-                                    component="a"
-                                    href={contacts.max}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    variant="white"
-                                    color="dark"
-                                    leftSection={<IconMessageCircle size={18} />}
-                                >
-                                    Max
-                                </Button>
-                            </Group>
-                        </Stack>
+                    <Container size="xl" className="catalog-hero__container">
+                        <div className="catalog-hero__content">
+                            <div className="catalog-hero__main">
+                                <CatalogBreadcrumbs data={data} />
+                                <Title order={1}>{title}</Title>
+                                <Stack gap="xs" align="flex-start">
+                                    <Text size="lg">{description}</Text>
+                                </Stack>
+                            </div>
+                            <aside className="catalog-hero__channels" aria-label="Каналы ЮНИК С">
+                                <div className="catalog-hero__qr-list">
+                                    <a className="catalog-hero__qr-item" href="https://max.ru/id4027139409_biz" target="_blank" rel="noreferrer">
+                                        <Image src="/assets/img/qr-max-uniqset.svg" alt="QR-код канала ЮНИК С в MAX" width={112} height={112} unoptimized />
+                                        <span>Канал в МАКСе</span>
+                                    </a>
+                                    <a className="catalog-hero__qr-item" href="https://t.me/uniqset_catalog" target="_blank" rel="noreferrer">
+                                        <Image src="/assets/img/qr-telegram-uniqset-catalog.svg" alt="QR-код канала ЮНИК С в Telegram" width={112} height={112} unoptimized />
+                                        <span>Канал в Телеграм</span>
+                                    </a>
+                                </div>
+                                <div className="catalog-hero__channel-copy">
+                                    <Title order={3}>Подпишитесь на наши каналы</Title>
+                                    <Text>Будьте в курсе новинок и специальных предложений.</Text>
+                                </div>
+                            </aside>
+                        </div>
                     </Container>
                 </section>
                 <section className="content-section catalog-section">

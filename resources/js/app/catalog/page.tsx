@@ -24,6 +24,8 @@ type CatalogPageProps = {
         state?: string | string[];
         sort?: string | string[];
         search?: string | string[];
+        price_from?: string | string[];
+        price_to?: string | string[];
     }>;
 };
 
@@ -49,6 +51,8 @@ function getCatalogSearchParams(params: Awaited<NonNullable<CatalogPageProps['se
         state: getSearchParamValue(params?.state),
         sort,
         search: getSearchParamValue(params?.search),
+        price_from: getSearchParamValue(params?.price_from),
+        price_to: getSearchParamValue(params?.price_to),
     };
 }
 

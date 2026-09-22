@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { SocialProofSection } from '@/components/common/SocialProofSection';
+import { FeedbackRequestModal } from '@/components/common/FeedbackRequestModal';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
 import { YandexMap } from '@/components/contacts/YandexMap';
@@ -110,7 +111,7 @@ export function ContactsPageView({ contacts }: ContactsPageViewProps) {
 
                 <section className="content-section contacts-section">
                     <Container size="xl">
-                        <Stack gap="xl">
+                        <Stack gap="lg">
                             <Title order={2} className="visually-hidden">Контактная информация</Title>
                             <SimpleGrid cols={{ base: 1, md: 3 }} spacing="lg">
                                 {contactCards.map(({ title, value, description, href, action, icon: Icon, isMessenger }) => (
@@ -217,15 +218,15 @@ export function ContactsPageView({ contacts }: ContactsPageViewProps) {
                                             <Text c="dimmed">
                                                 Опишите коротко свой запрос, вопрос или предложение и мы ответим вам в ближайшее время
                                             </Text>
-                                            <Button
-                                                component="a"
-                                                href={phoneHref(contacts.phone)}
-                                                className="contacts-note__button"
-                                                color="teal"
-                                                leftSection={<IconPhone size={18} />}
-                                            >
-                                                Свяжитесь со мной
-                                            </Button>
+                                            <FeedbackRequestModal
+                                                buttonLabel="Свяжитесь со мной"
+                                                modalTitle="Форма обратной связи"
+                                                description="Заполните поля формы и мы свяжемся с Вами в ближайшее время"
+                                                size="md"
+                                                buttonClassName="contacts-note__button"
+                                                buttonColor="teal"
+                                                buttonLeftSection={<IconPhone size={18} />}
+                                            />
                                         </div>
                                     </Stack>
                                 </section>
