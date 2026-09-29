@@ -4,6 +4,8 @@ import { SocialProofSection } from '@/components/common/SocialProofSection';
 import { SocialChannelsSection } from '@/components/common/SocialChannelsSection';
 import { FeedbackRequestModal } from '@/components/common/FeedbackRequestModal';
 import { canonicalUrl, getPageSeo, toMetadata } from '@/lib/seo';
+import { phoneHref } from '@/lib/site-content';
+import { getSiteContacts, type SiteContacts } from '@/lib/site-contacts';
 import { getCatalogPage, type CatalogProductCard } from '@/lib/catalog-api';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
@@ -22,10 +24,10 @@ import {
 } from '@mantine/core';
 import {
     IconArrowRight,
-    IconBrandTelegram,
     IconExternalLink,
     IconMessageCircle,
     IconPhotoScan,
+    IconPhone,
     IconReceiptTax,
     IconShieldCheck,
     IconTruckDelivery,
@@ -45,7 +47,6 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 const catalogHref = '/catalog';
-const telegramHref = 'https://telegram.me/uniqset_gen';
 
 const advantages = [
     {
@@ -89,7 +90,7 @@ const deliverySupport = [
     'Отправить транспортной компанией',
 ];
 
-function HeroSection() {
+function HeroSection({ contacts }: { contacts: SiteContacts }) {
     return (
         <section className="page-hero sales-hero">
             <Container size="xl">
@@ -108,21 +109,17 @@ function HeroSection() {
                         по кнопке ниже
                     </Text>
                     <Group gap="md">
-                        <Button component="a" href={catalogHref} size="lg" rightSection={<IconArrowRight size={18} />}>
-                            В каталог
+                        <Button component="a" href={phoneHref(contacts.phone)} size="lg" leftSection={<IconPhone size={18} />}>
+                            Позвонить
                         </Button>
-                        <Button
-                            component="a"
-                            href={telegramHref}
-                            target="_blank"
-                            rel="noreferrer"
-                            size="lg"
-                            variant="white"
-                            color="dark"
-                            leftSection={<IconBrandTelegram size={18} />}
-                        >
-                            Telegram
-                        </Button>
+                        <FeedbackRequestModal
+                            buttonLabel="Оставить заявку"
+                            modalTitle="Закажите обратный звонок"
+                            description="Оставьте контакты, и мы перезвоним вам, чтобы обсудить продажу оборудования."
+                            buttonVariant="white"
+                            buttonColor="dark"
+                            buttonLeftSection={null}
+                        />
                     </Group>
                 </Stack>
             </Container>
@@ -148,12 +145,12 @@ function LatestProductsSection({ products }: { products: CatalogProductCard[] })
                     </Button>
                 </Group>
                 <SimpleGrid className="latest-products-section__grid" cols={{ base: 1, sm: 2, lg: 4 }} spacing="lg">
-                    {products.slice(0, 4).map((product) => (
+                    {products.slice(0, 8).map((product) => (
                         <ProductCard key={product.id} product={product} />
                     ))}
                 </SimpleGrid>
                 <div className="latest-products-section__mobile-slider">
-                    <MobileProductSlider products={products.slice(0, 4)} />
+                    <MobileProductSlider products={products.slice(0, 8)} />
                 </div>
             </Container>
         </section>
@@ -290,14 +287,14 @@ function RemotePurchaseSection() {
 }
 
 export default async function ProductSaleServicePage() {
-    const catalogPage = await getCatalogPage();
+    const [catalogPage, contacts] = await Promise.all([getCatalogPage(), getSiteContacts()]);
 
     return (
         <>
             <PageStructuredData service seoKey="equipment_sale" path="/services/prodazha-oborudovaniya" fallbackTitle="Продажа оборудования | ЮНИК С" fallbackDescription="Продажа б/у промышленного оборудования по всей России с понятным состоянием, сопровождением сделки и логистики." />
             <Header />
             <main className="sales-page">
-                <HeroSection />
+                <HeroSection contacts={contacts} />
                 <LatestProductsSection products={catalogPage.products} />
                 <SocialChannelsSection />
                 <AdvantagesSection />

@@ -72,8 +72,7 @@ export function SocialProofSection({ className = 'content-section content-sectio
                     <div className="otgruzki-follow-summary">
                         <Badge variant="filled" color="orange" size="lg">97%</Badge>
                         <Text size="lg">
-                            <strong>97% клиентов довольны нашей работой</strong> и возвращаются к нам за следующими
-                            сделками или рекомендуют нас коллегам.
+                            <strong>97% наших клиентов остались довольны нами.</strong> Посмотрите отзывы о нашей работе в профиле Авито
                         </Text>
                     </div>
 

@@ -148,7 +148,7 @@ async function getRelatedProducts(product: CatalogProductDetail): Promise<Catalo
         exclude_product_id: product.id,
     });
 
-    return related.products.slice(0, 6);
+    return related.products.slice(0, 3);
 }
 
 function getRoutePathname(slug: string[]): string {
@@ -306,12 +306,6 @@ function ProductShowPage({
                         <ProductBreadcrumbs product={product} />
                         <ProductMobileBreadcrumbs product={product} />
                         <Title order={1}>{product.title}</Title>
-                        {product.summary ? (
-                            <div
-                                className="product-show-summary"
-                                dangerouslySetInnerHTML={{ __html: product.summary }}
-                            />
-                        ) : null}
                     </Container>
                 </section>
 

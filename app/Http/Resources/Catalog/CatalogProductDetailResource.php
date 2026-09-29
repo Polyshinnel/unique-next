@@ -119,7 +119,7 @@ final class CatalogProductDetailResource extends JsonResource
         $comment = $this->utf8($product->price_comment);
 
         return collect([
-            '<p class="product-sale-price">'.e($price).'</p>',
+            '<p class="product-sale-price">Цена: <strong>'.e($price).'</strong></p>',
             $this->labeledHtml('Комментарий', $comment, 'product-sale-comment'),
         ])->filter()->implode('');
     }

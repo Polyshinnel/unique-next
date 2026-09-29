@@ -18,7 +18,6 @@ import {
 } from '@mantine/core';
 import {
     IconArrowRight,
-    IconBrandTelegram,
     IconBrandVk,
     IconChevronLeft,
     IconChevronRight,
@@ -51,7 +50,6 @@ const remoteSupportSteps = [
 ];
 
 const vkHref = 'https://vk.com/uniqset';
-const telegramHref = 'https://telegram.me/uniqset_gen';
 
 function shortText(text: string, maxLength = 150) {
     if (text.length <= maxLength) {
@@ -241,15 +239,13 @@ export default async function OtgruzkiPage({ searchParams }: OtgruzkiPageProps) 
                                 </Button>
                                 <Button
                                     component="a"
-                                    href={telegramHref}
-                                    target="_blank"
-                                    rel="noreferrer"
+                                    href="/why-we"
                                     size="lg"
                                     variant="white"
                                     color="dark"
-                                    leftSection={<IconBrandTelegram size={18} />}
+                                    rightSection={<IconArrowRight size={18} />}
                                 >
-                                    Telegram
+                                    Почему мы
                                 </Button>
                             </Group>
                         </Stack>

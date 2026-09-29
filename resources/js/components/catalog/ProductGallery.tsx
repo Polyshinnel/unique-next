@@ -21,6 +21,7 @@ export function ProductGallery({ title, images, mobileSlider = false }: ProductG
     const [isDragging, setIsDragging] = useState(false);
     const galleryRef = useRef<HTMLDivElement | null>(null);
     const thumbsViewportRef = useRef<HTMLDivElement | null>(null);
+    const previousActiveIndexRef = useRef(activeIndex);
     const galleryId = useId();
     const dragStateRef = useRef({
         isDragging: false,
@@ -62,7 +63,6 @@ export function ProductGallery({ title, images, mobileSlider = false }: ProductG
             pointerId: event.pointerId,
         };
         setIsDragging(true);
-        viewport.setPointerCapture(event.pointerId);
     };
 
     const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
@@ -101,6 +101,11 @@ export function ProductGallery({ title, images, mobileSlider = false }: ProductG
     const safeActiveIndex = Math.min(activeIndex, Math.max(normalizedImages.length - 1, 0));
 
     useEffect(() => {
+        if (previousActiveIndexRef.current === safeActiveIndex) {
+            return;
+        }
+
+        previousActiveIndexRef.current = safeActiveIndex;
         const activeThumb = thumbsViewportRef.current?.querySelector<HTMLButtonElement>(
             `button:nth-child(${safeActiveIndex + 1})`,
         );
@@ -119,17 +124,20 @@ export function ProductGallery({ title, images, mobileSlider = false }: ProductG
         ));
     };
 
-    const handlePointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
-        if (event.currentTarget.hasPointerCapture(dragStateRef.current.pointerId)) {
-            event.currentTarget.releasePointerCapture(dragStateRef.current.pointerId);
-        }
-
+    const handlePointerUp = () => {
         finishDragging();
     };
 
     const handleThumbClick = (index: number) => {
         if (!suppressClickRef.current) {
             setActiveIndex(index);
+            const mainImages = galleryRef.current?.querySelectorAll<HTMLAnchorElement>(
+                '.product-show-gallery__main [data-fancybox]',
+            );
+
+            if (mainImages?.length) {
+                Fancybox.fromNodes(Array.from(mainImages), { startIndex: index });
+            }
         }
     };
 

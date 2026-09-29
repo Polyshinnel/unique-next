@@ -9,7 +9,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 final class BuildCatalogPageAction
 {
-    private const PER_PAGE = 12;
+    private const PER_PAGE = 15;
 
     public function __construct(
         private readonly CatalogQuery $catalog = new CatalogQuery,

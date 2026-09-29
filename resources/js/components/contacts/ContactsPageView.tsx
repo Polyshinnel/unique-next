@@ -96,7 +96,7 @@ export function ContactsPageView({ contacts }: ContactsPageViewProps) {
                             </Button>
                             <Button
                                 component="a"
-                                href="https://t.me/uniqset_catalog"
+                                href="https://t.me/uniqset_gen"
                                 target="_blank"
                                 rel="noreferrer"
                                 size="lg"
@@ -128,7 +128,7 @@ export function ContactsPageView({ contacts }: ContactsPageViewProps) {
                                                     <Text c="dimmed">{description}</Text>
                                                     <Button
                                                         component="a"
-                                                        href="https://t.me/uniqset_catalog"
+                                                        href="https://t.me/uniqset_gen"
                                                         target="_blank"
                                                         rel="noreferrer"
                                                         className="contact-card__messenger-button contact-card__messenger-button--telegram"

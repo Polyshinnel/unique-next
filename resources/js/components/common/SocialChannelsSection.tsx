@@ -37,7 +37,7 @@ export function SocialChannelsSection({ productPage = false }: SocialChannelsSec
                                 </Badge>
                             ))}
                         </div>
-                        <Title order={2}>Наши группы в Telegram и MAX</Title>
+                        <Title order={2}>Наши каналы в Telegram и MAX</Title>
                         <Text className="social-channels-block__description">
                             Все новинки, изменения цены и условий продажи мгновенно публикуем в наших каналах в Максе и
                             в Телеграм

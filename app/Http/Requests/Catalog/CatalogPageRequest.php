@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Catalog;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 final class CatalogPageRequest extends FormRequest
 {
@@ -24,7 +25,12 @@ final class CatalogPageRequest extends FormRequest
             'sort' => ['nullable', 'string', 'in:default,price_desc,price_asc'],
             'search' => ['nullable', 'string', 'max:100'],
             'price_from' => ['nullable', 'numeric', 'min:0'],
-            'price_to' => ['nullable', 'numeric', 'min:0', 'gte:price_from'],
+            'price_to' => [
+                'nullable',
+                'numeric',
+                'min:0',
+                Rule::when($this->input('price_from') !== null, ['gte:price_from']),
+            ],
             'category_path' => ['nullable', 'string', 'max:500'],
             'exact_category' => ['nullable', 'boolean'],
             'exclude_product_id' => ['nullable', 'integer', 'min:1'],
