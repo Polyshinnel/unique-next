@@ -1429,6 +1429,9 @@ img {
 }
 
 .footer-request {
+    display: flex;
+    align-items: center;
+    gap: var(--mantine-spacing-xs);
     flex-wrap: nowrap;
 }
 

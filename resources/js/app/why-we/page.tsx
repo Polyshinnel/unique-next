@@ -4,16 +4,14 @@ import { canonicalUrl, getPageSeo, toMetadata } from '@/lib/seo';
 import { PageStructuredData } from '@/components/seo/OrganizationJsonLd';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
+import { InlineFeedbackForm } from '@/components/common/InlineFeedbackForm';
 import { getSiteContacts, type SiteContacts } from '@/lib/site-contacts';
 import {
-    Button,
     Container,
     Image,
     SimpleGrid,
     Stack,
     Text,
-    TextInput,
-    Textarea,
     Title,
 } from '@mantine/core';
 import { IconPhotoScan, IconReceiptTax, IconTruckDelivery } from '@tabler/icons-react';
@@ -219,20 +217,7 @@ function ContactFormSection({ contacts }: { contacts: SiteContacts }) {
                         </Text>
                     </Stack>
 
-                    <Stack gap="sm" mt="xl">
-                        <TextInput label="Имя" placeholder="Как к вам обращаться" />
-                        <TextInput label="Email" placeholder="example@mail.ru" type="email" />
-                        <TextInput label="Телефон" placeholder="+7 (___) ___-__-__" />
-                        <Textarea
-                            label="Сообщение"
-                            placeholder="Напишите, какое оборудование вас интересует и какие вопросы нужно решить"
-                            minRows={5}
-                        />
-                    </Stack>
-
-                    <Button size="lg" mt="xl">
-                        Отправить сообщение
-                    </Button>
+                    <InlineFeedbackForm />
                     <Text size="sm" c="dimmed" className="buyout-form-card__hint">
                         Также можно написать на {contacts.email} или позвонить по номеру {contacts.phone}.
                     </Text>

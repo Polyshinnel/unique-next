@@ -20,6 +20,7 @@ import {
 } from '@tabler/icons-react';
 import { demoServices, emailHref, navItems, phoneHref } from '@/lib/site-content';
 import { formatOfficeAddress, getSiteContacts } from '@/lib/site-contacts';
+import { FooterCallbackForm } from '@/components/layout/FooterCallbackForm';
 
 function SocialButton({ href, icon: Icon, label }: { href: string; icon: typeof IconBrandVk; label: string }) {
     return (
@@ -115,10 +116,7 @@ export async function Footer() {
                         </Text>
                     </Stack>
                     <Stack gap={8} align="flex-end" className="footer-request-block">
-                        <Group gap="xs" className="footer-request">
-                            <TextInput placeholder="Ваш телефон" aria-label="Телефон для обратного звонка" />
-                            <Button>Позвоните мне</Button>
-                        </Group>
+                        <FooterCallbackForm />
                         <Text size="sm" c="gray.5" className="footer-consent">
                             Нажимая кнопку соглашаюсь с{' '}
                             <Anchor href="/private-policy" className="footer-consent__link">

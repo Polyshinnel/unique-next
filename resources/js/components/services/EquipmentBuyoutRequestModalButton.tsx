@@ -53,12 +53,7 @@ export function EquipmentBuyoutRequestModalButton({
                     close: 'feedback-modal__close',
                 }}
             >
-                <EquipmentBuyoutRequestForm
-                    onSubmit={(event) => {
-                        event.preventDefault();
-                        close();
-                    }}
-                />
+                <EquipmentBuyoutRequestForm />
             </Modal>
         </>
     );

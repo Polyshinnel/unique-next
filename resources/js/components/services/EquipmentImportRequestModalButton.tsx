@@ -53,12 +53,7 @@ export function EquipmentImportRequestModalButton({
                     close: 'feedback-modal__close',
                 }}
             >
-                <EquipmentImportRequestForm
-                    onSubmit={(event) => {
-                        event.preventDefault();
-                        close();
-                    }}
-                />
+                <EquipmentImportRequestForm />
             </Modal>
         </>
     );
