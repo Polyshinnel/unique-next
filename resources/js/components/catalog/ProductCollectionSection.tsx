@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { ProductCard } from '@/components/catalog/ProductCard';
 import { MobileProductSlider } from '@/components/catalog/MobileProductSlider';
 import type { CatalogProductCard } from '@/lib/catalog-api';
@@ -13,6 +14,7 @@ type ProductCollectionSectionProps = {
     limit?: number;
     withContainer?: boolean;
     mobileSlider?: boolean;
+    footer?: ReactNode;
     columns?: {
         base?: number;
         sm?: number;
@@ -30,6 +32,7 @@ export function ProductCollectionSection({
     limit = 4,
     withContainer = true,
     mobileSlider = false,
+    footer,
     columns = { base: 1, sm: 2, lg: 4 },
 }: ProductCollectionSectionProps) {
     if (products.length === 0) {
@@ -57,6 +60,7 @@ export function ProductCollectionSection({
                     <MobileProductSlider products={products.slice(0, limit)} />
                 </div>
             ) : null}
+            {footer}
         </>
     );
 

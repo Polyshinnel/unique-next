@@ -7,7 +7,7 @@ services:
       args:
         APP_URL: ${APP_URL:-http://localhost:28080}
     container_name: uniqset2_app
-    restart: unless-stopped
+    restart: "no"
     working_dir: /var/www/html
     volumes:
       - ./:/var/www/html
@@ -38,7 +38,7 @@ services:
       dockerfile: Dockerfile
       network: host
     container_name: uniqset2_scheduler
-    restart: unless-stopped
+    restart: "no"
     working_dir: /var/www/html
     command: php artisan schedule:work
     volumes:
@@ -61,7 +61,7 @@ services:
   db:
     image: mysql:8.4
     container_name: uniqset2_db
-    restart: unless-stopped
+    restart: "no"
     command: ["--defaults-file=/etc/mysql/conf.d/my.cnf"]
     environment:
       MYSQL_DATABASE: ${DB_DATABASE:-uniqset2}
@@ -82,7 +82,7 @@ services:
   redis:
     image: redis:7-alpine
     container_name: uniqset2_redis
-    restart: unless-stopped
+    restart: "no"
     command: ["redis-server", "--appendonly", "yes"]
     ports:
       - "${REDIS_HOST_PORT:-26379}:6379"

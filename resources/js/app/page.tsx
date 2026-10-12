@@ -12,6 +12,8 @@ import { MobileServiceSlider } from '@/components/services/MobileServiceSlider';
 import { HeroSlider } from '@/components/home/HeroSlider';
 import { PageStructuredData } from '@/components/seo/OrganizationJsonLd';
 import { SocialChannelsSection } from '@/components/common/SocialChannelsSection';
+import { Pagination } from '@/components/common/Pagination';
+import { IconChevronLeft, IconChevronRight, IconChevronsLeft, IconChevronsRight } from '@tabler/icons-react';
 import { Container, Group, Image, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -77,7 +79,7 @@ function CompanySection() {
     );
 }
 
-function LatestProducts({ products }: { products: CatalogProductCard[] }) {
+function LatestProducts({ products, totalPages }: { products: CatalogProductCard[]; totalPages: number }) {
     return (
         <ProductCollectionSection
             title="Последние поступления"
@@ -87,6 +89,19 @@ function LatestProducts({ products }: { products: CatalogProductCard[] }) {
             buttonLabel="Перейти в каталог"
             limit={8}
             mobileSlider
+            footer={
+                <Pagination
+                    currentPage={1}
+                    totalPages={totalPages}
+                    getPageHref={() => '/catalog'}
+                    ariaLabel="Пагинация каталога"
+                    className="catalog-pagination"
+                    firstControl={<IconChevronsLeft size={18} />}
+                    previousControl={<IconChevronLeft size={18} />}
+                    nextControl={<IconChevronRight size={18} />}
+                    lastControl={<IconChevronsRight size={18} />}
+                />
+            }
         />
     );
 }
@@ -182,7 +197,7 @@ export default async function HomePage() {
             <main>
                 <HeroSlider slides={banners} />
                 <CompanySection />
-                <LatestProducts products={catalogPage.products} />
+                <LatestProducts products={catalogPage.products} totalPages={catalogPage.pagination.totalPages} />
                 <SocialChannelsSection />
                 <ServicesSection />
                 <BusinessEquipmentSection />
