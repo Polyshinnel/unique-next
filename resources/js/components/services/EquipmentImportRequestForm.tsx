@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import { Button, Stack, Text, TextInput, Textarea, Title } from '@mantine/core';
 import type { FormEventHandler } from 'react';
