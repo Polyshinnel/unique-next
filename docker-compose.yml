@@ -22,6 +22,7 @@ services:
       - TZ=${TZ:-Europe/Moscow}
       - BACKEND_URL=http://127.0.0.1
       - NEXT_PUBLIC_API_URL=/api
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
       - DB_HOST=mysql
       - REDIS_HOST=redis
       - WWWUSER=${UID:-1000}
