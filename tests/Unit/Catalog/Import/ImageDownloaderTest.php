@@ -6,14 +6,85 @@ use App\Domain\Catalog\Import\Data\MediaItemData;
 use App\Domain\Catalog\Import\Services\ImageDownloader;
 use App\Domain\Catalog\Models\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 final class ImageDownloaderTest extends TestCase
 {
     use RefreshDatabase;
+
+    #[DataProvider('genericContentTypes')]
+    public function test_it_detects_jfif_content_and_saves_it_as_jpg(?string $contentType): void
+    {
+        Storage::fake('public');
+        $body = UploadedFile::fake()->image('photo.jpg', 2, 2)->getContent();
+        Http::fake([
+            'https://example.com/photo.jfif' => Http::response($body, 200,
+                $contentType === null ? [] : ['Content-Type' => $contentType]),
+        ]);
+
+        $product = Product::query()->create(['name' => 'Goodway GLS-2000', 'title' => 'Goodway GLS-2000']);
+        $media = new MediaItemData(
+            externalId: 5110,
+            fileName: 'photo.jfif',
+            fileUrl: 'https://example.com/photo.jfif',
+            mimeType: 'image/jpeg',
+            fileSize: null,
+            sortOrder: 0,
+            isMain: true,
+        );
+
+        $image = (new ImageDownloader)->download($product, $media);
+
+        self::assertNotNull($image);
+        self::assertSame('image/jpeg', $image->mime_type);
+        self::assertSame("products/{$product->id}/5110_photo.jpg", $image->file_path);
+        self::assertSame($body, Storage::disk('public')->get($image->file_path));
+        self::assertDatabaseHas('product_images', [
+            'product_id' => $product->id,
+            'external_id' => 5110,
+            'mime_type' => 'image/jpeg',
+            'file_path' => $image->file_path,
+        ]);
+    }
+
+    #[DataProvider('genericContentTypes')]
+    public function test_it_rejects_non_image_content_with_generic_headers(?string $contentType): void
+    {
+        Storage::fake('public');
+        Http::fake([
+            'https://example.com/photo.jfif' => Http::response('<html>Error</html>', 200,
+                $contentType === null ? [] : ['Content-Type' => $contentType]),
+        ]);
+
+        $product = Product::query()->create(['name' => 'Goodway GLS-2000', 'title' => 'Goodway GLS-2000']);
+        $media = new MediaItemData(
+            externalId: 5110,
+            fileName: 'photo.jfif',
+            fileUrl: 'https://example.com/photo.jfif',
+            mimeType: 'image/jpeg',
+            fileSize: null,
+            sortOrder: 0,
+            isMain: true,
+        );
+
+        self::assertNull((new ImageDownloader)->download($product, $media));
+        self::assertDatabaseCount('product_images', 0);
+        Storage::disk('public')->assertDirectoryEmpty("products/{$product->id}");
+    }
+
+    public static function genericContentTypes(): array
+    {
+        return [
+            'binary' => ['application/octet-stream'],
+            'binary with parameters' => ['Application/Octet-Stream; charset=binary'],
+            'missing' => [null],
+        ];
+    }
 
     public function test_it_downloads_an_image_and_persists_product_image_row(): void
     {

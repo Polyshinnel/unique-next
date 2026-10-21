@@ -5,7 +5,6 @@ import { PageStructuredData } from '@/components/seo/OrganizationJsonLd';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
 import { InlineFeedbackForm } from '@/components/common/InlineFeedbackForm';
-import { getSiteContacts, type SiteContacts } from '@/lib/site-contacts';
 import {
     Container,
     Image,
@@ -203,7 +202,7 @@ function SummarySection() {
     );
 }
 
-function ContactFormSection({ contacts }: { contacts: SiteContacts }) {
+function ContactFormSection() {
     return (
         <section className="content-section content-section--white">
             <Container size="xl">
@@ -219,7 +218,10 @@ function ContactFormSection({ contacts }: { contacts: SiteContacts }) {
 
                     <InlineFeedbackForm />
                     <Text size="sm" c="dimmed" className="buyout-form-card__hint">
-                        Также можно написать на {contacts.email} или позвонить по номеру {contacts.phone}.
+                        Нажимая кнопку, вы соглашаетесь с нашей{' '}
+                        <Link href="/private-policy" className="feedback-form__link">
+                            Политикой конфиденциальности
+                        </Link>.
                     </Text>
                 </section>
             </Container>
@@ -228,8 +230,6 @@ function ContactFormSection({ contacts }: { contacts: SiteContacts }) {
 }
 
 export default async function WhyWePage() {
-    const contacts = await getSiteContacts();
-
     return (
         <>
             <PageStructuredData seoKey="why_we" path="/why-we" fallbackTitle="Почему мы | ЮНИК С" fallbackDescription="Почему клиенты выбирают ЮНИК С при покупке б/у промышленного оборудования." />
@@ -241,7 +241,7 @@ export default async function WhyWePage() {
                 <SloganSection />
                 <AdvantagesSection />
                 <SummarySection />
-                <ContactFormSection contacts={contacts} />
+                <ContactFormSection />
             </main>
             <Footer />
         </>

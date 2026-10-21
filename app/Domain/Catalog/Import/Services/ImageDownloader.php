@@ -67,6 +67,13 @@ final class ImageDownloader
 
         $contentType = $this->normalizeMimeType($response->header('Content-Type'));
 
+        // Some servers serve JFIF/JPEG files with a generic binary content type.
+        // Accept those only when the downloaded bytes identify a raster image.
+        if ($contentType === null || $contentType === 'application/octet-stream') {
+            $imageInfo = @getimagesizefromstring($response->body());
+            $contentType = $imageInfo === false ? null : ($imageInfo['mime'] ?? null);
+        }
+
         if (! $this->looksLikeImage($contentType)) {
             $this->logWarning($product, $media, 'Catalog image download skipped non-image response.', [
                 'content_type' => $response->header('Content-Type'),
@@ -143,7 +150,7 @@ final class ImageDownloader
             $normalizedBaseName = sha1($media->fileName.'|'.$media->fileUrl);
         }
 
-        if ($extension === '') {
+        if ($extension === '' || in_array($extension, ['jfif', 'jif', 'jfi'], true)) {
             $extension = $this->extensionFromMimeType($contentType)
                 ?? $this->extensionFromMimeType($media->mimeType)
                 ?? 'img';

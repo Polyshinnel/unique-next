@@ -42,7 +42,7 @@ export function CookieConsentBanner() {
     return (
         <div className="cookie-consent-banner" role="dialog" aria-live="polite" aria-label="Уведомление об использовании cookie">
             <Text size="sm" className="cookie-consent-banner__text">
-                Сайт использует cookie-файлы. Пользуясь сайтом, вы принимаете{' '}
+                Сайт использует файлы cookie и сервисы веб-аналитики. Пользуясь сайтом, вы принимаете{' '}
                 <Anchor href="/private-policy" className="cookie-consent-banner__link">
                     Политику конфиденциальности
                 </Anchor>

@@ -1,6 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { FeedbackRequestModal } from '@/components/common/FeedbackRequestModal';
 import { canonicalUrl, getPageSeo, toMetadata } from '@/lib/seo';
+import { phoneHref } from '@/lib/site-content';
+import { getSiteContacts } from '@/lib/site-contacts';
 import { ProductGallery } from '@/components/catalog/ProductGallery';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
@@ -16,7 +19,6 @@ import {
     Title,
 } from '@mantine/core';
 import {
-    IconBrandTelegram,
     IconCertificate,
     IconCheck,
     IconMail,
@@ -62,9 +64,9 @@ const contactItems: ReadonlyArray<{
 ] as const;
 
 const priceRequestHref = 'mailto:konics@mail.ru?subject=%D0%97%D0%B0%D0%BF%D1%80%D0%BE%D1%81%20%D0%B0%D0%BA%D1%82%D1%83%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE%D0%B3%D0%BE%20%D0%BF%D1%80%D0%B0%D0%B9%D1%81%D0%B0';
-const telegramHref = 'https://telegram.me/uniqset_gen';
+export default async function ToolSalesPage() {
+    const contacts = await getSiteContacts();
 
-export default function ToolSalesPage() {
     return (
         <>
             <PageStructuredData service seoKey="tools_sale" path="/services/prodazha-instrumenta" fallbackTitle="Продажа инструмента | ЮНИК С" fallbackDescription="Инструмент от компании Коникс: поставка со склада в Йошкар-Оле, консультации, прайс и отправка по России." />
@@ -86,21 +88,17 @@ export default function ToolSalesPage() {
                                 &nbsp;«Коникс». Компания профессионально занимается инструментом с 1997 года.
                             </Text>
                             <Group gap="md">
-                                <Button component="a" href={priceRequestHref} size="lg" leftSection={<IconMail size={18} />}>
-                                    Запросить актуальный прайс
+                                <Button component="a" href={phoneHref(contacts.phone)} size="lg" leftSection={<IconPhone size={18} />}>
+                                    Позвонить
                                 </Button>
-                                <Button
-                                    component="a"
-                                    href={telegramHref}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    size="lg"
-                                    variant="white"
-                                    color="dark"
-                                    leftSection={<IconBrandTelegram size={18} />}
-                                >
-                                    Написать в Telegram
-                                </Button>
+                                <FeedbackRequestModal
+                                    buttonLabel="Оставить заявку"
+                                    modalTitle="Закажите обратный звонок"
+                                    description="Оставьте контакты, и мы перезвоним вам, чтобы обсудить продажу инструмента."
+                                    buttonVariant="white"
+                                    buttonColor="dark"
+                                    buttonLeftSection={null}
+                                />
                             </Group>
                         </Stack>
                     </Container>
@@ -157,9 +155,6 @@ export default function ToolSalesPage() {
                                         </div>
                                     </div>
 
-                                    <Button component="a" href={priceRequestHref} size="lg">
-                                        Запросить актуальный прайс
-                                    </Button>
                                 </Stack>
                             </section>
 
@@ -182,15 +177,14 @@ export default function ToolSalesPage() {
                                             );
                                         })}
                                     </Stack>
-                                    <Button
-                                        component="a"
-                                        href={priceRequestHref}
-                                        size="lg"
-                                        variant="default"
-                                        leftSection={<IconCheck size={18} />}
-                                    >
-                                        Запросить актуальный прайс
-                                    </Button>
+                                    <FeedbackRequestModal
+                                        buttonLabel="Запросить актуальный прайс"
+                                        modalTitle="Запрос актуального прайса"
+                                        description="Оставьте контакты, и мы отправим вам актуальный прайс на инструмент."
+                                        initialMessage="Прошу отправить актуальный прайс на инструмент."
+                                        buttonVariant="default"
+                                        buttonLeftSection={<IconCheck size={18} />}
+                                    />
                                 </Stack>
                             </section>
                         </div>

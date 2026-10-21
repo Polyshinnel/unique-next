@@ -236,7 +236,7 @@ export default function PrivatePolicyPage() {
                                         <div className="privacy-policy__data-grid">
                                             <div className="privacy-policy__data-row">
                                                 <Text className="privacy-policy__data-label">Цель обработки</Text>
-                                                <Text>информирование Пользователя посредством отправки электронных писем</Text>
+                                                <Text>информирование Пользователя посредством отправки электронных писем и телефонных звонков</Text>
                                             </div>
                                             <div className="privacy-policy__data-row">
                                                 <Text className="privacy-policy__data-label">Персональные данные</Text>
@@ -248,7 +248,7 @@ export default function PrivatePolicyPage() {
                                             </div>
                                             <div className="privacy-policy__data-row">
                                                 <Text className="privacy-policy__data-label">Правовые основания</Text>
-                                                <Text>уставные (учредительные) документы Оператора</Text>
+                                                <Text>Согласие Пользователя на обработку его персональных данных</Text>
                                             </div>
                                             <div className="privacy-policy__data-row">
                                                 <Text className="privacy-policy__data-label">Виды обработки персональных данных</Text>
@@ -286,6 +286,9 @@ export default function PrivatePolicyPage() {
                                                     <Text><b>{`8.${index + 1}.`}</b> {item}</Text>
                                                 </div>
                                             ))}
+                                            <div>
+                                                <Text><b>8.11.</b> На веб-сайте Оператора используется сторонний сервис веб-аналитики «Яндекс.Метрика» (ООО «ЯНДЕКС», ОГРН 1027739178167, 119021, Россия, г. Москва, ул. Льва Толстого, д. 16), который собирает и обрабатывает обезличенные данные пользователей (в т.ч. файлы cookie, IP-адрес, сведения о браузере, операционной системе, типе устройства и действиях на сайте). Целью обработки является анализ посещаемости, улучшение работы веб-сайта и оптимизация его функционала. Настоящим Пользователь соглашается с тем, что Оператор вправе поручить обработку этих данных ООО «ЯНДЕКС». Пользователь может самостоятельно ограничить сбор файлов cookie через настройки своего интернет-браузера.</Text>
+                                            </div>
                                         </div>
                                     </Stack>
                                 </section>
@@ -348,6 +351,16 @@ export default function PrivatePolicyPage() {
                                             </Anchor>
                                             .
                                         </Text>
+                                    </Stack>
+                                </section>
+
+                                <section className="privacy-policy__section">
+                                    <Stack gap="md">
+                                        <Title order={2}>13. Реквизиты Оператора</Title>
+                                        <Text>Наименование: ООО «Юник С»</Text>
+                                        <Text>ИНН: 4027139409 / ОГРН: 1194027002861</Text>
+                                        <Text>Адрес: 248002, Калужская обл., г. Калуга, ул. Никитина, д. 41, стр. 1</Text>
+                                        <Text>Email: <Anchor href="mailto:info@uniqset.com">info@uniqset.com</Anchor></Text>
                                     </Stack>
                                 </section>
                             </Stack>

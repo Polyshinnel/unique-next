@@ -143,7 +143,7 @@ function IntroSection() {
     );
 }
 
-function OfferSection({ contacts }: { contacts: SiteContacts }) {
+function OfferSection() {
     return (
         <section className="content-section import-offer-section">
             <Container size="xl">
@@ -171,9 +171,7 @@ function OfferSection({ contacts }: { contacts: SiteContacts }) {
                     </div>
 
                     <aside id="import-form" className="buyout-form-card import-form-card">
-                        <EquipmentImportRequestForm
-                            hint={`Также можно написать на ${contacts.email} или позвонить по номеру ${contacts.phone}.`}
-                        />
+                        <EquipmentImportRequestForm />
                     </aside>
                 </div>
             </Container>
@@ -270,7 +268,7 @@ export default async function EquipmentImportPage() {
             <main>
                 <HeroSection contacts={contacts} />
                 <IntroSection />
-                <OfferSection contacts={contacts} />
+                <OfferSection />
                 <GallerySection />
                 <AdvantagesSection contacts={contacts} />
             </main>

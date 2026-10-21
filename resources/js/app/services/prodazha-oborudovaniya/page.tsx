@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { SocialProofSection } from '@/components/common/SocialProofSection';
 import { SocialChannelsSection } from '@/components/common/SocialChannelsSection';
 import { FeedbackRequestModal } from '@/components/common/FeedbackRequestModal';
+import { Pagination } from '@/components/common/Pagination';
 import { canonicalUrl, getPageSeo, toMetadata } from '@/lib/seo';
 import { phoneHref } from '@/lib/site-content';
 import { getSiteContacts, type SiteContacts } from '@/lib/site-contacts';
@@ -24,6 +25,10 @@ import {
 } from '@mantine/core';
 import {
     IconArrowRight,
+    IconChevronLeft,
+    IconChevronRight,
+    IconChevronsLeft,
+    IconChevronsRight,
     IconExternalLink,
     IconMessageCircle,
     IconPhotoScan,
@@ -127,7 +132,7 @@ function HeroSection({ contacts }: { contacts: SiteContacts }) {
     );
 }
 
-function LatestProductsSection({ products }: { products: CatalogProductCard[] }) {
+function LatestProductsSection({ products, totalPages }: { products: CatalogProductCard[]; totalPages: number }) {
     if (products.length === 0) {
         return null;
     }
@@ -152,6 +157,17 @@ function LatestProductsSection({ products }: { products: CatalogProductCard[] })
                 <div className="latest-products-section__mobile-slider">
                     <MobileProductSlider products={products.slice(0, 8)} />
                 </div>
+                <Pagination
+                    currentPage={1}
+                    totalPages={totalPages}
+                    getPageHref={() => catalogHref}
+                    ariaLabel="Пагинация каталога"
+                    className="catalog-pagination"
+                    firstControl={<IconChevronsLeft size={18} />}
+                    previousControl={<IconChevronLeft size={18} />}
+                    nextControl={<IconChevronRight size={18} />}
+                    lastControl={<IconChevronsRight size={18} />}
+                />
             </Container>
         </section>
     );
@@ -295,7 +311,7 @@ export default async function ProductSaleServicePage() {
             <Header />
             <main className="sales-page">
                 <HeroSection contacts={contacts} />
-                <LatestProductsSection products={catalogPage.products} />
+                <LatestProductsSection products={catalogPage.products} totalPages={catalogPage.pagination.totalPages} />
                 <SocialChannelsSection />
                 <AdvantagesSection />
                 <SloganSection />
